@@ -1,0 +1,94 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Contact {
+  id        String   @id @default(cuid())
+  name      String
+  email     String
+  message   String   @db.Text
+  status    String   @default("pending") // pending, reviewing, completed
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("contacts")
+}
+
+model Quote {
+  id             String   @id @default(cuid())
+  name           String
+  email          String
+  serviceType    String   // showcase, ecommerce, automation, ai
+  options        String[] // design, maintenance, support
+  message        String?  @db.Text
+  estimatedPrice Int
+  status         String   @default("pending") // pending, reviewing, completed
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  @@map("quotes")
+}
+
+model Booking {
+  id           String   @id @default(cuid())
+  name         String
+  email        String
+  phone        String?
+  message      String?  @db.Text
+  selectedSlot String   // ISO date string
+  status       String   @default("confirmed") // pending, confirmed, completed, cancelled
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@map("bookings")
+}
+
+model Admin {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  password  String
+  role      String   @default("admin")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("admins")
+}
+
+model Client {
+  id           String   @id @default(cuid())
+  name         String
+  email        String   @unique
+  passwordHash String
+  isValidated  Boolean  @default(false)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  // Relations
+  wizardResponses WizardResponse[]
+
+  @@map("clients")
+}
+
+model WizardResponse {
+  id        String   @id @default(cuid())
+  clientId  String
+  step      Int
+  data      Json
+  isDraft   Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  client Client @relation(fields: [clientId], references: [id], onDelete: Cascade)
+
+  @@unique([clientId, step])
+  @@map("wizard_responses")
+}

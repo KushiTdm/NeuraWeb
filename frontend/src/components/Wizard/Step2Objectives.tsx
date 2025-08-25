@@ -1,5 +1,7 @@
+// frontend/src/components/Wizard/Step2Objectives.tsx
 import React from 'react';
 import { useForm } from 'react-hook-form';
+import { useLanguage } from '../../context/LanguageContext';
 
 interface Step2Data {
   primaryGoals: string[];
@@ -24,6 +26,7 @@ const Step2Objectives: React.FC<Step2Props> = ({
   isSaving,
   isSubmitted,
 }) => {
+  const { t } = useLanguage();
   const { register, handleSubmit, formState: { errors }, watch } = useForm<Step2Data>({
     defaultValues: data,
   });
@@ -41,35 +44,35 @@ const Step2Objectives: React.FC<Step2Props> = ({
   }, [watchedData, onSaveDraft, isSubmitted]);
 
   const goalOptions = [
-    'Increase brand awareness',
-    'Generate leads',
-    'Boost online sales',
-    'Improve customer engagement',
-    'Streamline business processes',
-    'Enhance user experience',
-    'Expand market reach',
-    'Reduce operational costs',
-    'Improve data collection',
-    'Automate workflows',
+    { key: 'brand', label: t('wizard.step2.goals.brand') },
+    { key: 'leads', label: t('wizard.step2.goals.leads') },
+    { key: 'sales', label: t('wizard.step2.goals.sales') },
+    { key: 'engagement', label: t('wizard.step2.goals.engagement') },
+    { key: 'processes', label: t('wizard.step2.goals.processes') },
+    { key: 'ux', label: t('wizard.step2.goals.ux') },
+    { key: 'reach', label: t('wizard.step2.goals.reach') },
+    { key: 'costs', label: t('wizard.step2.goals.costs') },
+    { key: 'data', label: t('wizard.step2.goals.data') },
+    { key: 'workflows', label: t('wizard.step2.goals.workflows') },
   ];
 
   return (
     <form onSubmit={handleSubmit(onNext)} className="space-y-6">
       <div>
         <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-4">
-          Primary Goals * (Select all that apply)
+          {t('wizard.step2.primary.goals')} * ({t('wizard.step2.primary.goals.select')})
         </label>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
           {goalOptions.map((goal) => (
-            <label key={goal} className="flex items-center space-x-3 cursor-pointer">
+            <label key={goal.key} className="flex items-center space-x-3 cursor-pointer">
               <input
                 type="checkbox"
-                value={goal}
-                {...register('primaryGoals', { required: 'Please select at least one goal' })}
+                value={goal.label}
+                {...register('primaryGoals', { required: t('wizard.step2.error.goals') })}
                 className="form-checkbox h-5 w-5 text-primary-600 rounded focus:ring-primary-500 border-gray-300"
                 disabled={isSubmitted}
               />
-              <span className="text-gray-700 dark:text-gray-300">{goal}</span>
+              <span className="text-gray-700 dark:text-gray-300">{goal.label}</span>
             </label>
           ))}
         </div>
@@ -80,14 +83,14 @@ const Step2Objectives: React.FC<Step2Props> = ({
 
       <div>
         <label htmlFor="successMetrics" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-          Success Metrics *
+          {t('wizard.step2.success.metrics')} *
         </label>
         <textarea
           id="successMetrics"
           rows={3}
-          {...register('successMetrics', { required: 'Success metrics are required' })}
+          {...register('successMetrics', { required: t('wizard.step2.error.success.metrics') })}
           className="input-field"
-          placeholder="How will you measure the success of this project? (e.g., increased traffic, conversion rates, user engagement, etc.)"
+          placeholder={t('wizard.step2.success.metrics.placeholder')}
           disabled={isSubmitted}
         />
         {errors.successMetrics && (
@@ -97,14 +100,14 @@ const Step2Objectives: React.FC<Step2Props> = ({
 
       <div>
         <label htmlFor="currentChallenges" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-          Current Challenges *
+          {t('wizard.step2.challenges')} *
         </label>
         <textarea
           id="currentChallenges"
           rows={3}
-          {...register('currentChallenges', { required: 'Current challenges are required' })}
+          {...register('currentChallenges', { required: t('wizard.step2.error.challenges') })}
           className="input-field"
-          placeholder="What challenges are you currently facing that this project should address?"
+          placeholder={t('wizard.step2.challenges.placeholder')}
           disabled={isSubmitted}
         />
         {errors.currentChallenges && (
@@ -114,28 +117,28 @@ const Step2Objectives: React.FC<Step2Props> = ({
 
       <div>
         <label htmlFor="competitorAnalysis" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-          Competitor Analysis
+          {t('wizard.step2.competitors')}
         </label>
         <textarea
           id="competitorAnalysis"
           rows={3}
           {...register('competitorAnalysis')}
           className="input-field"
-          placeholder="Who are your main competitors? What do you like/dislike about their websites or solutions?"
+          placeholder={t('wizard.step2.competitors.placeholder')}
           disabled={isSubmitted}
         />
       </div>
 
       <div>
         <label htmlFor="uniqueValue" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-          Unique Value Proposition *
+          {t('wizard.step2.unique.value')} *
         </label>
         <textarea
           id="uniqueValue"
           rows={3}
-          {...register('uniqueValue', { required: 'Unique value proposition is required' })}
+          {...register('uniqueValue', { required: t('wizard.step2.error.unique.value') })}
           className="input-field"
-          placeholder="What makes your business/project unique? What value do you provide that others don't?"
+          placeholder={t('wizard.step2.unique.value.placeholder')}
           disabled={isSubmitted}
         />
         {errors.uniqueValue && (
@@ -146,7 +149,7 @@ const Step2Objectives: React.FC<Step2Props> = ({
       {isSaving && (
         <div className="text-sm text-gray-500 dark:text-gray-400 flex items-center space-x-2">
           <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-gray-400" />
-          <span>Auto-saving...</span>
+          <span>{t('wizard.step1.autosaving')}</span>
         </div>
       )}
     </form>

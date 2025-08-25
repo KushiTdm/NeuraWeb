@@ -1,5 +1,7 @@
+// frontend/src/components/Wizard/Step9Other.tsx
 import React from 'react';
 import { useForm } from 'react-hook-form';
+import { useLanguage } from '../../context/LanguageContext';
 
 interface Step9Data {
   additionalRequirements: string;
@@ -28,6 +30,7 @@ const Step9Other: React.FC<Step9Props> = ({
   isSubmitting,
   isSubmitted,
 }) => {
+  const { t } = useLanguage();
   const { register, handleSubmit, watch } = useForm<Step9Data>({
     defaultValues: data,
   });
@@ -48,49 +51,49 @@ const Step9Other: React.FC<Step9Props> = ({
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
       <div>
         <label htmlFor="additionalRequirements" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-          Additional Requirements
+          {t('wizard.step9.additional.requirements')}
         </label>
         <textarea
           id="additionalRequirements"
           rows={4}
           {...register('additionalRequirements')}
           className="input-field"
-          placeholder="Any additional requirements, features, or specifications that weren't covered in the previous steps?"
+          placeholder={t('wizard.step9.additional.requirements.placeholder')}
           disabled={isSubmitted}
         />
       </div>
 
       <div>
         <label htmlFor="concerns" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-          Concerns or Challenges
+          {t('wizard.step9.concerns')}
         </label>
         <textarea
           id="concerns"
           rows={3}
           {...register('concerns')}
           className="input-field"
-          placeholder="Do you have any concerns about the project? Past experiences with web development? Specific challenges you're worried about?"
+          placeholder={t('wizard.step9.concerns.placeholder')}
           disabled={isSubmitted}
         />
       </div>
 
       <div>
         <label htmlFor="questions" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-          Questions for Us
+          {t('wizard.step9.questions')}
         </label>
         <textarea
           id="questions"
           rows={3}
           {...register('questions')}
           className="input-field"
-          placeholder="What questions do you have for us? About our process, timeline, pricing, or anything else?"
+          placeholder={t('wizard.step9.questions.placeholder')}
           disabled={isSubmitted}
         />
       </div>
 
       <div>
         <label htmlFor="communicationPreference" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-          Communication Preference
+          {t('wizard.step9.communication.preference')}
         </label>
         <select
           id="communicationPreference"
@@ -98,40 +101,40 @@ const Step9Other: React.FC<Step9Props> = ({
           className="input-field"
           disabled={isSubmitted}
         >
-          <option value="">Select communication preference</option>
-          <option value="email">Email</option>
-          <option value="phone">Phone calls</option>
-          <option value="video">Video calls</option>
-          <option value="slack">Slack/Teams</option>
-          <option value="project-management">Project management tool</option>
-          <option value="mixed">Mixed approach</option>
+          <option value="">{t('wizard.step9.communication.preference.placeholder')}</option>
+          <option value="email">{t('wizard.step9.communication.email')}</option>
+          <option value="phone">{t('wizard.step9.communication.phone')}</option>
+          <option value="video">{t('wizard.step9.communication.video')}</option>
+          <option value="slack">{t('wizard.step9.communication.slack')}</option>
+          <option value="project-management">{t('wizard.step9.communication.project')}</option>
+          <option value="mixed">{t('wizard.step9.communication.mixed')}</option>
         </select>
       </div>
 
       <div>
         <label htmlFor="decisionMakers" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-          Decision Makers
+          {t('wizard.step9.decision.makers')}
         </label>
         <textarea
           id="decisionMakers"
           rows={2}
           {...register('decisionMakers')}
           className="input-field"
-          placeholder="Who will be involved in making decisions about this project? Should we include anyone else in communications?"
+          placeholder={t('wizard.step9.decision.makers.placeholder')}
           disabled={isSubmitted}
         />
       </div>
 
       <div>
         <label htmlFor="additionalInfo" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-          Anything Else?
+          {t('wizard.step9.additional.info')}
         </label>
         <textarea
           id="additionalInfo"
           rows={4}
           {...register('additionalInfo')}
           className="input-field"
-          placeholder="Is there anything else you'd like us to know about your project, your business, or your expectations?"
+          placeholder={t('wizard.step9.additional.info.placeholder')}
           disabled={isSubmitted}
         />
       </div>
@@ -139,16 +142,16 @@ const Step9Other: React.FC<Step9Props> = ({
       {!isSubmitted && (
         <div className="bg-primary-50 dark:bg-primary-900/20 border border-primary-200 dark:border-primary-800 rounded-lg p-6">
           <h3 className="text-lg font-semibold text-primary-800 dark:text-primary-200 mb-3">
-            Ready to Submit Your Project Brief?
+            {t('wizard.step9.ready.title')}
           </h3>
           <p className="text-primary-700 dark:text-primary-300 mb-4">
-            Once you submit this project brief, our team will review your requirements and get back to you within 24-48 hours with:
+            {t('wizard.step9.ready.description')}
           </p>
           <ul className="list-disc list-inside text-primary-700 dark:text-primary-300 space-y-1">
-            <li>A detailed project proposal</li>
-            <li>Accurate timeline and pricing</li>
-            <li>Next steps for moving forward</li>
-            <li>Answers to any questions you've asked</li>
+            <li>{t('wizard.step9.ready.proposal')}</li>
+            <li>{t('wizard.step9.ready.pricing')}</li>
+            <li>{t('wizard.step9.ready.nextsteps')}</li>
+            <li>{t('wizard.step9.ready.answers')}</li>
           </ul>
         </div>
       )}
@@ -156,7 +159,7 @@ const Step9Other: React.FC<Step9Props> = ({
       {isSaving && (
         <div className="text-sm text-gray-500 dark:text-gray-400 flex items-center space-x-2">
           <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-gray-400" />
-          <span>Auto-saving...</span>
+          <span>{t('common.auto.saving')}</span>
         </div>
       )}
     </form>

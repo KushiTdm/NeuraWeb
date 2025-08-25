@@ -1,5 +1,7 @@
+// frontend/src/components/Wizard/Step7Evolution.tsx
 import React from 'react';
 import { useForm } from 'react-hook-form';
+import { useLanguage } from '../../context/LanguageContext';
 
 interface Step7Data {
   futureFeatures: string[];
@@ -25,6 +27,7 @@ const Step7Evolution: React.FC<Step7Props> = ({
   isSaving,
   isSubmitted,
 }) => {
+  const { t } = useLanguage();
   const { register, handleSubmit, formState: { errors }, watch } = useForm<Step7Data>({
     defaultValues: data,
   });
@@ -42,40 +45,40 @@ const Step7Evolution: React.FC<Step7Props> = ({
   }, [watchedData, onSaveDraft, isSubmitted]);
 
   const futureFeatureOptions = [
-    'Advanced analytics and reporting',
-    'AI-powered features',
-    'Mobile app development',
-    'Advanced e-commerce features',
-    'Multi-language expansion',
-    'API integrations',
-    'Advanced user management',
-    'Automation workflows',
-    'Advanced SEO features',
-    'Social media integration',
-    'Advanced security features',
-    'Performance optimization',
-    'Custom integrations',
-    'Advanced content management',
-    'Marketing automation',
+    { key: 'wizard.step7.features.analytics', value: 'Advanced analytics and reporting' },
+    { key: 'wizard.step7.features.ai', value: 'AI-powered features' },
+    { key: 'wizard.step7.features.mobile', value: 'Mobile app development' },
+    { key: 'wizard.step7.features.ecommerce', value: 'Advanced e-commerce features' },
+    { key: 'wizard.step7.features.multilang', value: 'Multi-language expansion' },
+    { key: 'wizard.step7.features.api', value: 'API integrations' },
+    { key: 'wizard.step7.features.users', value: 'Advanced user management' },
+    { key: 'wizard.step7.features.automation', value: 'Automation workflows' },
+    { key: 'wizard.step7.features.seo', value: 'Advanced SEO features' },
+    { key: 'wizard.step7.features.social', value: 'Social media integration' },
+    { key: 'wizard.step7.features.security', value: 'Advanced security features' },
+    { key: 'wizard.step7.features.performance', value: 'Performance optimization' },
+    { key: 'wizard.step7.features.integrations', value: 'Custom integrations' },
+    { key: 'wizard.step7.features.cms', value: 'Advanced content management' },
+    { key: 'wizard.step7.features.marketing', value: 'Marketing automation' },
   ];
 
   return (
     <form onSubmit={handleSubmit(onNext)} className="space-y-6">
       <div>
         <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-4">
-          Future Features (Select features you might want to add later)
+          {t('wizard.step7.future.features')}
         </label>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
           {futureFeatureOptions.map((feature) => (
-            <label key={feature} className="flex items-center space-x-3 cursor-pointer">
+            <label key={feature.value} className="flex items-center space-x-3 cursor-pointer">
               <input
                 type="checkbox"
-                value={feature}
+                value={feature.value}
                 {...register('futureFeatures')}
                 className="form-checkbox h-5 w-5 text-primary-600 rounded focus:ring-primary-500 border-gray-300"
                 disabled={isSubmitted}
               />
-              <span className="text-gray-700 dark:text-gray-300">{feature}</span>
+              <span className="text-gray-700 dark:text-gray-300">{t(feature.key)}</span>
             </label>
           ))}
         </div>
@@ -83,21 +86,21 @@ const Step7Evolution: React.FC<Step7Props> = ({
 
       <div>
         <label htmlFor="scalabilityNeeds" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-          Scalability Requirements *
+          {t('wizard.step7.scalability.needs')} *
         </label>
         <select
           id="scalabilityNeeds"
-          {...register('scalabilityNeeds', { required: 'Scalability needs are required' })}
+          {...register('scalabilityNeeds', { required: t('wizard.step7.error.scalability.needs') })}
           className="input-field"
           disabled={isSubmitted}
         >
-          <option value="">Select scalability needs</option>
-          <option value="minimal">Minimal growth expected</option>
-          <option value="moderate">Moderate growth expected</option>
-          <option value="high">High growth expected</option>
-          <option value="enterprise">Enterprise-level scalability needed</option>
-          <option value="global">Global expansion planned</option>
-          <option value="unsure">Unsure about future growth</option>
+          <option value="">{t('wizard.step7.scalability.needs.placeholder')}</option>
+          <option value="minimal">{t('wizard.step7.scalability.minimal')}</option>
+          <option value="moderate">{t('wizard.step7.scalability.moderate')}</option>
+          <option value="high">{t('wizard.step7.scalability.high')}</option>
+          <option value="enterprise">{t('wizard.step7.scalability.enterprise')}</option>
+          <option value="global">{t('wizard.step7.scalability.global')}</option>
+          <option value="unsure">{t('wizard.step7.scalability.unsure')}</option>
         </select>
         {errors.scalabilityNeeds && (
           <p className="mt-1 text-sm text-error-600">{errors.scalabilityNeeds.message}</p>
@@ -106,21 +109,21 @@ const Step7Evolution: React.FC<Step7Props> = ({
 
       <div>
         <label htmlFor="maintenancePreference" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-          Maintenance Preference *
+          {t('wizard.step7.maintenance.preference')} *
         </label>
         <select
           id="maintenancePreference"
-          {...register('maintenancePreference', { required: 'Maintenance preference is required' })}
+          {...register('maintenancePreference', { required: t('wizard.step7.error.maintenance.preference') })}
           className="input-field"
           disabled={isSubmitted}
         >
-          <option value="">Select maintenance approach</option>
-          <option value="full-service">Full-service maintenance (we handle everything)</option>
-          <option value="partial">Partial maintenance (we handle technical, you handle content)</option>
-          <option value="training">Training-based (we train your team)</option>
-          <option value="self-managed">Self-managed (minimal ongoing support)</option>
-          <option value="as-needed">As-needed support (pay per request)</option>
-          <option value="custom">Custom maintenance plan</option>
+          <option value="">{t('wizard.step7.maintenance.preference.placeholder')}</option>
+          <option value="full-service">{t('wizard.step7.maintenance.full')}</option>
+          <option value="partial">{t('wizard.step7.maintenance.partial')}</option>
+          <option value="training">{t('wizard.step7.maintenance.training')}</option>
+          <option value="self-managed">{t('wizard.step7.maintenance.self')}</option>
+          <option value="as-needed">{t('wizard.step7.maintenance.asneeded')}</option>
+          <option value="custom">{t('wizard.step7.maintenance.custom')}</option>
         </select>
         {errors.maintenancePreference && (
           <p className="mt-1 text-sm text-error-600">{errors.maintenancePreference.message}</p>
@@ -129,22 +132,22 @@ const Step7Evolution: React.FC<Step7Props> = ({
 
       <div>
         <label htmlFor="updateFrequency" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-          Expected Update Frequency *
+          {t('wizard.step7.update.frequency')} *
         </label>
         <select
           id="updateFrequency"
-          {...register('updateFrequency', { required: 'Update frequency is required' })}
+          {...register('updateFrequency', { required: t('wizard.step7.error.update.frequency') })}
           className="input-field"
           disabled={isSubmitted}
         >
-          <option value="">Select update frequency</option>
-          <option value="daily">Daily updates</option>
-          <option value="weekly">Weekly updates</option>
-          <option value="monthly">Monthly updates</option>
-          <option value="quarterly">Quarterly updates</option>
-          <option value="rarely">Rarely (static content)</option>
-          <option value="seasonal">Seasonal updates</option>
-          <option value="as-needed">As needed</option>
+          <option value="">{t('wizard.step7.update.frequency.placeholder')}</option>
+          <option value="daily">{t('wizard.step7.update.daily')}</option>
+          <option value="weekly">{t('wizard.step7.update.weekly')}</option>
+          <option value="monthly">{t('wizard.step7.update.monthly')}</option>
+          <option value="quarterly">{t('wizard.step7.update.quarterly')}</option>
+          <option value="rarely">{t('wizard.step7.update.rarely')}</option>
+          <option value="seasonal">{t('wizard.step7.update.seasonal')}</option>
+          <option value="as-needed">{t('wizard.step7.update.asneeded')}</option>
         </select>
         {errors.updateFrequency && (
           <p className="mt-1 text-sm text-error-600">{errors.updateFrequency.message}</p>
@@ -153,7 +156,7 @@ const Step7Evolution: React.FC<Step7Props> = ({
 
       <div>
         <label htmlFor="trainingNeeds" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-          Training Requirements
+          {t('wizard.step7.training.needs')}
         </label>
         <select
           id="trainingNeeds"
@@ -161,27 +164,27 @@ const Step7Evolution: React.FC<Step7Props> = ({
           className="input-field"
           disabled={isSubmitted}
         >
-          <option value="">Select training needs</option>
-          <option value="none">No training needed</option>
-          <option value="basic">Basic training (content updates)</option>
-          <option value="comprehensive">Comprehensive training (all features)</option>
-          <option value="ongoing">Ongoing training and support</option>
-          <option value="documentation">Documentation only</option>
-          <option value="video-tutorials">Video tutorials</option>
-          <option value="live-sessions">Live training sessions</option>
+          <option value="">{t('wizard.step7.training.needs.placeholder')}</option>
+          <option value="none">{t('wizard.step7.training.none')}</option>
+          <option value="basic">{t('wizard.step7.training.basic')}</option>
+          <option value="comprehensive">{t('wizard.step7.training.comprehensive')}</option>
+          <option value="ongoing">{t('wizard.step7.training.ongoing')}</option>
+          <option value="documentation">{t('wizard.step7.training.documentation')}</option>
+          <option value="video-tutorials">{t('wizard.step7.training.video')}</option>
+          <option value="live-sessions">{t('wizard.step7.training.live')}</option>
         </select>
       </div>
 
       <div>
         <label htmlFor="longTermVision" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-          Long-term Vision
+          {t('wizard.step7.longterm.vision')}
         </label>
         <textarea
           id="longTermVision"
           rows={4}
           {...register('longTermVision')}
           className="input-field"
-          placeholder="Describe your long-term vision for this project. Where do you see it in 2-3 years? What are your growth plans?"
+          placeholder={t('wizard.step7.longterm.vision.placeholder')}
           disabled={isSubmitted}
         />
       </div>
@@ -189,7 +192,7 @@ const Step7Evolution: React.FC<Step7Props> = ({
       {isSaving && (
         <div className="text-sm text-gray-500 dark:text-gray-400 flex items-center space-x-2">
           <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-gray-400" />
-          <span>Auto-saving...</span>
+          <span>{t('common.auto.saving')}</span>
         </div>
       )}
     </form>

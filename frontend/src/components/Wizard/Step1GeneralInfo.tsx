@@ -1,5 +1,7 @@
+// frontend/src/components/Wizard/Step1GeneralInfo.tsx
 import React from 'react';
 import { useForm } from 'react-hook-form';
+import { useLanguage } from '../../context/LanguageContext';
 
 interface Step1Data {
   projectName: string;
@@ -26,6 +28,7 @@ const Step1GeneralInfo: React.FC<Step1Props> = ({
   isSaving,
   isSubmitted,
 }) => {
+  const { t } = useLanguage();
   const { register, handleSubmit, formState: { errors }, watch } = useForm<Step1Data>({
     defaultValues: data,
   });
@@ -47,14 +50,14 @@ const Step1GeneralInfo: React.FC<Step1Props> = ({
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div>
           <label htmlFor="projectName" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-            Project Name *
+            {t('wizard.step1.project.name')} *
           </label>
           <input
             type="text"
             id="projectName"
-            {...register('projectName', { required: 'Project name is required' })}
+            {...register('projectName', { required: t('wizard.step1.error.project.name') })}
             className="input-field"
-            placeholder="My Awesome Website"
+            placeholder={t('wizard.step1.project.name.placeholder')}
             disabled={isSubmitted}
           />
           {errors.projectName && (
@@ -64,14 +67,14 @@ const Step1GeneralInfo: React.FC<Step1Props> = ({
 
         <div>
           <label htmlFor="companyName" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-            Company/Organization Name *
+            {t('wizard.step1.company.name')} *
           </label>
           <input
             type="text"
             id="companyName"
-            {...register('companyName', { required: 'Company name is required' })}
+            {...register('companyName', { required: t('wizard.step1.error.company.name') })}
             className="input-field"
-            placeholder="Acme Corporation"
+            placeholder={t('wizard.step1.company.name.placeholder')}
             disabled={isSubmitted}
           />
           {errors.companyName && (
@@ -83,26 +86,26 @@ const Step1GeneralInfo: React.FC<Step1Props> = ({
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div>
           <label htmlFor="industry" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-            Industry/Sector *
+            {t('wizard.step1.industry')} *
           </label>
           <select
             id="industry"
-            {...register('industry', { required: 'Industry is required' })}
+            {...register('industry', { required: t('wizard.step1.error.industry') })}
             className="input-field"
             disabled={isSubmitted}
           >
-            <option value="">Select an industry</option>
-            <option value="technology">Technology</option>
-            <option value="healthcare">Healthcare</option>
-            <option value="finance">Finance</option>
-            <option value="education">Education</option>
-            <option value="retail">Retail/E-commerce</option>
-            <option value="manufacturing">Manufacturing</option>
-            <option value="consulting">Consulting</option>
-            <option value="nonprofit">Non-profit</option>
-            <option value="hospitality">Hospitality</option>
-            <option value="real-estate">Real Estate</option>
-            <option value="other">Other</option>
+            <option value="">{t('wizard.step1.industry.placeholder')}</option>
+            <option value="technology">{t('wizard.step1.industry.technology')}</option>
+            <option value="healthcare">{t('wizard.step1.industry.healthcare')}</option>
+            <option value="finance">{t('wizard.step1.industry.finance')}</option>
+            <option value="education">{t('wizard.step1.industry.education')}</option>
+            <option value="retail">{t('wizard.step1.industry.retail')}</option>
+            <option value="manufacturing">{t('wizard.step1.industry.manufacturing')}</option>
+            <option value="consulting">{t('wizard.step1.industry.consulting')}</option>
+            <option value="nonprofit">{t('wizard.step1.industry.nonprofit')}</option>
+            <option value="hospitality">{t('wizard.step1.industry.hospitality')}</option>
+            <option value="real-estate">{t('wizard.step1.industry.realestate')}</option>
+            <option value="other">{t('wizard.step1.industry.other')}</option>
           </select>
           {errors.industry && (
             <p className="mt-1 text-sm text-error-600">{errors.industry.message}</p>
@@ -111,23 +114,23 @@ const Step1GeneralInfo: React.FC<Step1Props> = ({
 
         <div>
           <label htmlFor="projectType" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-            Project Type *
+            {t('wizard.step1.project.type')} *
           </label>
           <select
             id="projectType"
-            {...register('projectType', { required: 'Project type is required' })}
+            {...register('projectType', { required: t('wizard.step1.error.project.type') })}
             className="input-field"
             disabled={isSubmitted}
           >
-            <option value="">Select project type</option>
-            <option value="new-website">New Website</option>
-            <option value="website-redesign">Website Redesign</option>
-            <option value="web-application">Web Application</option>
-            <option value="e-commerce">E-commerce Platform</option>
-            <option value="mobile-app">Mobile Application</option>
-            <option value="automation">Process Automation</option>
-            <option value="ai-integration">AI Integration</option>
-            <option value="other">Other</option>
+            <option value="">{t('wizard.step1.project.type.placeholder')}</option>
+            <option value="new-website">{t('wizard.step1.project.type.new')}</option>
+            <option value="website-redesign">{t('wizard.step1.project.type.redesign')}</option>
+            <option value="web-application">{t('wizard.step1.project.type.webapp')}</option>
+            <option value="e-commerce">{t('wizard.step1.project.type.ecommerce')}</option>
+            <option value="mobile-app">{t('wizard.step1.project.type.mobile')}</option>
+            <option value="automation">{t('wizard.step1.project.type.automation')}</option>
+            <option value="ai-integration">{t('wizard.step1.project.type.ai')}</option>
+            <option value="other">{t('wizard.step1.project.type.other')}</option>
           </select>
           {errors.projectType && (
             <p className="mt-1 text-sm text-error-600">{errors.projectType.message}</p>
@@ -137,14 +140,14 @@ const Step1GeneralInfo: React.FC<Step1Props> = ({
 
       <div>
         <label htmlFor="description" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-          Project Description *
+          {t('wizard.step1.description')} *
         </label>
         <textarea
           id="description"
           rows={4}
-          {...register('description', { required: 'Project description is required' })}
+          {...register('description', { required: t('wizard.step1.error.description') })}
           className="input-field"
-          placeholder="Provide a brief overview of your project, what you want to achieve, and any specific requirements..."
+          placeholder={t('wizard.step1.description.placeholder')}
           disabled={isSubmitted}
         />
         {errors.description && (
@@ -154,14 +157,14 @@ const Step1GeneralInfo: React.FC<Step1Props> = ({
 
       <div>
         <label htmlFor="targetAudience" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-          Target Audience *
+          {t('wizard.step1.target.audience')} *
         </label>
         <textarea
           id="targetAudience"
           rows={3}
-          {...register('targetAudience', { required: 'Target audience is required' })}
+          {...register('targetAudience', { required: t('wizard.step1.error.target.audience') })}
           className="input-field"
-          placeholder="Describe your target audience: demographics, interests, technical proficiency, etc."
+          placeholder={t('wizard.step1.target.audience.placeholder')}
           disabled={isSubmitted}
         />
         {errors.targetAudience && (
@@ -172,7 +175,7 @@ const Step1GeneralInfo: React.FC<Step1Props> = ({
       {isSaving && (
         <div className="text-sm text-gray-500 dark:text-gray-400 flex items-center space-x-2">
           <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-gray-400" />
-          <span>Auto-saving...</span>
+          <span>{t('wizard.step1.autosaving')}</span>
         </div>
       )}
     </form>

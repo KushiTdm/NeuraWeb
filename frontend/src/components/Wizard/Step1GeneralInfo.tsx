@@ -29,7 +29,7 @@ const Step1GeneralInfo: React.FC<Step1Props> = ({
   isSubmitted,
 }) => {
   const { t } = useLanguage();
-  const { register, handleSubmit, formState: { errors }, watch } = useForm<Step1Data>({
+  const { register, handleSubmit, formState: { errors }, watch, getValues } = useForm<Step1Data>({
     defaultValues: data,
   });
 
@@ -38,15 +38,29 @@ const Step1GeneralInfo: React.FC<Step1Props> = ({
   React.useEffect(() => {
     const interval = setInterval(() => {
       if (!isSubmitted) {
-        onSaveDraft(watchedData);
+        onSaveDraft(getValues());
       }
     }, 30000); // Auto-save every 30 seconds
 
     return () => clearInterval(interval);
-  }, [watchedData, onSaveDraft, isSubmitted]);
+  }, [getValues, onSaveDraft, isSubmitted]);
+
+  // Expose form data to parent component
+  React.useEffect(() => {
+    // This ensures parent component always has access to current form data
+    const currentData = getValues();
+    if (JSON.stringify(currentData) !== JSON.stringify(data)) {
+      // Only update if data has changed to avoid unnecessary re-renders
+      onSaveDraft(currentData);
+    }
+  }, [watchedData, getValues, data, onSaveDraft]);
+
+  const onSubmit = (formData: Step1Data) => {
+    onNext(formData);
+  };
 
   return (
-    <form onSubmit={handleSubmit(onNext)} className="space-y-6">
+    <div className="space-y-6">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div>
           <label htmlFor="projectName" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
@@ -178,7 +192,16 @@ const Step1GeneralInfo: React.FC<Step1Props> = ({
           <span>{t('wizard.step1.autosaving')}</span>
         </div>
       )}
-    </form>
+
+      {/* Hidden form for validation - this will be triggered by parent component */}
+      <form
+        id="step1-form"
+        onSubmit={handleSubmit(onSubmit)}
+        style={{ display: 'none' }}
+      >
+        {/* This form exists only for validation purposes */}
+      </form>
+    </div>
   );
 };
 

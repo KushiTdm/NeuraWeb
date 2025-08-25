@@ -1,3 +1,4 @@
+// frontend/src/stores/wizardStore.ts
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 

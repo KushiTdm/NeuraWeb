@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+// frontend/src/components/Wizard/StepWizard.tsx
+import React, { useState, useRef } from 'react';
 import { toast } from 'react-hot-toast';
 import { ChevronLeft, ChevronRight, Send, Save } from 'lucide-react';
 import { useWizardStore } from '../../stores/wizardStore';
@@ -28,6 +29,10 @@ const StepWizard: React.FC = () => {
 
   const [isSaving, setIsSaving] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [currentStepData, setCurrentStepData] = useState({});
+
+  // Refs to store current form data for each step
+  const stepDataRefs = useRef<Record<number, any>>({});
 
   const stepComponents = {
     1: Step1GeneralInfo,
@@ -54,6 +59,10 @@ const StepWizard: React.FC = () => {
   };
 
   const saveStep = async (step: number, data: any, isDraft = true) => {
+    if (!data || Object.keys(data).length === 0) {
+      return; // Don't save empty data
+    }
+
     setIsSaving(true);
     try {
       await wizardApi.saveStep(step, data, isDraft);
@@ -70,29 +79,49 @@ const StepWizard: React.FC = () => {
     }
   };
 
-  const handleNext = async (data: any) => {
-    await saveStep(currentStep, data, false);
-    if (currentStep < 9) {
-      setCurrentStep(currentStep + 1);
+  const getCurrentStepData = () => {
+    return stepDataRefs.current[currentStep] || steps[currentStep]?.data || {};
+  };
+
+  const handleNext = async () => {
+    const data = getCurrentStepData();
+    if (data && Object.keys(data).length > 0) {
+      await saveStep(currentStep, data, false);
+      if (currentStep < 9) {
+        setCurrentStep(currentStep + 1);
+      }
+    } else {
+      toast.error('Please fill in the required fields');
     }
   };
 
-  const handlePrevious = async (data: any) => {
-    await saveStep(currentStep, data, true);
+  const handlePrevious = async () => {
+    const data = getCurrentStepData();
+    if (data && Object.keys(data).length > 0) {
+      await saveStep(currentStep, data, true);
+    }
     if (currentStep > 1) {
       setCurrentStep(currentStep - 1);
     }
   };
 
-  const handleSaveDraft = async (data: any) => {
-    await saveStep(currentStep, data, true);
+  const handleSaveDraft = async () => {
+    const data = getCurrentStepData();
+    if (data && Object.keys(data).length > 0) {
+      await saveStep(currentStep, data, true);
+    } else {
+      toast.error('No data to save');
+    }
   };
 
-  const handleSubmitWizard = async (data: any) => {
+  const handleSubmitWizard = async () => {
+    const data = getCurrentStepData();
     setIsSubmitting(true);
     try {
       // Save final step
-      await saveStep(currentStep, data, false);
+      if (data && Object.keys(data).length > 0) {
+        await saveStep(currentStep, data, false);
+      }
       
       // Submit entire wizard
       await wizardApi.submitWizard();
@@ -107,8 +136,27 @@ const StepWizard: React.FC = () => {
     }
   };
 
+  // Handler to receive form data from step components
+  const handleStepDataChange = (data: any) => {
+    stepDataRefs.current[currentStep] = data;
+    setCurrentStepData(data);
+  };
+
+  // Enhanced step component props
+  const stepProps = {
+    data: steps[currentStep]?.data || {},
+    onNext: handleNext,
+    onPrevious: handlePrevious,
+    onSaveDraft: handleStepDataChange, // Changed to update data instead of saving
+    onSubmit: handleSubmitWizard,
+    isFirstStep: currentStep === 1,
+    isLastStep: currentStep === 9,
+    isSaving: isSaving,
+    isSubmitting: isSubmitting,
+    isSubmitted: isSubmitted,
+  };
+
   const CurrentStepComponent = stepComponents[currentStep as keyof typeof stepComponents];
-  const currentStepData = steps[currentStep]?.data || {};
 
   return (
     <div className="max-w-4xl mx-auto">
@@ -132,7 +180,14 @@ const StepWizard: React.FC = () => {
           {Array.from({ length: 9 }, (_, i) => i + 1).map((step) => (
             <button
               key={step}
-              onClick={() => setCurrentStep(step)}
+              onClick={() => {
+                // Save current step data before switching
+                const data = getCurrentStepData();
+                if (data && Object.keys(data).length > 0) {
+                  saveStep(currentStep, data, true);
+                }
+                setCurrentStep(step);
+              }}
               className={`w-8 h-8 rounded-full text-xs font-medium transition-colors ${
                 step === currentStep
                   ? 'bg-primary-600 text-white'
@@ -140,6 +195,7 @@ const StepWizard: React.FC = () => {
                   ? 'bg-success-500 text-white'
                   : 'bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-400'
               }`}
+              disabled={isSubmitted}
             >
               {step}
             </button>
@@ -156,25 +212,14 @@ const StepWizard: React.FC = () => {
           <div className="w-16 h-1 bg-gradient-to-r from-primary-500 to-secondary-500 rounded-full" />
         </div>
 
-        <CurrentStepComponent
-          data={currentStepData}
-          onNext={handleNext}
-          onPrevious={handlePrevious}
-          onSaveDraft={handleSaveDraft}
-          onSubmit={handleSubmitWizard}
-          isFirstStep={currentStep === 1}
-          isLastStep={currentStep === 9}
-          isSaving={isSaving}
-          isSubmitting={isSubmitting}
-          isSubmitted={isSubmitted}
-        />
+        <CurrentStepComponent {...stepProps} />
       </div>
 
       {/* Navigation */}
       <div className="flex justify-between items-center">
         <button
-          onClick={() => handlePrevious(currentStepData)}
-          disabled={currentStep === 1 || isSaving}
+          onClick={handlePrevious}
+          disabled={currentStep === 1 || isSaving || isSubmitted}
           className="flex items-center space-x-2 px-6 py-3 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
         >
           <ChevronLeft size={20} />
@@ -182,7 +227,7 @@ const StepWizard: React.FC = () => {
         </button>
 
         <button
-          onClick={() => handleSaveDraft(currentStepData)}
+          onClick={handleSaveDraft}
           disabled={isSaving || isSubmitted}
           className="flex items-center space-x-2 px-6 py-3 bg-gray-600 hover:bg-gray-700 text-white rounded-lg disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
         >
@@ -196,7 +241,7 @@ const StepWizard: React.FC = () => {
 
         {currentStep < 9 ? (
           <button
-            onClick={() => handleNext(currentStepData)}
+            onClick={handleNext}
             disabled={isSaving || isSubmitted}
             className="flex items-center space-x-2 btn-primary disabled:opacity-50 disabled:cursor-not-allowed"
           >
@@ -205,7 +250,7 @@ const StepWizard: React.FC = () => {
           </button>
         ) : (
           <button
-            onClick={() => handleSubmitWizard(currentStepData)}
+            onClick={handleSubmitWizard}
             disabled={isSubmitting || isSubmitted}
             className="flex items-center space-x-2 bg-success-600 hover:bg-success-700 text-white px-6 py-3 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
           >

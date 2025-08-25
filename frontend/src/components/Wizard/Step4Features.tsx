@@ -28,7 +28,7 @@ const Step4Features: React.FC<Step4Props> = ({
   isSubmitted,
 }) => {
   const { t } = useLanguage();
-  const { register, handleSubmit, formState: { errors }, watch } = useForm<Step4Data>({
+  const { register, handleSubmit, formState: { errors }, watch, getValues } = useForm<Step4Data>({
     defaultValues: data,
   });
 
@@ -37,12 +37,23 @@ const Step4Features: React.FC<Step4Props> = ({
   React.useEffect(() => {
     const interval = setInterval(() => {
       if (!isSubmitted) {
-        onSaveDraft(watchedData);
+        onSaveDraft(getValues());
       }
     }, 30000);
 
     return () => clearInterval(interval);
-  }, [watchedData, onSaveDraft, isSubmitted]);
+  }, [getValues, onSaveDraft, isSubmitted]);
+
+  React.useEffect(() => {
+    const currentData = getValues();
+    if (JSON.stringify(currentData) !== JSON.stringify(data)) {
+      onSaveDraft(currentData);
+    }
+  }, [watchedData, getValues, data, onSaveDraft]);
+
+  const onSubmit = (formData: Step4Data) => {
+    onNext(formData);
+  };
 
   const coreFeatureOptions = [
     { key: 'contact', label: t('wizard.step4.features.contact') },
@@ -78,7 +89,7 @@ const Step4Features: React.FC<Step4Props> = ({
   ];
 
   return (
-    <form onSubmit={handleSubmit(onNext)} className="space-y-6">
+    <div className="space-y-6">
       <div>
         <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-4">
           {t('wizard.step4.core.features')} * ({t('wizard.step4.core.features.select')})
@@ -206,7 +217,14 @@ const Step4Features: React.FC<Step4Props> = ({
           <span>{t('wizard.step1.autosaving')}</span>
         </div>
       )}
-    </form>
+
+      <form
+        id="step4-form"
+        onSubmit={handleSubmit(onSubmit)}
+        style={{ display: 'none' }}
+      >
+      </form>
+    </div>
   );
 };
 

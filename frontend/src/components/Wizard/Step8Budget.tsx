@@ -28,7 +28,7 @@ const Step8Budget: React.FC<Step8Props> = ({
   isSubmitted,
 }) => {
   const { t } = useLanguage();
-  const { register, handleSubmit, formState: { errors }, watch } = useForm<Step8Data>({
+  const { register, handleSubmit, formState: { errors }, watch, getValues } = useForm<Step8Data>({
     defaultValues: data,
   });
 
@@ -37,15 +37,26 @@ const Step8Budget: React.FC<Step8Props> = ({
   React.useEffect(() => {
     const interval = setInterval(() => {
       if (!isSubmitted) {
-        onSaveDraft(watchedData);
+        onSaveDraft(getValues());
       }
     }, 30000);
 
     return () => clearInterval(interval);
-  }, [watchedData, onSaveDraft, isSubmitted]);
+  }, [getValues, onSaveDraft, isSubmitted]);
+
+  React.useEffect(() => {
+    const currentData = getValues();
+    if (JSON.stringify(currentData) !== JSON.stringify(data)) {
+      onSaveDraft(currentData);
+    }
+  }, [watchedData, getValues, data, onSaveDraft]);
+
+  const onSubmit = (formData: Step8Data) => {
+    onNext(formData);
+  };
 
   return (
-    <form onSubmit={handleSubmit(onNext)} className="space-y-6">
+    <div className="space-y-6">
       <div>
         <label htmlFor="budgetRange" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
           {t('wizard.step8.budget.range')} *
@@ -173,10 +184,17 @@ const Step8Budget: React.FC<Step8Props> = ({
       {isSaving && (
         <div className="text-sm text-gray-500 dark:text-gray-400 flex items-center space-x-2">
           <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-gray-400" />
-          <span>{t('common.auto.saving')}</span>
+          <span>{t('wizard.step1.autosaving')}</span>
         </div>
       )}
-    </form>
+
+      <form
+        id="step8-form"
+        onSubmit={handleSubmit(onSubmit)}
+        style={{ display: 'none' }}
+      >
+      </form>
+    </div>
   );
 };
 

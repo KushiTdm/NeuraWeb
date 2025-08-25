@@ -28,7 +28,7 @@ const Step5Design: React.FC<Step5Props> = ({
   isSubmitted,
 }) => {
   const { t } = useLanguage();
-  const { register, handleSubmit, formState: { errors }, watch } = useForm<Step5Data>({
+  const { register, handleSubmit, formState: { errors }, watch, getValues } = useForm<Step5Data>({
     defaultValues: data,
   });
 
@@ -37,15 +37,26 @@ const Step5Design: React.FC<Step5Props> = ({
   React.useEffect(() => {
     const interval = setInterval(() => {
       if (!isSubmitted) {
-        onSaveDraft(watchedData);
+        onSaveDraft(getValues());
       }
     }, 30000);
 
     return () => clearInterval(interval);
-  }, [watchedData, onSaveDraft, isSubmitted]);
+  }, [getValues, onSaveDraft, isSubmitted]);
+
+  React.useEffect(() => {
+    const currentData = getValues();
+    if (JSON.stringify(currentData) !== JSON.stringify(data)) {
+      onSaveDraft(currentData);
+    }
+  }, [watchedData, getValues, data, onSaveDraft]);
+
+  const onSubmit = (formData: Step5Data) => {
+    onNext(formData);
+  };
 
   return (
-    <form onSubmit={handleSubmit(onNext)} className="space-y-6">
+    <div className="space-y-6">
       <div>
         <label htmlFor="designStyle" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
           {t('wizard.step5.design.style')} *
@@ -165,7 +176,14 @@ const Step5Design: React.FC<Step5Props> = ({
           <span>{t('wizard.step1.autosaving')}</span>
         </div>
       )}
-    </form>
+
+      <form
+        id="step5-form"
+        onSubmit={handleSubmit(onSubmit)}
+        style={{ display: 'none' }}
+      >
+      </form>
+    </div>
   );
 };
 

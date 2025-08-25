@@ -28,7 +28,7 @@ const Step3Content: React.FC<Step3Props> = ({
   isSubmitted,
 }) => {
   const { t } = useLanguage();
-  const { register, handleSubmit, formState: { errors }, watch } = useForm<Step3Data>({
+  const { register, handleSubmit, formState: { errors }, watch, getValues } = useForm<Step3Data>({
     defaultValues: data,
   });
 
@@ -37,12 +37,23 @@ const Step3Content: React.FC<Step3Props> = ({
   React.useEffect(() => {
     const interval = setInterval(() => {
       if (!isSubmitted) {
-        onSaveDraft(watchedData);
+        onSaveDraft(getValues());
       }
     }, 30000);
 
     return () => clearInterval(interval);
-  }, [watchedData, onSaveDraft, isSubmitted]);
+  }, [getValues, onSaveDraft, isSubmitted]);
+
+  React.useEffect(() => {
+    const currentData = getValues();
+    if (JSON.stringify(currentData) !== JSON.stringify(data)) {
+      onSaveDraft(currentData);
+    }
+  }, [watchedData, getValues, data, onSaveDraft]);
+
+  const onSubmit = (formData: Step3Data) => {
+    onNext(formData);
+  };
 
   const languageOptions = [
     { key: 'english', label: t('wizard.step3.languages.english') },
@@ -58,7 +69,7 @@ const Step3Content: React.FC<Step3Props> = ({
   ];
 
   return (
-    <form onSubmit={handleSubmit(onNext)} className="space-y-6">
+    <div className="space-y-6">
       <div>
         <label htmlFor="contentStrategy" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
           {t('wizard.step3.content.strategy')} *
@@ -177,7 +188,14 @@ const Step3Content: React.FC<Step3Props> = ({
           <span>{t('wizard.step1.autosaving')}</span>
         </div>
       )}
-    </form>
+
+      <form
+        id="step3-form"
+        onSubmit={handleSubmit(onSubmit)}
+        style={{ display: 'none' }}
+      >
+      </form>
+    </div>
   );
 };
 

@@ -27,7 +27,7 @@ const Step2Objectives: React.FC<Step2Props> = ({
   isSubmitted,
 }) => {
   const { t } = useLanguage();
-  const { register, handleSubmit, formState: { errors }, watch } = useForm<Step2Data>({
+  const { register, handleSubmit, formState: { errors }, watch, getValues } = useForm<Step2Data>({
     defaultValues: data,
   });
 
@@ -36,12 +36,24 @@ const Step2Objectives: React.FC<Step2Props> = ({
   React.useEffect(() => {
     const interval = setInterval(() => {
       if (!isSubmitted) {
-        onSaveDraft(watchedData);
+        onSaveDraft(getValues());
       }
     }, 30000);
 
     return () => clearInterval(interval);
-  }, [watchedData, onSaveDraft, isSubmitted]);
+  }, [getValues, onSaveDraft, isSubmitted]);
+
+  // Expose form data to parent component
+  React.useEffect(() => {
+    const currentData = getValues();
+    if (JSON.stringify(currentData) !== JSON.stringify(data)) {
+      onSaveDraft(currentData);
+    }
+  }, [watchedData, getValues, data, onSaveDraft]);
+
+  const onSubmit = (formData: Step2Data) => {
+    onNext(formData);
+  };
 
   const goalOptions = [
     { key: 'brand', label: t('wizard.step2.goals.brand') },
@@ -57,7 +69,7 @@ const Step2Objectives: React.FC<Step2Props> = ({
   ];
 
   return (
-    <form onSubmit={handleSubmit(onNext)} className="space-y-6">
+    <div className="space-y-6">
       <div>
         <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-4">
           {t('wizard.step2.primary.goals')} * ({t('wizard.step2.primary.goals.select')})
@@ -152,8 +164,17 @@ const Step2Objectives: React.FC<Step2Props> = ({
           <span>{t('wizard.step1.autosaving')}</span>
         </div>
       )}
-    </form>
+
+      {/* Hidden form for validation - this will be triggered by parent component */}
+      <form
+        id="step2-form"
+        onSubmit={handleSubmit(onSubmit)}
+        style={{ display: 'none' }}
+      >
+        {/* This form exists only for validation purposes */}
+      </form>
+    </div>
   );
 };
 
-export default Step2Objectives;
+export default Step2Objectives

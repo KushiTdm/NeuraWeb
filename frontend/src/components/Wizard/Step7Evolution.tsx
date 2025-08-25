@@ -28,7 +28,7 @@ const Step7Evolution: React.FC<Step7Props> = ({
   isSubmitted,
 }) => {
   const { t } = useLanguage();
-  const { register, handleSubmit, formState: { errors }, watch } = useForm<Step7Data>({
+  const { register, handleSubmit, formState: { errors }, watch, getValues } = useForm<Step7Data>({
     defaultValues: data,
   });
 
@@ -37,12 +37,23 @@ const Step7Evolution: React.FC<Step7Props> = ({
   React.useEffect(() => {
     const interval = setInterval(() => {
       if (!isSubmitted) {
-        onSaveDraft(watchedData);
+        onSaveDraft(getValues());
       }
     }, 30000);
 
     return () => clearInterval(interval);
-  }, [watchedData, onSaveDraft, isSubmitted]);
+  }, [getValues, onSaveDraft, isSubmitted]);
+
+  React.useEffect(() => {
+    const currentData = getValues();
+    if (JSON.stringify(currentData) !== JSON.stringify(data)) {
+      onSaveDraft(currentData);
+    }
+  }, [watchedData, getValues, data, onSaveDraft]);
+
+  const onSubmit = (formData: Step7Data) => {
+    onNext(formData);
+  };
 
   const futureFeatureOptions = [
     { key: 'wizard.step7.features.analytics', value: 'Advanced analytics and reporting' },
@@ -63,7 +74,7 @@ const Step7Evolution: React.FC<Step7Props> = ({
   ];
 
   return (
-    <form onSubmit={handleSubmit(onNext)} className="space-y-6">
+    <div className="space-y-6">
       <div>
         <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-4">
           {t('wizard.step7.future.features')}
@@ -192,10 +203,17 @@ const Step7Evolution: React.FC<Step7Props> = ({
       {isSaving && (
         <div className="text-sm text-gray-500 dark:text-gray-400 flex items-center space-x-2">
           <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-gray-400" />
-          <span>{t('common.auto.saving')}</span>
+          <span>{t('wizard.step1.autosaving')}</span>
         </div>
       )}
-    </form>
+
+      <form
+        id="step7-form"
+        onSubmit={handleSubmit(onSubmit)}
+        style={{ display: 'none' }}
+      >
+      </form>
+    </div>
   );
 };
 

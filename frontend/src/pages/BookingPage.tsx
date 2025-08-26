@@ -24,7 +24,7 @@ const BookingPage: React.FC = () => {
   const { t } = useLanguage();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [selectedSlot, setSelectedSlot] = useState<string>('');
-  const [availableSlots, setAvailableSlots] = useState<TimeSlot[]>([]);
+  const [availableSlots, setAvailableSlots] = useState<TimeSlot[]>([]); // Ensure initial state is an array
   const [loading, setLoading] = useState(true);
   const { register, handleSubmit, setValue, formState: { errors } } = useForm<BookingFormData>();
 
@@ -36,7 +36,13 @@ const BookingPage: React.FC = () => {
     try {
       setLoading(true);
       const response = await api.get('/booking/slots');
-      setAvailableSlots(response.data);
+      // Ensure response.data is an array
+      if (Array.isArray(response.data)) {
+        setAvailableSlots(response.data);
+      } else {
+        console.error('API response is not an array:', response.data);
+        generateMockSlots();
+      }
     } catch (error) {
       console.error('Error fetching slots:', error);
       // Generate mock slots for demo
@@ -150,52 +156,59 @@ const BookingPage: React.FC = () => {
             </div>
 
             <div className="space-y-4 max-h-96 overflow-y-auto">
-              {availableSlots.map((slot) => {
-                const { date, time } = formatDateTime(slot.datetime);
-                const isSelected = selectedSlot === slot.id;
-                
-                return (
-                  <button
-                    key={slot.id}
-                    onClick={() => slot.available && handleSlotSelect(slot.id)}
-                    disabled={!slot.available}
-                    className={`w-full p-4 rounded-lg border-2 text-left transition-all ${
-                      isSelected
-                        ? 'border-primary-500 bg-primary-50 dark:bg-primary-900/20'
-                        : slot.available
-                        ? 'border-gray-200 dark:border-gray-600 hover:border-primary-300 bg-white dark:bg-gray-800'
-                        : 'border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 opacity-50 cursor-not-allowed'
-                    }`}
-                  >
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <p className={`font-medium ${
-                          isSelected ? 'text-primary-700 dark:text-primary-300' : 'text-gray-900 dark:text-white'
-                        }`}>
-                          {date}
-                        </p>
-                        <div className="flex items-center space-x-1 mt-1">
-                          <Clock size={14} className={
-                            isSelected ? 'text-primary-600' : 'text-gray-500 dark:text-gray-400'
-                          } />
-                          <span className={`text-sm ${
-                            isSelected ? 'text-primary-600' : 'text-gray-500 dark:text-gray-400'
+              {/* Add safety check to ensure availableSlots is an array */}
+              {Array.isArray(availableSlots) && availableSlots.length > 0 ? (
+                availableSlots.map((slot) => {
+                  const { date, time } = formatDateTime(slot.datetime);
+                  const isSelected = selectedSlot === slot.id;
+                  
+                  return (
+                    <button
+                      key={slot.id}
+                      onClick={() => slot.available && handleSlotSelect(slot.id)}
+                      disabled={!slot.available}
+                      className={`w-full p-4 rounded-lg border-2 text-left transition-all ${
+                        isSelected
+                          ? 'border-primary-500 bg-primary-50 dark:bg-primary-900/20'
+                          : slot.available
+                          ? 'border-gray-200 dark:border-gray-600 hover:border-primary-300 bg-white dark:bg-gray-800'
+                          : 'border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 opacity-50 cursor-not-allowed'
+                      }`}
+                    >
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <p className={`font-medium ${
+                            isSelected ? 'text-primary-700 dark:text-primary-300' : 'text-gray-900 dark:text-white'
                           }`}>
-                            {time}
-                          </span>
+                            {date}
+                          </p>
+                          <div className="flex items-center space-x-1 mt-1">
+                            <Clock size={14} className={
+                              isSelected ? 'text-primary-600' : 'text-gray-500 dark:text-gray-400'
+                            } />
+                            <span className={`text-sm ${
+                              isSelected ? 'text-primary-600' : 'text-gray-500 dark:text-gray-400'
+                            }`}>
+                              {time}
+                            </span>
+                          </div>
+                        </div>
+                        <div className={`px-2 py-1 rounded text-xs font-medium ${
+                          slot.available
+                            ? 'bg-success-100 text-success-800 dark:bg-success-900/20 dark:text-success-300'
+                            : 'bg-gray-100 text-gray-800 dark:bg-gray-600 dark:text-gray-300'
+                        }`}>
+                          {slot.available ? t('booking.available') : t('booking.booked')}
                         </div>
                       </div>
-                      <div className={`px-2 py-1 rounded text-xs font-medium ${
-                        slot.available
-                          ? 'bg-success-100 text-success-800 dark:bg-success-900/20 dark:text-success-300'
-                          : 'bg-gray-100 text-gray-800 dark:bg-gray-600 dark:text-gray-300'
-                      }`}>
-                        {slot.available ? t('booking.available') : t('booking.booked')}
-                      </div>
-                    </div>
-                  </button>
-                );
-              })}
+                    </button>
+                  );
+                })
+              ) : (
+                <div className="text-center py-8 text-gray-500 dark:text-gray-400">
+                  <p>{t('booking.no.slots') || 'No available slots at the moment.'}</p>
+                </div>
+              )}
             </div>
           </div>
 

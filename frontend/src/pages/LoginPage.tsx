@@ -1,9 +1,11 @@
+// frontend/src/pages/LoginPage.tsx
 import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { toast } from 'react-hot-toast';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { LogIn, UserPlus, User, Shield } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import { useLanguage } from '../context/LanguageContext';
 
 interface LoginFormData {
   email: string;
@@ -22,6 +24,7 @@ const LoginPage: React.FC = () => {
   const [userType, setUserType] = useState<'client' | 'admin'>('client');
   const [isLoading, setIsLoading] = useState(false);
   const { login, register } = useAuth();
+  const { t } = useLanguage();
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -34,15 +37,15 @@ const LoginPage: React.FC = () => {
     try {
       if (isLogin) {
         await login(data.email, data.password, userType);
-        toast.success('Login successful!');
+        toast.success(t('login.success'));
         navigate(userType === 'admin' ? '/admin' : from);
       } else {
         if (data.password !== data.confirmPassword) {
-          toast.error('Passwords do not match');
+          toast.error(t('login.passwords.nomatch'));
           return;
         }
         await register(data.name, data.email, data.password);
-        toast.success('Registration successful! Please wait for admin validation.');
+        toast.success(t('login.register.success'));
         setIsLogin(true);
         reset();
       }
@@ -65,10 +68,10 @@ const LoginPage: React.FC = () => {
           </Link>
           
           <h2 className="text-3xl font-bold text-gray-900 dark:text-white">
-            {isLogin ? 'Sign in to your account' : 'Create your account'}
+            {isLogin ? t('login.signin.title') : t('login.create.title')}
           </h2>
           <p className="mt-2 text-sm text-gray-600 dark:text-gray-400">
-            {isLogin ? "Don't have an account? " : "Already have an account? "}
+            {isLogin ? t('login.no.account') : t('login.have.account')}
             <button
               onClick={() => {
                 setIsLogin(!isLogin);
@@ -76,7 +79,7 @@ const LoginPage: React.FC = () => {
               }}
               className="font-medium text-primary-600 hover:text-primary-500"
             >
-              {isLogin ? 'Sign up' : 'Sign in'}
+              {isLogin ? t('login.signup') : t('login.signin')}
             </button>
           </p>
         </div>
@@ -94,7 +97,7 @@ const LoginPage: React.FC = () => {
               }`}
             >
               <User size={20} />
-              <span>Client</span>
+              <span>{t('login.client')}</span>
             </button>
             <button
               type="button"
@@ -106,7 +109,7 @@ const LoginPage: React.FC = () => {
               }`}
             >
               <Shield size={20} />
-              <span>Admin</span>
+              <span>{t('login.admin')}</span>
             </button>
           </div>
 
@@ -114,14 +117,14 @@ const LoginPage: React.FC = () => {
             {!isLogin && (
               <div>
                 <label htmlFor="name" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  Full Name
+                  {t('login.fullname')}
                 </label>
                 <input
                   type="text"
                   id="name"
-                  {...registerField('name', { required: !isLogin && 'Name is required' })}
+                  {...registerField('name', { required: !isLogin && t('login.name.required') })}
                   className="input-field"
-                  placeholder="John Doe"
+                  placeholder={t('login.fullname.placeholder')}
                 />
                 {errors.name && (
                   <p className="mt-1 text-sm text-error-600">{errors.name.message}</p>
@@ -131,20 +134,20 @@ const LoginPage: React.FC = () => {
 
             <div>
               <label htmlFor="email" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                Email Address
+                {t('login.email')}
               </label>
               <input
                 type="email"
                 id="email"
                 {...registerField('email', { 
-                  required: 'Email is required',
+                  required: t('common.email.required'),
                   pattern: {
                     value: /^\S+@\S+$/i,
-                    message: 'Please enter a valid email address'
+                    message: t('common.email.invalid')
                   }
                 })}
                 className="input-field"
-                placeholder={userType === 'admin' ? 'admin@neuraweb.com' : 'john@example.com'}
+                placeholder={userType === 'admin' ? t('login.email.placeholder.admin') : t('login.email.placeholder.client')}
               />
               {errors.email && (
                 <p className="mt-1 text-sm text-error-600">{errors.email.message}</p>
@@ -153,17 +156,17 @@ const LoginPage: React.FC = () => {
 
             <div>
               <label htmlFor="password" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                Password
+                {t('login.password')}
               </label>
               <input
                 type="password"
                 id="password"
                 {...registerField('password', { 
-                  required: 'Password is required',
-                  minLength: !isLogin ? { value: 6, message: 'Password must be at least 6 characters' } : undefined
+                  required: t('common.password.required'),
+                  minLength: !isLogin ? { value: 6, message: t('login.password.minlength') } : undefined
                 })}
                 className="input-field"
-                placeholder={userType === 'admin' ? 'admin123' : '••••••••'}
+                placeholder={userType === 'admin' ? t('login.password.placeholder.admin') : t('login.password.placeholder.client')}
               />
               {errors.password && (
                 <p className="mt-1 text-sm text-error-600">{errors.password.message}</p>
@@ -173,17 +176,17 @@ const LoginPage: React.FC = () => {
             {!isLogin && (
               <div>
                 <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  Confirm Password
+                  {t('login.confirm.password')}
                 </label>
                 <input
                   type="password"
                   id="confirmPassword"
                   {...registerField('confirmPassword', { 
-                    required: !isLogin && 'Please confirm your password',
-                    validate: !isLogin ? (value) => value === watch('password') || 'Passwords do not match' : undefined
+                    required: !isLogin && t('login.confirm.password.required'),
+                    validate: !isLogin ? (value) => value === watch('password') || t('login.passwords.nomatch') : undefined
                   })}
                   className="input-field"
-                  placeholder="••••••••"
+                  placeholder={t('login.confirm.password.placeholder')}
                 />
                 {errors.confirmPassword && (
                   <p className="mt-1 text-sm text-error-600">{errors.confirmPassword.message}</p>
@@ -201,7 +204,7 @@ const LoginPage: React.FC = () => {
               ) : (
                 <>
                   {isLogin ? <LogIn size={20} /> : <UserPlus size={20} />}
-                  <span>{isLogin ? 'Sign In' : 'Sign Up'}</span>
+                  <span>{isLogin ? t('login.signin.button') : t('login.signup.button')}</span>
                 </>
               )}
             </button>
@@ -210,9 +213,9 @@ const LoginPage: React.FC = () => {
           {userType === 'admin' && isLogin && (
             <div className="mt-6 p-4 bg-gray-100 dark:bg-gray-800 rounded-lg">
               <p className="text-sm text-gray-600 dark:text-gray-300 text-center">
-                <strong>Demo Admin Credentials:</strong><br />
-                Email: admin@neuraweb.com<br />
-                Password: admin123
+                <strong>{t('login.demo.credentials')}</strong><br />
+                {t('login.demo.email.text')}<br />
+                {t('login.demo.password.text')}
               </p>
             </div>
           )}

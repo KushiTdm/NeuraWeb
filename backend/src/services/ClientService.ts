@@ -1,6 +1,7 @@
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import { PrismaService } from './PrismaService';
+import { AdminDashboardService } from './AdminDashboardService';
 
 interface RegisterClientData {
   name: string;
@@ -15,9 +16,11 @@ interface LoginClientData {
 
 export class ClientService {
   private prisma: PrismaService;
+  private dashboardService: AdminDashboardService;
 
   constructor() {
     this.prisma = new PrismaService();
+    this.dashboardService = new AdminDashboardService();
   }
 
   async register(data: RegisterClientData) {
@@ -102,6 +105,9 @@ export class ClientService {
     }
   }
 
+  async logSession(clientId: string, ipAddress: string, userAgent?: string): Promise<void> {
+    await this.dashboardService.logClientSession(clientId, ipAddress, userAgent);
+  }
   async getClients() {
     try {
       const clients = await this.prisma.client.findMany({

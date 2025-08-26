@@ -2,8 +2,10 @@
 import React, { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { toast } from 'react-hot-toast';
-import { Lock, LogOut, FileText, Users, Calendar, Eye, X } from 'lucide-react';
+import { Lock, LogOut, FileText, Users, Calendar, Eye, UserCheck, Briefcase, X, BarChart3 } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import { useLanguage } from '../context/LanguageContext';
+import { useAuth } from '../context/AuthContext';
 import api from '../utils/api';
 
 interface LoginFormData {
@@ -45,35 +47,60 @@ interface Booking {
 
 const AdminPage: React.FC = () => {
   const { t } = useLanguage();
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [activeTab, setActiveTab] = useState<'quotes' | 'contacts' | 'bookings'>('quotes');
+  const { user, logout, isAuthenticated } = useAuth();
+  const [activeTab, setActiveTab] = useState<'quotes' | 'contacts' | 'bookings' | 'clients' | 'wizards'>('quotes');
   const [quotes, setQuotes] = useState<Quote[]>([]);
   const [contacts, setContacts] = useState<Contact[]>([]);
   const [bookings, setBookings] = useState<Booking[]>([]);
+  const [clients, setClients] = useState<any[]>([]);
+  const [wizards, setWizards] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
   const [selectedItem, setSelectedItem] = useState<any>(null);
-  const { register, handleSubmit, formState: { errors } } = useForm<LoginFormData>();
+
+  // Redirect if not admin
+  if (!isAuthenticated || user?.type !== 'admin') {
+    return (
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center">
+        <div className="card max-w-md w-full text-center">
+          <div className="w-16 h-16 bg-error-100 dark:bg-error-900/20 rounded-full flex items-center justify-center mx-auto mb-4">
+            <Lock className="text-error-600" size={32} />
+          </div>
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">
+            Access Denied
+          </h1>
+          <p className="text-gray-600 dark:text-gray-300 mb-6">
+            You need admin privileges to access this page.
+          </p>
+          <Link to="/login" className="btn-primary">
+            Login as Admin
+          </Link>
+        </div>
+      </div>
+    );
+  }
 
   useEffect(() => {
-    const token = localStorage.getItem('adminToken');
-    if (token) {
-      setIsLoggedIn(true);
+    if (isAuthenticated && user?.type === 'admin') {
       fetchData();
     }
-  }, []);
+  }, [isAuthenticated, user]);
 
   const fetchData = async () => {
     setLoading(true);
     try {
-      const [quotesRes, contactsRes, bookingsRes] = await Promise.all([
+      const [quotesRes, contactsRes, bookingsRes, clientsRes, wizardsRes] = await Promise.all([
         api.get('/admin/quotes'),
         api.get('/admin/contacts'),
         api.get('/admin/bookings'),
+        api.get('/admin/clients'),
+        api.get('/admin/wizards'),
       ]);
       
-      setQuotes(quotesRes.data);
-      setContacts(contactsRes.data);
-      setBookings(bookingsRes.data);
+      setQuotes(quotesRes.data.data);
+      setContacts(contactsRes.data.data);
+      setBookings(bookingsRes.data.data);
+      setClients(clientsRes.data.data);
+      setWizards(wizardsRes.data.data);
     } catch (error) {
       console.error('Error fetching admin data:', error);
       // Set mock data for demo
@@ -143,45 +170,23 @@ const AdminPage: React.FC = () => {
     ]);
   };
 
-  const onLogin = async (data: LoginFormData) => {
-    setLoading(true);
+  const validateClient = async (clientId: string) => {
     try {
-      const response = await api.post('/admin/login', data);
-      localStorage.setItem('adminToken', response.data.token);
-      setIsLoggedIn(true);
-      toast.success(t('admin.login.success'));
+      await api.patch(`/admin/clients/${clientId}/validate`);
+      toast.success('Client validated successfully');
       fetchData();
     } catch (error) {
-      // For demo purposes, allow login with admin@neuraweb.com / admin123
-      if (data.email === 'admin@neuraweb.com' && data.password === 'admin123') {
-        localStorage.setItem('adminToken', 'demo_token');
-        setIsLoggedIn(true);
-        toast.success(t('admin.login.success'));
-        setMockData();
-      } else {
-        toast.error(t('admin.login.error'));
-      }
-    } finally {
-      setLoading(false);
+      toast.error('Error validating client');
     }
-  };
-
-  const handleLogout = () => {
-    localStorage.removeItem('adminToken');
-    setIsLoggedIn(false);
-    setQuotes([]);
-    setContacts([]);
-    setBookings([]);
-    toast.success(t('admin.logout.success'));
   };
 
   const updateStatus = async (type: string, id: string, status: string) => {
     try {
       await api.patch(`/admin/${type}/${id}/status`, { status });
-      toast.success(t('admin.status.update.success'));
+      toast.success('Status updated successfully');
       fetchData();
     } catch (error) {
-      toast.error(t('admin.status.update.error'));
+      toast.error('Error updating status');
     }
   };
 
@@ -199,91 +204,31 @@ const AdminPage: React.FC = () => {
     }
   };
 
-  if (!isLoggedIn) {
-    return (
-      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center">
-        <div className="card max-w-md w-full">
-          <div className="text-center mb-8">
-            <div className="w-16 h-16 bg-primary-100 dark:bg-primary-900 rounded-full flex items-center justify-center mx-auto mb-4">
-              <Lock className="text-primary-600" size={32} />
-            </div>
-            <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
-              {t('admin.title')}
-            </h1>
-          </div>
-
-          <form onSubmit={handleSubmit(onLogin)} className="space-y-6">
-            <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                {t('admin.email')}
-              </label>
-              <input
-                type="email"
-                id="email"
-                {...register('email', { required: t('common.email.required') })}
-                className="input-field"
-                placeholder="admin@neuraweb.com"
-              />
-              {errors.email && (
-                <p className="mt-1 text-sm text-error-600">{errors.email.message}</p>
-              )}
-            </div>
-
-            <div>
-              <label htmlFor="password" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                {t('admin.password')}
-              </label>
-              <input
-                type="password"
-                id="password"
-                {...register('password', { required: t('common.password.required') })}
-                className="input-field"
-                placeholder="admin123"
-              />
-              {errors.password && (
-                <p className="mt-1 text-sm text-error-600">{errors.password.message}</p>
-              )}
-            </div>
-
-            <button
-              type="submit"
-              disabled={loading}
-              className="w-full btn-primary flex items-center justify-center space-x-2 disabled:opacity-50"
-            >
-              {loading ? (
-                <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
-              ) : (
-                <span>{t('admin.login')}</span>
-              )}
-            </button>
-          </form>
-
-          <div className="mt-6 p-4 bg-gray-100 dark:bg-gray-800 rounded-lg">
-            <p className="text-sm text-gray-600 dark:text-gray-300 text-center">
-              <strong>{t('admin.demo.title')}</strong><br />
-              {t('admin.demo.email')}<br />
-              {t('admin.demo.password')}
-            </p>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-8">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <div className="flex justify-between items-center mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
-            {t('admin.title')}
-          </h1>
+          <div>
+            <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
+              {t('admin.title')}
+            </h1>
+            <div className="flex space-x-4 mt-2">
+              <Link
+                to="/admin/dashboard"
+                className="flex items-center space-x-2 text-primary-600 hover:text-primary-700 text-sm font-medium"
+              >
+                <BarChart3 size={16} />
+                <span>Advanced Dashboard</span>
+              </Link>
+            </div>
+          </div>
           <button
-            onClick={handleLogout}
+            onClick={logout}
             className="flex items-center space-x-2 text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white"
           >
             <LogOut size={20} />
-            <span>{t('admin.logout')}</span>
+            <span>Logout</span>
           </button>
         </div>
 
@@ -323,6 +268,28 @@ const AdminPage: React.FC = () => {
               <Calendar className="inline mr-2" size={16} />
               {t('admin.meetings')} ({bookings.length})
             </button>
+            <button
+              onClick={() => setActiveTab('clients')}
+              className={`py-2 px-1 border-b-2 font-medium text-sm ${
+                activeTab === 'clients'
+                  ? 'border-primary-500 text-primary-600'
+                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+              }`}
+            >
+              <UserCheck className="inline mr-2" size={16} />
+              Clients ({clients.length})
+            </button>
+            <button
+              onClick={() => setActiveTab('wizards')}
+              className={`py-2 px-1 border-b-2 font-medium text-sm ${
+                activeTab === 'wizards'
+                  ? 'border-primary-500 text-primary-600'
+                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+              }`}
+            >
+              <Briefcase className="inline mr-2" size={16} />
+              Project Briefs ({wizards.length})
+            </button>
           </nav>
         </div>
 
@@ -338,7 +305,7 @@ const AdminPage: React.FC = () => {
             {activeTab === 'quotes' && (
               <div className="card">
                 <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-6">
-                  {t('admin.quotes')}
+                  Quote Requests
                 </h3>
                 <div className="space-y-4">
                   {quotes.map((quote) => (
@@ -366,11 +333,11 @@ const AdminPage: React.FC = () => {
                       </div>
                       <div className="grid grid-cols-2 gap-4 text-sm">
                         <div>
-                          <span className="text-gray-500 dark:text-gray-400">{t('admin.service')}</span>{' '}
+                          <span className="text-gray-500 dark:text-gray-400">Service:</span>{' '}
                           <span className="font-medium">{t(`quote.service.${quote.serviceType}`)}</span>
                         </div>
                         <div>
-                          <span className="text-gray-500 dark:text-gray-400">{t('admin.price')}</span>{' '}
+                          <span className="text-gray-500 dark:text-gray-400">Price:</span>{' '}
                           <span className="font-medium">${quote.estimatedPrice.toLocaleString()}</span>
                         </div>
                       </div>
@@ -380,16 +347,16 @@ const AdminPage: React.FC = () => {
                           onChange={(e) => updateStatus('quotes', quote.id, e.target.value)}
                           className="text-sm border border-gray-300 dark:border-gray-600 rounded px-2 py-1 bg-white dark:bg-gray-800"
                         >
-                          <option value="pending">{t('admin.status.pending')}</option>
-                          <option value="reviewing">{t('admin.status.reviewing')}</option>
-                          <option value="completed">{t('admin.status.completed')}</option>
+                          <option value="pending">Pending</option>
+                          <option value="reviewing">Reviewing</option>
+                          <option value="completed">Completed</option>
                         </select>
                       </div>
                     </div>
                   ))}
                   {quotes.length === 0 && (
                     <p className="text-gray-500 dark:text-gray-400 text-center py-8">
-                      {t('admin.no.quotes')}
+                      No quote requests yet.
                     </p>
                   )}
                 </div>
@@ -400,7 +367,7 @@ const AdminPage: React.FC = () => {
             {activeTab === 'contacts' && (
               <div className="card">
                 <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-6">
-                  {t('admin.contacts')}
+                  Contact Messages
                 </h3>
                 <div className="space-y-4">
                   {contacts.map((contact) => (
@@ -435,16 +402,16 @@ const AdminPage: React.FC = () => {
                           onChange={(e) => updateStatus('contacts', contact.id, e.target.value)}
                           className="text-sm border border-gray-300 dark:border-gray-600 rounded px-2 py-1 bg-white dark:bg-gray-800"
                         >
-                          <option value="pending">{t('admin.status.pending')}</option>
-                          <option value="reviewing">{t('admin.status.reviewing')}</option>
-                          <option value="completed">{t('admin.status.completed')}</option>
+                          <option value="pending">Pending</option>
+                          <option value="reviewing">Reviewing</option>
+                          <option value="completed">Completed</option>
                         </select>
                       </div>
                     </div>
                   ))}
                   {contacts.length === 0 && (
                     <p className="text-gray-500 dark:text-gray-400 text-center py-8">
-                      {t('admin.no.contacts')}
+                      No contact messages yet.
                     </p>
                   )}
                 </div>
@@ -455,7 +422,7 @@ const AdminPage: React.FC = () => {
             {activeTab === 'bookings' && (
               <div className="card">
                 <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-6">
-                  {t('admin.meetings')}
+                  Booked Meetings
                 </h3>
                 <div className="space-y-4">
                   {bookings.map((booking) => (
@@ -472,7 +439,7 @@ const AdminPage: React.FC = () => {
                         </div>
                         <div className="flex items-center space-x-2">
                           <span className={`px-2 py-1 rounded text-xs font-medium ${getStatusColor(booking.status)}`}>
-                            {booking.status === 'confirmed' ? t('admin.status.confirmed') : t(`admin.status.${booking.status}`)}
+                            {booking.status === 'confirmed' ? 'Confirmed' : t(`admin.status.${booking.status}`)}
                           </span>
                           <button
                             onClick={() => setSelectedItem(booking)}
@@ -483,7 +450,7 @@ const AdminPage: React.FC = () => {
                         </div>
                       </div>
                       <p className="text-sm text-gray-600 dark:text-gray-300">
-                        <strong>{t('booking.meeting.time')}</strong>{' '}
+                        <strong>Meeting Time:</strong>{' '}
                         {new Date(booking.selectedSlot).toLocaleString()}
                       </p>
                       <div className="mt-2 flex space-x-2">
@@ -492,16 +459,115 @@ const AdminPage: React.FC = () => {
                           onChange={(e) => updateStatus('bookings', booking.id, e.target.value)}
                           className="text-sm border border-gray-300 dark:border-gray-600 rounded px-2 py-1 bg-white dark:bg-gray-800"
                         >
-                          <option value="pending">{t('admin.status.pending')}</option>
-                          <option value="confirmed">{t('admin.status.confirmed')}</option>
-                          <option value="completed">{t('admin.status.completed')}</option>
+                          <option value="pending">Pending</option>
+                          <option value="confirmed">Confirmed</option>
+                          <option value="completed">Completed</option>
                         </select>
                       </div>
                     </div>
                   ))}
                   {bookings.length === 0 && (
                     <p className="text-gray-500 dark:text-gray-400 text-center py-8">
-                      {t('admin.no.meetings')}
+                      No booked meetings yet.
+                    </p>
+                  )}
+                </div>
+              </div>
+            )}
+
+            {/* Clients Tab */}
+            {activeTab === 'clients' && (
+              <div className="card">
+                <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-6">
+                  Client Management
+                </h3>
+                <div className="space-y-4">
+                  {clients.map((client) => (
+                    <div key={client.id} className="border border-gray-200 dark:border-gray-600 rounded-lg p-4">
+                      <div className="flex justify-between items-start mb-2">
+                        <div>
+                          <h4 className="font-medium text-gray-900 dark:text-white">
+                            {client.name}
+                          </h4>
+                          <p className="text-sm text-gray-500 dark:text-gray-400">
+                            {client.email}
+                          </p>
+                        </div>
+                        <div className="flex items-center space-x-2">
+                          <span className={`px-2 py-1 rounded text-xs font-medium ${
+                            client.isValidated 
+                              ? 'bg-success-100 text-success-800 dark:bg-success-900/20 dark:text-success-300'
+                              : 'bg-warning-100 text-warning-800 dark:bg-warning-900/20 dark:text-warning-300'
+                          }`}>
+                            {client.isValidated ? 'Validated' : 'Pending'}
+                          </span>
+                        </div>
+                      </div>
+                      <div className="text-sm text-gray-600 dark:text-gray-300 mb-2">
+                        <span>Wizard Responses: {client._count?.wizardResponses || 0}</span>
+                      </div>
+                      {!client.isValidated && (
+                        <button
+                          onClick={() => validateClient(client.id)}
+                          className="btn-primary text-sm px-4 py-2"
+                        >
+                          Validate Client
+                        </button>
+                      )}
+                    </div>
+                  ))}
+                  {clients.length === 0 && (
+                    <p className="text-gray-500 dark:text-gray-400 text-center py-8">
+                      No clients registered yet.
+                    </p>
+                  )}
+                </div>
+              </div>
+            )}
+
+            {/* Wizards Tab */}
+            {activeTab === 'wizards' && (
+              <div className="card">
+                <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-6">
+                  Project Briefs
+                </h3>
+                <div className="space-y-4">
+                  {wizards.map((wizard, index) => (
+                    <div key={index} className="border border-gray-200 dark:border-gray-600 rounded-lg p-4">
+                      <div className="flex justify-between items-start mb-2">
+                        <div>
+                          <h4 className="font-medium text-gray-900 dark:text-white">
+                            {wizard.client.name}
+                          </h4>
+                          <p className="text-sm text-gray-500 dark:text-gray-400">
+                            {wizard.client.email}
+                          </p>
+                        </div>
+                        <div className="flex items-center space-x-2">
+                          <span className={`px-2 py-1 rounded text-xs font-medium ${
+                            wizard.isCompleted
+                              ? 'bg-success-100 text-success-800 dark:bg-success-900/20 dark:text-success-300'
+                              : 'bg-warning-100 text-warning-800 dark:bg-warning-900/20 dark:text-warning-300'
+                          }`}>
+                            {wizard.isCompleted ? 'Completed' : 'In Progress'}
+                          </span>
+                          <button
+                            onClick={() => setSelectedItem(wizard)}
+                            className="text-primary-600 hover:text-primary-700"
+                          >
+                            <Eye size={16} />
+                          </button>
+                        </div>
+                      </div>
+                      <div className="text-sm text-gray-600 dark:text-gray-300">
+                        <span>Steps completed: {wizard.responses.filter((r: any) => !r.isDraft).length}/9</span>
+                        <span className="ml-4">Last updated: {new Date(wizard.lastUpdated).toLocaleDateString()}</span>
+                      </div>
+                    </div>
+                  ))}
+                  {wizards.length === 0 && (
+                    <p className="text-gray-500 dark:text-gray-400 text-center py-8">
+                      No project briefs submitted yet.
                     </p>
                   )}
                 </div>
@@ -517,7 +583,7 @@ const AdminPage: React.FC = () => {
               <div className="p-6">
                 <div className="flex justify-between items-start mb-4">
                   <h3 className="text-xl font-semibold text-gray-900 dark:text-white">
-                    {t('admin.details')}
+                    Details
                   </h3>
                   <button
                     onClick={() => setSelectedItem(null)}
@@ -529,63 +595,71 @@ const AdminPage: React.FC = () => {
                 
                 <div className="space-y-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                      {t('contact.name')}
-                    </label>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Name</label>
                     <p className="text-gray-900 dark:text-white">{selectedItem.name}</p>
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                      {t('contact.email')}
-                    </label>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Email</label>
                     <p className="text-gray-900 dark:text-white">{selectedItem.email}</p>
                   </div>
                   {selectedItem.phone && (
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                        {t('booking.phone')}
-                      </label>
+                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Phone</label>
                       <p className="text-gray-900 dark:text-white">{selectedItem.phone}</p>
                     </div>
                   )}
                   {selectedItem.serviceType && (
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                        {t('quote.service')}
-                      </label>
+                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Service Type</label>
                       <p className="text-gray-900 dark:text-white">{t(`quote.service.${selectedItem.serviceType}`)}</p>
                     </div>
                   )}
                   {selectedItem.estimatedPrice && (
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                        {t('quote.estimate')}
-                      </label>
+                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Estimated Price</label>
                       <p className="text-gray-900 dark:text-white">${selectedItem.estimatedPrice.toLocaleString()}</p>
                     </div>
                   )}
                   {selectedItem.selectedSlot && (
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                        {t('booking.meeting.time')}
-                      </label>
+                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Meeting Time</label>
                       <p className="text-gray-900 dark:text-white">{new Date(selectedItem.selectedSlot).toLocaleString()}</p>
                     </div>
                   )}
                   {selectedItem.message && (
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                        {t('contact.message')}
-                      </label>
+                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Message</label>
                       <p className="text-gray-900 dark:text-white">{selectedItem.message}</p>
                     </div>
                   )}
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                      Date de création
-                    </label>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Created At</label>
                     <p className="text-gray-900 dark:text-white">{new Date(selectedItem.createdAt).toLocaleString()}</p>
                   </div>
+                  {selectedItem.responses && (
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Project Brief Responses</label>
+                      <div className="space-y-3 max-h-60 overflow-y-auto">
+                        {selectedItem.responses.map((response: any) => (
+                          <div key={response.step} className="bg-gray-50 dark:bg-gray-700 p-3 rounded">
+                            <div className="flex justify-between items-center mb-2">
+                              <span className="font-medium text-sm">Step {response.step}</span>
+                              <span className={`px-2 py-1 rounded text-xs ${
+                                response.isDraft 
+                                  ? 'bg-warning-100 text-warning-800 dark:bg-warning-900/20 dark:text-warning-300'
+                                  : 'bg-success-100 text-success-800 dark:bg-success-900/20 dark:text-success-300'
+                              }`}>
+                                {response.isDraft ? 'Draft' : 'Completed'}
+                              </span>
+                            </div>
+                            <pre className="text-xs text-gray-600 dark:text-gray-300 whitespace-pre-wrap">
+                              {JSON.stringify(response.data, null, 2)}
+                            </pre>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
                 </div>
               </div>
             </div>

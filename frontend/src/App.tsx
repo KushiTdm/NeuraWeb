@@ -12,6 +12,7 @@ import BookingPage from './pages/BookingPage';
 import AdminPage from './pages/AdminPage';
 import LoginPage from './pages/LoginPage';
 import WizardPage from './pages/WizardPage';
+import AdminDashboardPage from './pages/AdminDashboardPage';
 
 function App() {
   return (
@@ -30,6 +31,7 @@ function App() {
                     <Route path="/quote" element={<QuotePage />} />
                     <Route path="/booking" element={<BookingPage />} />
                     <Route path="/admin" element={<AdminPage />} />
+                    <Route path="/admin/dashboard" element={<AdminDashboardPage />} />
                   </Routes>
                 </Layout>
               } />

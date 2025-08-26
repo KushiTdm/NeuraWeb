@@ -2,12 +2,14 @@ import express from 'express';
 import { AdminService } from '../services/AdminService';
 import { ClientService } from '../services/ClientService';
 import { WizardService } from '../services/WizardService';
+import { AdminDashboardService } from '../services/AdminDashboardService';
 import { authenticateAdmin } from '../middleware/auth';
 
 const router = express.Router();
 const adminService = new AdminService();
 const clientService = new ClientService();
 const wizardService = new WizardService();
+const dashboardService = new AdminDashboardService();
 
 // POST /api/admin/login - Admin login
 router.post('/login', async (req, res, next) => {
@@ -62,6 +64,81 @@ router.get('/bookings', authenticateAdmin, async (req, res, next) => {
     res.json({
       success: true,
       data: bookings,
+    });
+  } catch (error) {
+    next(error);
+  }
+});
+
+// GET /api/admin/dashboard/clients - Get all clients with stats
+router.get('/dashboard/clients', authenticateAdmin, async (req, res, next) => {
+  try {
+    const clients = await dashboardService.getClientsWithStats();
+    
+    res.json({
+      success: true,
+      data: clients,
+    });
+  } catch (error) {
+    next(error);
+  }
+});
+
+// PATCH /api/admin/dashboard/clients/:id/validate - Validate client
+router.patch('/dashboard/clients/:id/validate', authenticateAdmin, async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    
+    await dashboardService.validateClient(id);
+
+    res.json({
+      success: true,
+      message: 'Client validated successfully',
+    });
+  } catch (error) {
+    next(error);
+  }
+});
+
+// DELETE /api/admin/dashboard/clients/:id - Delete client
+router.delete('/dashboard/clients/:id', authenticateAdmin, async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    
+    await dashboardService.deleteClient(id);
+
+    res.json({
+      success: true,
+      message: 'Client deleted successfully',
+    });
+  } catch (error) {
+    next(error);
+  }
+});
+
+// GET /api/admin/dashboard/sessions - Get all client sessions
+router.get('/dashboard/sessions', authenticateAdmin, async (req, res, next) => {
+  try {
+    const { clientId } = req.query;
+    const sessions = await dashboardService.getClientSessions(clientId as string);
+    
+    res.json({
+      success: true,
+      data: sessions,
+    });
+  } catch (error) {
+    next(error);
+  }
+});
+
+// GET /api/admin/dashboard/stats - Get platform statistics
+router.get('/dashboard/stats', authenticateAdmin, async (req, res, next) => {
+  try {
+    const stats = await dashboardService.getPlatformStats();
+    
+    res.json({
+      success: true,
+      data: stats,
     });
   } catch (error) {
     next(error);

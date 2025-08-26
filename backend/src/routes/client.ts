@@ -26,8 +26,13 @@ router.post('/register', validateClientRegistration, async (req, res, next) => {
 router.post('/login', validateClientLogin, async (req, res, next) => {
   try {
     const { email, password } = req.body;
+    const ipAddress = req.ip || req.connection.remoteAddress || 'unknown';
+    const userAgent = req.get('User-Agent');
     
     const result = await clientService.login({ email, password });
+    
+    // Log the session
+    await clientService.logSession(result.client.id, ipAddress, userAgent);
 
     res.json({
       success: true,

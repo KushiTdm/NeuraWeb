@@ -1,3 +1,4 @@
+// backend/src/services/ClientService.ts
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import { PrismaService } from './PrismaService';

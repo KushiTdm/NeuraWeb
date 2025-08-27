@@ -22,7 +22,6 @@ function App() {
           <div className="App">
             <Routes>
               <Route path="/login" element={<LoginPage />} />
-              <Route path="/wizard" element={<WizardPage />} />
               <Route path="/*" element={
                 <Layout>
                   <Routes>
@@ -31,7 +30,8 @@ function App() {
                     <Route path="/quote" element={<QuotePage />} />
                     <Route path="/booking" element={<BookingPage />} />
                     <Route path="/admin" element={<AdminPage />} />
-                    <Route path="/admin/dashboard" element={<AdminDashboardPage />} />
+                    <Route path="/admin/dashboard" element={<AdminDashboardPage />} /> 
+                    <Route path="/wizard" element={<WizardPage />} />
                   </Routes>
                 </Layout>
               } />

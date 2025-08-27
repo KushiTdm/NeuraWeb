@@ -5,10 +5,12 @@ import { toast } from 'react-hot-toast';
 import { useAuth } from '../context/AuthContext';
 import { useWizardStore } from '../stores/wizardStore';
 import { wizardApi } from '../utils/api';
+import { useLanguage } from '../context/LanguageContext';
 import StepWizard from '../components/Wizard/StepWizard';
 import { CheckCircle, Clock, AlertCircle } from 'lucide-react';
 
 const WizardPage: React.FC = () => {
+  const { t } = useLanguage();
   const { user, isValidatedClient } = useAuth();
   const { loadFromServer, isSubmitted } = useWizardStore();
   const [isLoading, setIsLoading] = useState(true);
@@ -44,13 +46,13 @@ const WizardPage: React.FC = () => {
             <Clock className="text-warning-600" size={32} />
           </div>
           <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">
-            Account Validation Pending
+            {t('wizard.page.validation.pending.title')}
           </h1>
           <p className="text-gray-600 dark:text-gray-300 mb-6">
-            Your account is currently being reviewed by our admin team. You'll be able to access the project wizard once your account is validated.
+            {t('wizard.page.validation.pending.message')}
           </p>
           <p className="text-sm text-gray-500 dark:text-gray-400">
-            This usually takes 24-48 hours. You'll receive an email notification once approved.
+            {t('wizard.page.validation.pending.timeframe')}
           </p>
         </div>
       </div>
@@ -67,7 +69,7 @@ const WizardPage: React.FC = () => {
       <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600 mx-auto mb-4"></div>
-          <p className="text-gray-600 dark:text-gray-300">Loading wizard...</p>
+          <p className="text-gray-600 dark:text-gray-300">{t('wizard.page.loading')}</p>
         </div>
       </div>
     );
@@ -79,16 +81,16 @@ const WizardPage: React.FC = () => {
         {/* Header */}
         <div className="text-center mb-8">
           <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-4">
-            Project Brief Wizard
+            {t('wizard.page.title')}
           </h1>
           <p className="text-xl text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
-            Help us understand your project requirements by completing this comprehensive questionnaire.
+            {t('wizard.page.subtitle')}
           </p>
           
           {isSubmitted && (
             <div className="mt-6 inline-flex items-center space-x-2 bg-success-100 dark:bg-success-900/20 text-success-800 dark:text-success-300 px-4 py-2 rounded-lg">
               <CheckCircle size={20} />
-              <span className="font-medium">Project brief submitted successfully!</span>
+              <span className="font-medium">{t('wizard.page.submitted.success')}</span>
             </div>
           )}
         </div>

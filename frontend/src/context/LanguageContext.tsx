@@ -182,6 +182,34 @@ const translations = {
     'footer.links.admin': 'Admin Login',
     'footer.copyright': '© 2024 NeuraWeb. All rights reserved.',
 
+    // WizardPage
+    'wizard.page.title': 'Project Brief Wizard',
+    'wizard.page.subtitle': 'Help us understand your project requirements by completing this comprehensive questionnaire.',
+    'wizard.page.submitted.success': 'Project brief submitted successfully!',
+    'wizard.page.loading': 'Loading wizard...',
+    'wizard.page.validation.pending.title': 'Account Validation Pending',
+    'wizard.page.validation.pending.message': 'Your account is currently being reviewed by our admin team. You\'ll be able to access the project wizard once your account is validated.',
+    'wizard.page.validation.pending.timeframe': 'This usually takes 24-48 hours. You\'ll receive an email notification once approved.',
+
+     // StepWizard navigation et actions
+    'wizard.progress.step': 'Step',
+    'wizard.progress.of': 'of',
+    'wizard.progress.complete': 'Complete',
+    'wizard.navigation.previous': 'Previous',
+    'wizard.navigation.next': 'Next',
+    'wizard.navigation.save.draft': 'Save Draft',
+    'wizard.navigation.submit': 'Submit Project Brief',
+    'wizard.navigation.submitted': 'Submitted',
+    'wizard.status.saving': 'Saving...',
+    'wizard.status.submitting': 'Submitting...',
+    'wizard.messages.draft.saved': 'Draft saved',
+    'wizard.messages.step.completed': 'Step completed',
+    'wizard.messages.save.failed': 'Failed to save step',
+    'wizard.messages.submit.success': 'Project brief submitted successfully!',
+    'wizard.messages.submit.failed': 'Failed to submit project brief',
+    'wizard.messages.fill.required': 'Please fill in the required fields',
+    'wizard.messages.no.data': 'No data to save',
+
     // Project Wizard - Step 1
     'wizard.step1.title': 'General Information',
     'wizard.step1.project.name': 'Project Name',
@@ -766,6 +794,34 @@ const translations = {
     'footer.links.title': 'Liens Rapides',
     'footer.links.admin': 'Connexion Admin',
     'footer.copyright': '© 2024 NeuraWeb. Tous droits réservés.',
+
+    // WizardPage
+    'wizard.page.title': 'Assistant de Brief de Projet',
+    'wizard.page.subtitle': 'Aidez-nous à comprendre les exigences de votre projet en complétant ce questionnaire complet.',
+    'wizard.page.submitted.success': 'Brief de projet soumis avec succès !',
+    'wizard.page.loading': 'Chargement de l\'assistant...',
+    'wizard.page.validation.pending.title': 'Validation de Compte en Attente',
+    'wizard.page.validation.pending.message': 'Votre compte est actuellement en cours d\'examen par notre équipe d\'administration. Vous pourrez accéder à l\'assistant de projet une fois votre compte validé.',
+    'wizard.page.validation.pending.timeframe': 'Cela prend généralement 24 à 48 heures. Vous recevrez une notification par email une fois approuvé.',
+
+    // StepWizard navigation et actions
+    'wizard.progress.step': 'Étape',
+    'wizard.progress.of': 'sur',
+    'wizard.progress.complete': 'Terminé',
+    'wizard.navigation.previous': 'Précédent',
+    'wizard.navigation.next': 'Suivant',
+    'wizard.navigation.save.draft': 'Sauvegarder Brouillon',
+    'wizard.navigation.submit': 'Soumettre Brief Projet',
+    'wizard.navigation.submitted': 'Soumis',
+    'wizard.status.saving': 'Sauvegarde...',
+    'wizard.status.submitting': 'Soumission...',
+    'wizard.messages.draft.saved': 'Brouillon sauvegardé',
+    'wizard.messages.step.completed': 'Étape terminée',
+    'wizard.messages.save.failed': 'Échec de la sauvegarde',
+    'wizard.messages.submit.success': 'Brief de projet soumis avec succès !',
+    'wizard.messages.submit.failed': 'Échec de la soumission du brief',
+    'wizard.messages.fill.required': 'Veuillez remplir les champs requis',
+    'wizard.messages.no.data': 'Aucune donnée à sauvegarder',
 
     // Project Wizard - Step 1
     'wizard.step1.title': 'Informations Générales',

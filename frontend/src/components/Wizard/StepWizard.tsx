@@ -4,6 +4,7 @@ import { toast } from 'react-hot-toast';
 import { ChevronLeft, ChevronRight, Send, Save } from 'lucide-react';
 import { useWizardStore } from '../../stores/wizardStore';
 import { wizardApi } from '../../utils/api';
+import { useLanguage } from '../../context/LanguageContext';
 
 // Step Components
 import Step1GeneralInfo from './Step1GeneralInfo';
@@ -17,6 +18,7 @@ import Step8Budget from './Step8Budget';
 import Step9Other from './Step9Other';
 
 const StepWizard: React.FC = () => {
+  const { t } = useLanguage();
   const {
     currentStep,
     steps,
@@ -47,15 +49,15 @@ const StepWizard: React.FC = () => {
   };
 
   const stepTitles = {
-    1: 'General Information',
-    2: 'Project Objectives',
-    3: 'Content & Structure',
-    4: 'Features & Functionality',
-    5: 'Design Preferences',
-    6: 'Hosting & Technical',
-    7: 'Future Evolution',
-    8: 'Budget & Timeline',
-    9: 'Additional Information',
+    1: t('wizard.step1.title'),
+    2: t('wizard.step2.title'),
+    3: t('wizard.step3.title'),
+    4: t('wizard.step4.title'),
+    5: t('wizard.step5.title'),
+    6: t('wizard.step6.title'),
+    7: t('wizard.step7.title'),
+    8: t('wizard.step8.title'),
+    9: t('wizard.step9.title'),
   };
 
   const saveStep = async (step: number, data: any, isDraft = true) => {
@@ -70,9 +72,9 @@ const StepWizard: React.FC = () => {
       if (!isDraft) {
         markStepCompleted(step);
       }
-      toast.success(isDraft ? 'Draft saved' : 'Step completed');
+      toast.success(isDraft ? t('wizard.messages.draft.saved') : t('wizard.messages.step.completed'));
     } catch (error) {
-      toast.error('Failed to save step');
+      toast.error(t('wizard.messages.save.failed'));
       console.error('Save step error:', error);
     } finally {
       setIsSaving(false);
@@ -91,7 +93,7 @@ const StepWizard: React.FC = () => {
         setCurrentStep(currentStep + 1);
       }
     } else {
-      toast.error('Please fill in the required fields');
+      toast.error(t('wizard.messages.fill.required'));
     }
   };
 
@@ -110,7 +112,7 @@ const StepWizard: React.FC = () => {
     if (data && Object.keys(data).length > 0) {
       await saveStep(currentStep, data, true);
     } else {
-      toast.error('No data to save');
+      toast.error(t('wizard.messages.no.data'));
     }
   };
 
@@ -127,9 +129,9 @@ const StepWizard: React.FC = () => {
       await wizardApi.submitWizard();
       
       setSubmitted(true);
-      toast.success('Project brief submitted successfully!');
+      toast.success(t('wizard.messages.submit.success'));
     } catch (error) {
-      toast.error('Failed to submit project brief');
+      toast.error(t('wizard.messages.submit.failed'));
       console.error('Submit wizard error:', error);
     } finally {
       setIsSubmitting(false);
@@ -164,10 +166,10 @@ const StepWizard: React.FC = () => {
       <div className="mb-8">
         <div className="flex items-center justify-between mb-4">
           <span className="text-sm font-medium text-gray-600 dark:text-gray-300">
-            Step {currentStep} of 9
+            {t('wizard.progress.step')} {currentStep} {t('wizard.progress.of')} 9
           </span>
           <span className="text-sm font-medium text-gray-600 dark:text-gray-300">
-            {Math.round((currentStep / 9) * 100)}% Complete
+            {Math.round((currentStep / 9) * 100)}% {t('wizard.progress.complete')}
           </span>
         </div>
         <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
@@ -223,7 +225,7 @@ const StepWizard: React.FC = () => {
           className="flex items-center space-x-2 px-6 py-3 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
         >
           <ChevronLeft size={20} />
-          <span>Previous</span>
+          <span>{t('wizard.navigation.previous')}</span>
         </button>
 
         <button
@@ -236,7 +238,7 @@ const StepWizard: React.FC = () => {
           ) : (
             <Save size={20} />
           )}
-          <span>Save Draft</span>
+          <span>{t('wizard.navigation.save.draft')}</span>
         </button>
 
         {currentStep < 9 ? (
@@ -245,7 +247,7 @@ const StepWizard: React.FC = () => {
             disabled={isSaving || isSubmitted}
             className="flex items-center space-x-2 btn-primary disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            <span>Next</span>
+            <span>{t('wizard.navigation.next')}</span>
             <ChevronRight size={20} />
           </button>
         ) : (
@@ -259,7 +261,7 @@ const StepWizard: React.FC = () => {
             ) : (
               <Send size={20} />
             )}
-            <span>{isSubmitted ? 'Submitted' : 'Submit Project Brief'}</span>
+            <span>{isSubmitted ? t('wizard.navigation.submitted') : t('wizard.navigation.submit')}</span>
           </button>
         )}
       </div>

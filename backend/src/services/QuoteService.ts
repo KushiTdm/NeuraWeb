@@ -1,3 +1,4 @@
+// backend/src/services/QuoteService.ts
 import { Resend } from 'resend';
 import { PrismaService } from './PrismaService';
 

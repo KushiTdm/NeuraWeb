@@ -18,7 +18,15 @@ const QuotePage: React.FC = () => {
   const { t } = useLanguage();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [estimatedPrice, setEstimatedPrice] = useState(0);
-  const { register, handleSubmit, watch, reset, formState: { errors } } = useForm<QuoteFormData>();
+  const { register, handleSubmit, watch, reset, formState: { errors } } = useForm<QuoteFormData>({
+    defaultValues: {
+      name: '',
+      email: '',
+      serviceType: '',
+      options: [],
+      message: ''
+    }
+  });
 
   const watchedServiceType = watch('serviceType');
   const watchedOptions = watch('options', []);
@@ -50,15 +58,39 @@ const QuotePage: React.FC = () => {
   }, [watchedServiceType, watchedOptions]);
 
   const onSubmit = async (data: QuoteFormData) => {
+    console.log('Submitting quote data:', data);
+    
     setIsSubmitting(true);
     try {
-      await api.post('/quotes', { ...data, estimatedPrice });
+      // Ensure options is always an array
+      const submitData = {
+        ...data,
+        options: Array.isArray(data.options) ? data.options : [],
+        estimatedPrice,
+        message: data.message || '' // Ensure message is never undefined
+      };
+
+      console.log('Final submit data:', submitData);
+
+      const response = await api.post('/quotes', submitData);
+      console.log('Quote submission response:', response.data);
+      
       toast.success(t('quote.success'));
       reset();
       setEstimatedPrice(0);
-    } catch (error) {
-      toast.error(t('common.error'));
+    } catch (error: any) {
       console.error('Quote form error:', error);
+      
+      if (error.response?.data?.error) {
+        toast.error(`Error: ${error.response.data.error}`);
+        
+        // Log detailed validation errors if available
+        if (error.response.data.details) {
+          console.log('Validation details:', error.response.data.details);
+        }
+      } else {
+        toast.error(t('common.error'));
+      }
     } finally {
       setIsSubmitting(false);
     }
@@ -128,6 +160,7 @@ const QuotePage: React.FC = () => {
                   id="serviceType"
                   {...register('serviceType', { required: t('common.service.required') })}
                   className="input-field"
+                  defaultValue=""
                 >
                   <option value="">{t('quote.service.placeholder')}</option>
                   <option value="showcase">{t('quote.service.showcase')} ($2,500)</option>

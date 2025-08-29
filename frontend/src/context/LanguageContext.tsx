@@ -91,7 +91,7 @@ const translations = {
     'contact.info.email': 'Email',
     'contact.info.phone': 'Phone',
     'contact.info.location': 'Location',
-    'contact.info.location.value': 'Montreal, QC, Canada',
+    'contact.info.location.value': 'Paris, FR, France',
     'contact.why.title': 'Why Work With Us?',
     'contact.why.experience': '• Expert team with 10+ years experience',
     'contact.why.tech': '• Cutting-edge technologies and best practices',
@@ -180,7 +180,7 @@ const translations = {
     'footer.services.maintenance': 'Maintenance & Support',
     'footer.links.title': 'Quick Links',
     'footer.links.admin': 'Admin Login',
-    'footer.copyright': '© 2024 NeuraWeb. All rights reserved.',
+    'footer.copyright': '© 2025 NeuraWeb. All rights reserved.',
 
     // WizardPage
     'wizard.page.title': 'Project Brief Wizard',
@@ -704,7 +704,7 @@ const translations = {
     'contact.info.email': 'Email',
     'contact.info.phone': 'Téléphone',
     'contact.info.location': 'Localisation',
-    'contact.info.location.value': 'Montréal, QC, Canada',
+    'contact.info.location.value': 'Paris, FR, France',
     'contact.why.title': 'Pourquoi Travailler Avec Nous ?',
     'contact.why.experience': '• Équipe d\'experts avec plus de 10 ans d\'expérience',
     'contact.why.tech': '• Technologies de pointe et meilleures pratiques',

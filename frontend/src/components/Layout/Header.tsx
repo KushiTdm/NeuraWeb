@@ -31,11 +31,25 @@ const Header: React.FC = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           {/* Logo */}
-          <Link to="/" className="flex items-center space-x-2">
-            <div className="w-8 h-8 bg-gradient-to-r from-primary-500 to-secondary-500 rounded-lg flex items-center justify-center">
-              <span className="text-white font-bold text-sm">NW</span>
+          <Link to="/" className="flex items-center">
+            <img 
+              src={isDark ? "/assets/neurawebW.png" : "/assets/neurawebB.png"}
+              alt="NeuraWeb Logo" 
+              className="h-14 w-auto object-contain"
+              onError={(e) => {
+                // Fallback en cas d'erreur de chargement du logo
+                e.currentTarget.style.display = 'none';
+                const fallback = e.currentTarget.nextElementSibling as HTMLElement;
+                if (fallback) fallback.style.display = 'flex';
+              }}
+            />
+            {/* Fallback logo en cas d'erreur */}
+            <div 
+              className="h-14 w-14 bg-gradient-to-r from-primary-500 to-secondary-500 rounded-lg flex items-center justify-center"
+              style={{ display: 'none' }}
+            >
+              <span className="text-white font-bold text-lg">NW</span>
             </div>
-            <span className="text-xl font-bold text-gray-900 dark:text-white">NeuraWeb</span>
           </Link>
 
           {/* Desktop Navigation */}
@@ -87,6 +101,14 @@ const Header: React.FC = () => {
                     className="text-sm font-medium text-primary-600 hover:text-primary-700"
                   >
                     Project Wizard
+                  </Link>
+                )}
+                {user?.type === 'admin' && (
+                  <Link
+                    to="/admin/dashboard"
+                    className="text-sm font-medium text-primary-600 hover:text-primary-700"
+                  >
+                    Admin Dashboard
                   </Link>
                 )}
                 <button
@@ -199,6 +221,15 @@ const Header: React.FC = () => {
                         className="block text-sm font-medium text-primary-600 hover:text-primary-700 mb-4"
                       >
                         Project Wizard
+                      </Link>
+                    )}
+                    {user?.type === 'admin' && (
+                      <Link
+                        to="/admin/dashboard"
+                        onClick={() => setIsMenuOpen(false)}
+                        className="block text-sm font-medium text-primary-600 hover:text-primary-700 mb-4"
+                      >
+                        Admin Dashboard
                       </Link>
                     )}
                     <button

@@ -13,19 +13,33 @@ const Footer: React.FC = () => {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           {/* Company Info */}
           <div>
-            <div className="flex items-center space-x-2 mb-4">
-              <div className="w-8 h-8 bg-gradient-to-r from-primary-500 to-secondary-500 rounded-lg flex items-center justify-center">
+            <Link to="/" className="flex items-center space-x-2 mb-4">
+              <img 
+                src="/assets/neurawebW.png"
+                alt="NeuraWeb Logo" 
+                className="h-8 w-auto object-contain"
+                onError={(e) => {
+                  // Fallback en cas d'erreur de chargement du logo
+                  e.currentTarget.style.display = 'none';
+                  const fallback = e.currentTarget.nextElementSibling as HTMLElement;
+                  if (fallback) fallback.style.display = 'flex';
+                }}
+              />
+              {/* Fallback logo en cas d'erreur */}
+              <div 
+                className="w-8 h-8 bg-gradient-to-r from-primary-500 to-secondary-500 rounded-lg flex items-center justify-center"
+                style={{ display: 'none' }}
+              >
                 <span className="text-white font-bold text-sm">NW</span>
               </div>
-              <span className="text-xl font-bold">NeuraWeb</span>
-            </div>
+            </Link>
             <p className="text-gray-400 mb-4">
               {t('footer.company.description')}
             </p>
             <div className="space-y-2">
               <div className="flex items-center space-x-2 text-gray-400">
                 <Mail size={16} />
-                <span>contact@neuraweb.com</span>
+                <span>contact@neuraweb.tech</span>
               </div>
               <div className="flex items-center space-x-2 text-gray-400">
                 <Phone size={16} />
@@ -40,7 +54,7 @@ const Footer: React.FC = () => {
 
           {/* Services */}
           <div>
-            <h3 className="text-lg font-semibold mb-4">{t('services.title')}</h3>
+            <h3 className="text-lg font-semibold mb-4 text-white">{t('services.title')}</h3>
             <ul className="space-y-2 text-gray-400">
               <li>{t('services.web.title')}</li>
               <li>{t('footer.services.ecommerce')}</li>
@@ -52,7 +66,7 @@ const Footer: React.FC = () => {
 
           {/* Quick Links */}
           <div>
-            <h3 className="text-lg font-semibold mb-4">{t('footer.links.title')}</h3>
+            <h3 className="text-lg font-semibold mb-4 text-white">{t('footer.links.title')}</h3>
             <ul className="space-y-2 text-gray-400">
               <li>
                 <Link to="/contact" className="hover:text-white transition-colors">

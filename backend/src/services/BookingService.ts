@@ -1,6 +1,8 @@
+// backend/src/services/BookingService.ts
 import { google } from 'googleapis';
-import { Resend } from 'resend';
+import nodemailer from 'nodemailer';
 import { PrismaService } from './PrismaService';
+import validator from 'validator';
 
 interface BookingFormData {
   name: string;
@@ -18,12 +20,12 @@ interface TimeSlot {
 
 export class BookingService {
   private calendar: any;
-  private resend: Resend;
+  private transporter!: nodemailer.Transporter;
   private prisma: PrismaService;
 
   constructor() {
-    this.resend = new Resend(process.env.RESEND_API_KEY);
     this.prisma = new PrismaService();
+    this.initializeTransporter();
 
     // Initialize Google Calendar API
     if (process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET) {
@@ -40,6 +42,35 @@ export class BookingService {
       }
 
       this.calendar = google.calendar({ version: 'v3', auth });
+    }
+  }
+
+  private initializeTransporter(): void {
+    const smtpConfig = {
+      host: process.env.SMTP_HOST,
+      port: parseInt(process.env.SMTP_PORT || '587'),
+      secure: process.env.SMTP_SECURE === 'true',
+      auth: {
+        user: process.env.SMTP_USER,
+        pass: process.env.SMTP_PASSWORD,
+      },
+      tls: {
+        rejectUnauthorized: false
+      }
+    };
+
+    this.transporter = nodemailer.createTransport(smtpConfig);
+
+    // Vérifier la configuration SMTP
+    this.verifyTransporter();
+  }
+
+  private async verifyTransporter(): Promise<void> {
+    try {
+      await this.transporter.verify();
+      console.log('✅ SMTP configuration is valid for BookingService');
+    } catch (error) {
+      console.error('❌ SMTP configuration error in BookingService:', error);
     }
   }
 
@@ -82,6 +113,165 @@ export class BookingService {
     return slots;
   }
 
+  private getBookingEmailTemplate(type: 'user' | 'admin', data: BookingFormData, meetingDateTime: Date): string {
+    const baseTemplate = `
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NeuraWeb - Réservation de rendez-vous</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; line-height: 1.6; color: #374151; background-color: #f9fafb; }
+        .email-container { max-width: 600px; margin: 0 auto; background-color: #ffffff; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); }
+        .email-header { background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%); padding: 24px; text-align: center; }
+        .logo { height: 56px; width: auto; object-fit: contain; }
+        .company-name { color: #ffffff; font-size: 24px; font-weight: bold; margin: 12px 0 0 0; }
+        .company-tagline { color: rgba(255, 255, 255, 0.8); font-size: 14px; margin: 8px 0 0 0; }
+        .email-content { padding: 32px 24px; }
+        .greeting { font-size: 18px; color: #1f2937; margin-bottom: 20px; font-weight: 500; }
+        .content-text { font-size: 16px; line-height: 1.8; color: #4b5563; margin-bottom: 20px; }
+        .highlight-box { background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%); border-left: 4px solid #3b82f6; padding: 20px; margin: 24px 0; border-radius: 0 8px 8px 0; }
+        .meeting-details { background: #f3f4f6; padding: 20px; border-radius: 8px; margin: 20px 0; }
+        .meeting-details h3 { color: #1f2937; margin-bottom: 12px; }
+        .meeting-details p { margin-bottom: 8px; }
+        .cta-button { display: inline-block; background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%); color: #ffffff !important; padding: 14px 32px; text-decoration: none; border-radius: 8px; font-weight: 600; font-size: 16px; margin: 24px 0; }
+        .signature { margin-top: 32px; color: #4b5563; font-size: 16px; }
+        .email-footer { background-color: #111827; color: #ffffff; padding: 24px; text-align: center; }
+        .footer-text { font-size: 14px; color: #9ca3af; margin-bottom: 16px; }
+        .admin-info { background-color: #fef3c7; border: 1px solid #f59e0b; padding: 16px; margin: 20px 0; border-radius: 8px; }
+        .admin-info strong { color: #92400e; }
+    </style>
+</head>
+<body>
+    <div class="email-container">
+        <header class="email-header">
+            <img src="${process.env.DOMAIN_URL || 'https://votre-domaine.fr'}/assets/neurawebW.png" alt="NeuraWeb Logo" class="logo">
+            <h1 class="company-name">NeuraWeb</h1>
+            <p class="company-tagline">Solutions Web & IA sur mesure</p>
+        </header>
+        
+        <main class="email-content">
+            ${this.getBookingContentByType(type, data, meetingDateTime)}
+        </main>
+        
+        <footer class="email-footer">
+            <p class="footer-text">© 2025 NeuraWeb. Tous droits réservés.</p>
+            <p class="footer-text">
+                <a href="${process.env.DOMAIN_URL}/contact" style="color: #9ca3af;">Contact</a> |
+                <a href="${process.env.DOMAIN_URL}/booking" style="color: #9ca3af;">Réserver</a>
+            </p>
+        </footer>
+    </div>
+</body>
+</html>`;
+
+    return baseTemplate;
+  }
+
+  private getBookingContentByType(type: 'user' | 'admin', data: BookingFormData, meetingDateTime: Date): string {
+    if (type === 'user') {
+      return `
+        <div class="greeting">
+            Bonjour ${validator.escape(data.name)},
+        </div>
+        
+        <div class="content-text">
+            <strong>🎉 Votre rendez-vous est confirmé !</strong><br>
+            Nous sommes ravis de pouvoir échanger avec vous prochainement.
+        </div>
+        
+        <div class="meeting-details">
+            <h3>📅 Détails du rendez-vous</h3>
+            <p><strong>Date et heure :</strong> ${meetingDateTime.toLocaleDateString('fr-FR', { 
+              weekday: 'long', 
+              year: 'numeric', 
+              month: 'long', 
+              day: 'numeric',
+              hour: '2-digit',
+              minute: '2-digit'
+            })}</p>
+            <p><strong>Durée :</strong> 1 heure</p>
+            <p><strong>Type :</strong> Visioconférence</p>
+            ${data.phone ? `<p><strong>Téléphone :</strong> ${validator.escape(data.phone)}</p>` : ''}
+        </div>
+
+        ${data.message ? `
+        <div class="highlight-box">
+            <strong>Votre message :</strong><br>
+            ${validator.escape(data.message)}
+        </div>
+        ` : ''}
+        
+        <div class="content-text">
+            <strong>Prochaines étapes :</strong><br>
+            • Nous vous enverrons le lien de la réunion 30 minutes avant le rendez-vous<br>
+            • Préparez vos questions et idées pour optimiser notre échange<br>
+            • En cas d'empêchement, merci de nous prévenir au moins 24h à l'avance
+        </div>
+        
+        <div style="text-align: center;">
+            <a href="${process.env.DOMAIN_URL}/contact" class="cta-button">Nous contacter</a>
+        </div>
+        
+        <div class="signature">
+            À très bientôt,<br>
+            <strong>L'équipe NeuraWeb</strong><br>
+            <em>Votre partenaire technologique</em>
+        </div>`;
+    } else {
+      return `
+        <div class="greeting">
+            Nouveau rendez-vous réservé
+        </div>
+        
+        <div class="admin-info">
+            <strong>Informations du client :</strong><br>
+            <strong>Nom :</strong> ${validator.escape(data.name)}<br>
+            <strong>Email :</strong> ${validator.escape(data.email)}<br>
+            ${data.phone ? `<strong>Téléphone :</strong> ${validator.escape(data.phone)}<br>` : ''}
+            <strong>Date de réservation :</strong> ${new Date().toLocaleString('fr-FR')}
+        </div>
+        
+        <div class="meeting-details">
+            <h3>📅 Détails du rendez-vous</h3>
+            <p><strong>Date et heure :</strong> ${meetingDateTime.toLocaleDateString('fr-FR', { 
+              weekday: 'long', 
+              year: 'numeric', 
+              month: 'long', 
+              day: 'numeric',
+              hour: '2-digit',
+              minute: '2-digit'
+            })}</p>
+            <p><strong>Durée :</strong> 1 heure</p>
+        </div>
+
+        ${data.message ? `
+        <div class="highlight-box">
+            <strong>Message du client :</strong><br>
+            ${validator.escape(data.message)}
+        </div>
+        ` : ''}
+        
+        <div class="content-text">
+            <strong>Actions à effectuer :</strong><br>
+            • Préparer l'agenda et les questions pour l'entretien<br>
+            • Envoyer le lien de visioconférence 30 minutes avant<br>
+            • Ajouter l'événement à votre calendrier personnel
+        </div>
+        
+        <div style="text-align: center;">
+            <a href="${process.env.DOMAIN_URL}/admin/bookings" class="cta-button">Voir dans l'admin</a>
+        </div>
+        
+        <div class="signature">
+            Système de notification NeuraWeb<br>
+            <em>Email automatique - Ne pas répondre</em>
+        </div>`;
+    }
+  }
+
   async createBooking(data: BookingFormData) {
     try {
       // Save to database
@@ -105,15 +295,15 @@ export class BookingService {
           await this.calendar.events.insert({
             calendarId: process.env.GOOGLE_CALENDAR_ID,
             requestBody: {
-              summary: `Meeting with ${data.name}`,
-              description: `Phone: ${data.phone || 'Not provided'}\nEmail: ${data.email}\nMessage: ${data.message || 'No message provided'}`,
+              summary: `Rendez-vous avec ${data.name}`,
+              description: `Téléphone: ${data.phone || 'Non fourni'}\nEmail: ${data.email}\nMessage: ${data.message || 'Aucun message fourni'}`,
               start: {
                 dateTime: eventDateTime.toISOString(),
-                timeZone: 'America/Toronto',
+                timeZone: process.env.TIMEZONE || 'Europe/Paris',
               },
               end: {
                 dateTime: endDateTime.toISOString(),
-                timeZone: 'America/Toronto',
+                timeZone: process.env.TIMEZONE || 'Europe/Paris',
               },
               attendees: [
                 { email: data.email },
@@ -127,53 +317,124 @@ export class BookingService {
       }
 
       // Send email confirmations
-      if (process.env.RESEND_API_KEY && process.env.FROM_EMAIL) {
+      const senderEmail = process.env.SENDER_EMAIL;
+      const recipientEmail = process.env.RECIPIENT_EMAIL;
+
+      if (senderEmail && recipientEmail) {
         const meetingDateTime = new Date(data.selectedSlot);
         
+        const commonMailOptions = {
+          from: {
+            name: process.env.SENDER_NAME || 'NeuraWeb',
+            address: senderEmail
+          }
+        };
+
         // Send notification to admin
-        await this.resend.emails.send({
-          from: process.env.FROM_EMAIL,
-          to: [process.env.FROM_EMAIL],
-          subject: `New Meeting Booked - ${data.name}`,
-          html: `
-            <h2>New Meeting Booking</h2>
-            <p><strong>Name:</strong> ${data.name}</p>
-            <p><strong>Email:</strong> ${data.email}</p>
-            <p><strong>Phone:</strong> ${data.phone || 'Not provided'}</p>
-            <p><strong>Meeting Time:</strong> ${meetingDateTime.toLocaleString()}</p>
-            ${data.message ? `<p><strong>Message:</strong></p><p>${data.message}</p>` : ''}
-            <hr>
-            <p>Booked at: ${new Date().toLocaleString()}</p>
-          `,
-        });
+        const adminMailOptions = {
+          ...commonMailOptions,
+          to: recipientEmail,
+          subject: `🗓️ Nouveau rendez-vous réservé - ${data.name}`,
+          html: this.getBookingEmailTemplate('admin', data, meetingDateTime),
+          text: `
+Nouveau rendez-vous réservé
+
+Nom: ${data.name}
+Email: ${data.email}
+Téléphone: ${data.phone || 'Non fourni'}
+Date du rendez-vous: ${meetingDateTime.toLocaleString('fr-FR')}
+
+${data.message ? `Message: ${data.message}` : ''}
+
+Réservé le: ${new Date().toLocaleString('fr-FR')}
+          `.trim()
+        };
 
         // Send confirmation to user
-        await this.resend.emails.send({
-          from: process.env.FROM_EMAIL,
-          to: [data.email],
-          subject: 'Meeting Confirmation - NeuraWeb',
-          html: `
-            <h2>Meeting Confirmed!</h2>
-            <p>Hi ${data.name},</p>
-            <p>Your meeting has been successfully booked.</p>
-            
-            <h3>Meeting Details:</h3>
-            <p><strong>Date & Time:</strong> ${meetingDateTime.toLocaleString()}</p>
-            <p><strong>Duration:</strong> 1 hour</p>
-            
-            <p>We'll send you a meeting link closer to the scheduled time. If you need to reschedule or cancel, please contact us as soon as possible.</p>
-            
-            <p>Looking forward to speaking with you!</p>
-            <hr>
-            <p>Best regards,<br>The NeuraWeb Team</p>
-          `,
-        });
+        const userMailOptions = {
+          ...commonMailOptions,
+          to: data.email,
+          subject: '✅ Rendez-vous confirmé - NeuraWeb',
+          html: this.getBookingEmailTemplate('user', data, meetingDateTime),
+          text: `
+Bonjour ${data.name},
+
+Votre rendez-vous est confirmé !
+
+Date et heure: ${meetingDateTime.toLocaleString('fr-FR')}
+Durée: 1 heure
+
+Nous vous enverrons le lien de la réunion 30 minutes avant le rendez-vous.
+
+Cordialement,
+L'équipe NeuraWeb
+          `.trim()
+        };
+
+        // Envoi des emails
+        try {
+          await this.transporter.sendMail(adminMailOptions);
+          console.log('✅ Admin booking notification sent');
+
+          await this.transporter.sendMail(userMailOptions);
+          console.log('✅ User booking confirmation sent');
+        } catch (emailError) {
+          console.error('❌ Failed to send booking emails:', emailError);
+          // Don't fail the booking if email fails
+        }
       }
+
+      console.log(`✅ Booking created successfully: ${booking.id}`);
+      return booking;
+    } catch (error) {
+      console.error('❌ Booking service error:', error);
+      throw new Error('Failed to create booking');
+    }
+  }
+
+  // Méthode utilitaire pour obtenir les réservations (pour l'admin)
+  async getBookings(page: number = 1, limit: number = 10) {
+    try {
+      const skip = (page - 1) * limit;
+      
+      const [bookings, total] = await Promise.all([
+        this.prisma.booking.findMany({
+          skip,
+          take: limit,
+          orderBy: {
+            createdAt: 'desc'
+          }
+        }),
+        this.prisma.booking.count()
+      ]);
+
+      return {
+        bookings,
+        pagination: {
+          page,
+          limit,
+          total,
+          totalPages: Math.ceil(total / limit)
+        }
+      };
+    } catch (error) {
+      console.error('Error fetching bookings:', error);
+      throw new Error('Failed to fetch bookings');
+    }
+  }
+
+  // Méthode pour annuler une réservation
+  async cancelBooking(bookingId: string) {
+    try {
+      const booking = await this.prisma.booking.update({
+        where: { id: bookingId },
+        data: { status: 'cancelled' }
+      });
 
       return booking;
     } catch (error) {
-      console.error('Booking service error:', error);
-      throw new Error('Failed to create booking');
+      console.error('Error cancelling booking:', error);
+      throw new Error('Failed to cancel booking');
     }
   }
 }

@@ -255,37 +255,82 @@ export class QuoteService {
         },
       });
 
-      // Send email notifications if SMTP is configured
-      if (process.env.SMTP_HOST && process.env.SMTP_USER && process.env.FROM_EMAIL) {
+      // Send email notifications - CORRECTION: Utiliser les mêmes variables d'environnement que BookingService
+      const senderEmail = process.env.SENDER_EMAIL;
+      const recipientEmail = process.env.RECIPIENT_EMAIL;
+
+      if (senderEmail && recipientEmail) {
+        const commonMailOptions = {
+          from: {
+            name: process.env.SENDER_NAME || 'NeuraWeb',
+            address: senderEmail
+          }
+        };
+
         try {
           // Send notification to admin
-          await this.transporter.sendMail({
-            from: `"NeuraWeb" <${process.env.FROM_EMAIL}>`,
-            to: process.env.FROM_EMAIL,
-            subject: `Nouvelle demande de devis - ${data.name}`,
+          const adminMailOptions = {
+            ...commonMailOptions,
+            to: recipientEmail,
+            subject: `💰 Nouvelle demande de devis - ${data.name}`,
             html: this.getQuoteEmailTemplate('admin', data),
-          });
+            text: `
+Nouvelle demande de devis
 
-          // Send confirmation to user
-          await this.transporter.sendMail({
-            from: `"NeuraWeb" <${process.env.FROM_EMAIL}>`,
+Nom: ${data.name}
+Email: ${data.email}
+Service: ${data.serviceType}
+Options: ${data.options.join(', ') || 'Aucune'}
+Prix estimé: ${data.estimatedPrice.toLocaleString('fr-FR')} €
+
+${data.message ? `Message: ${data.message}` : ''}
+
+Demande reçue le: ${new Date().toLocaleString('fr-FR')}
+            `.trim()
+          };
+
+          // Send confirmation to user  
+          const userMailOptions = {
+            ...commonMailOptions,
             to: data.email,
-            subject: 'Votre demande de devis - NeuraWeb',
+            subject: '✅ Votre demande de devis - NeuraWeb',
             html: this.getQuoteEmailTemplate('user', data),
-          });
+            text: `
+Bonjour ${data.name},
 
-          console.log('✅ Quote emails sent successfully');
+Merci pour votre demande de devis !
+
+Service: ${data.serviceType}
+Estimation préliminaire: ${data.estimatedPrice.toLocaleString('fr-FR')} €
+
+Notre équipe analysera votre demande dans les plus brefs délais.
+
+Cordialement,
+L'équipe NeuraWeb
+            `.trim()
+          };
+
+          // Envoi des emails
+          await this.transporter.sendMail(adminMailOptions);
+          console.log('✅ Admin quote notification sent');
+
+          await this.transporter.sendMail(userMailOptions);
+          console.log('✅ User quote confirmation sent');
         } catch (emailError) {
           console.error('❌ Failed to send quote emails:', emailError);
-          // Continue without throwing error - quote is still saved
+          // Don't fail the quote if email fails
         }
       } else {
-        console.warn('⚠️ SMTP not configured, emails not sent');
+        console.warn('⚠️ SMTP configuration incomplete for QuoteService:', {
+          senderEmail: !!senderEmail,
+          recipientEmail: !!recipientEmail
+        });
       }
 
+      console.log(`✅ Quote created successfully: ${quote.id}`);
       return quote;
     } catch (error) {
-      console.error('Quote service error:', error);
+      console.error('❌ Quote service error:', error);
       throw new Error('Failed to process quote request');
     }
   }

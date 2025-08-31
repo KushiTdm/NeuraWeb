@@ -35,7 +35,7 @@ export class QuoteService {
       }
     };
 
-    this.transporter = nodemailer.createTransporter(smtpConfig);
+    this.transporter = nodemailer.createTransport(smtpConfig);
 
     // Vérifier la configuration SMTP
     this.verifyTransporter();

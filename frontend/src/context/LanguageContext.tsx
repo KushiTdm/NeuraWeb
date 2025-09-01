@@ -793,7 +793,7 @@ const translations = {
     'footer.services.maintenance': 'Maintenance et Support',
     'footer.links.title': 'Liens Rapides',
     'footer.links.admin': 'Connexion Admin',
-    'footer.copyright': '© 2024 NeuraWeb. Tous droits réservés.',
+    'footer.copyright': '© 2025 NeuraWeb. Tous droits réservés.',
 
     // WizardPage
     'wizard.page.title': 'Assistant de Brief de Projet',

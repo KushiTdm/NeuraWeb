@@ -43,8 +43,10 @@ model Booking {
   message      String?  @db.Text
   selectedSlot String   // ISO date string
   status       String   @default("confirmed") // pending, confirmed, completed, cancelled
+  isFake       Boolean  @default(false) // Nouveau champ pour distinguer les réservations de test
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
+  
 
   @@map("bookings")
 }

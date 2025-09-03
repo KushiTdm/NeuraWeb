@@ -1,5 +1,5 @@
 // frontend/src/components/Layout/Header.tsx
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Menu, X, Sun, Moon, Globe, User, LogOut } from 'lucide-react';
 import { useTheme } from '../../context/ThemeContext';
@@ -8,6 +8,7 @@ import { useAuth } from '../../context/AuthContext';
 
 const Header: React.FC = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isScrolled, setIsScrolled] = useState(false);
   const { isDark, toggleTheme } = useTheme();
   const { language, setLanguage, t } = useLanguage();
   const { user, logout, isAuthenticated } = useAuth();
@@ -26,16 +27,46 @@ const Header: React.FC = () => {
     setIsMenuOpen(false);
   };
 
+  // Effet pour détecter le scroll
+  useEffect(() => {
+    const handleScroll = () => {
+      const scrollTop = window.scrollY;
+      setIsScrolled(scrollTop > 20);
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  // Détermine si on est sur la homepage
+  const isHomePage = location.pathname === '/';
+
   return (
-    <header className="bg-white dark:bg-gray-900 shadow-sm border-b border-gray-200 dark:border-gray-700">
+    <header className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
+      isScrolled || !isHomePage
+        ? 'bg-white dark:bg-gray-900 shadow-sm border-b border-gray-200 dark:border-gray-700'
+        : 'bg-white/95 dark:bg-gray-900/95 backdrop-blur-md shadow-lg border-b border-gray-200/50 dark:border-gray-700/50'
+    }`}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           {/* Logo */}
-          <Link to="/" className="flex items-center space-x-2">
-            <div className="w-8 h-8 bg-gradient-to-r from-primary-500 to-secondary-500 rounded-lg flex items-center justify-center">
-              <span className="text-white font-bold text-sm">NW</span>
+          <Link to="/" className="flex items-center">
+            <img 
+              src={isDark ? "/assets/neurawebW.png" : "/assets/neurawebB.png"}
+              alt="NeuraWeb Logo" 
+              className="h-14 w-auto object-contain"
+              onError={(e) => {
+                e.currentTarget.style.display = 'none';
+                const fallback = e.currentTarget.nextElementSibling as HTMLElement;
+                if (fallback) fallback.style.display = 'flex';
+              }}
+            />
+            <div 
+              className="h-14 w-14 bg-gradient-to-r from-primary-500 to-secondary-500 rounded-lg flex items-center justify-center"
+              style={{ display: 'none' }}
+            >
+              <span className="text-white font-bold text-lg">NW</span>
             </div>
-            <span className="text-xl font-bold text-gray-900 dark:text-white">NeuraWeb</span>
           </Link>
 
           {/* Desktop Navigation */}
@@ -87,6 +118,14 @@ const Header: React.FC = () => {
                     className="text-sm font-medium text-primary-600 hover:text-primary-700"
                   >
                     Project Wizard
+                  </Link>
+                )}
+                {user?.type === 'admin' && (
+                  <Link
+                    to="/admin/dashboard"
+                    className="text-sm font-medium text-primary-600 hover:text-primary-700"
+                  >
+                    Admin Dashboard
                   </Link>
                 )}
                 <button
@@ -199,6 +238,15 @@ const Header: React.FC = () => {
                         className="block text-sm font-medium text-primary-600 hover:text-primary-700 mb-4"
                       >
                         Project Wizard
+                      </Link>
+                    )}
+                    {user?.type === 'admin' && (
+                      <Link
+                        to="/admin/dashboard"
+                        onClick={() => setIsMenuOpen(false)}
+                        className="block text-sm font-medium text-primary-600 hover:text-primary-700 mb-4"
+                      >
+                        Admin Dashboard
                       </Link>
                     )}
                     <button

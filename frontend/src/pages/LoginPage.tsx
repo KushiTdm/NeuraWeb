@@ -218,15 +218,7 @@ const LoginPage: React.FC = () => {
             </button>
           </form>
 
-          {userType === 'admin' && (
-            <div className="mt-6 p-4 bg-gray-100 dark:bg-gray-800 rounded-lg">
-              <p className="text-sm text-gray-600 dark:text-gray-300 text-center">
-                <strong>{t('login.demo.credentials')}</strong><br />
-                {t('login.demo.email.text')}<br />
-                {t('login.demo.password.text')}
-              </p>
-            </div>
-          )}
+          
 
           {/* NOUVEAU - Message d'information pour les nouveaux clients */}
           {userType === 'client' && (

@@ -256,7 +256,7 @@ export class GoogleCalendarService {
         startDateTime: startDateTime.toISOString(),
         endDateTime: endDateTime.toISOString(),
         timeZone: process.env.TIMEZONE || 'Europe/Paris',
-        attendee: eventData.email,
+        client: eventData.email,
         calendarId: process.env.GOOGLE_CALENDAR_ID
       });
 
@@ -271,17 +271,9 @@ export class GoogleCalendarService {
           dateTime: endDateTime.toISOString(),
           timeZone: process.env.TIMEZONE || 'Europe/Paris',
         },
-        attendees: [
-          {
-            email: eventData.email,
-            displayName: eventData.name,
-            responseStatus: 'needsAction'
-          }
-        ],
         reminders: {
           useDefault: false,
           overrides: [
-            { method: 'email', minutes: 24 * 60 }, // 24 hours before
             { method: 'popup', minutes: 30 }       // 30 minutes before
           ]
         }
@@ -291,8 +283,7 @@ export class GoogleCalendarService {
 
       const response = await this.calendar.events.insert({
         calendarId: process.env.GOOGLE_CALENDAR_ID,
-        requestBody: eventPayload,
-        sendUpdates: 'all' // Send email notifications
+        requestBody: eventPayload
       });
 
       console.log('✅ Calendar event created successfully:', {
@@ -440,8 +431,7 @@ export class GoogleCalendarService {
       
       await this.calendar.events.delete({
         calendarId: process.env.GOOGLE_CALENDAR_ID,
-        eventId,
-        sendUpdates: 'all' // Send cancellation notifications
+        eventId
       });
 
       console.log(`✅ Calendar event cancelled: ${eventId}`);
@@ -500,8 +490,7 @@ export class GoogleCalendarService {
       const response = await this.calendar.events.update({
         calendarId: process.env.GOOGLE_CALENDAR_ID,
         eventId,
-        requestBody: updatedEvent,
-        sendUpdates: 'all'
+        requestBody: updatedEvent
       });
 
       console.log(`✅ Calendar event updated: ${eventId}`);
@@ -570,7 +559,7 @@ export class GoogleCalendarService {
   }
 
   /**
-   * Search events by attendee email
+   * Search events by client email in description
    */
   async findEventsByEmail(email: string, days: number = 30): Promise<CalendarEvent[]> {
     if (!this.isReady()) {

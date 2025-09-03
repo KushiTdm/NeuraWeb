@@ -2,6 +2,7 @@
 import { google } from 'googleapis';
 import nodemailer from 'nodemailer';
 import { PrismaService } from './PrismaService';
+import { GoogleCalendarService, BookingEventData } from './GoogleCalendarService';
 import validator from 'validator';
 
 interface BookingFormData {
@@ -10,6 +11,14 @@ interface BookingFormData {
   phone?: string;
   message?: string;
   selectedSlot: string;
+}
+
+interface CreateBookingData {
+  name: string;
+  email: string;
+  datetime: string;
+  phone?: string;
+  message?: string;
 }
 
 interface TimeSlot {
@@ -22,12 +31,14 @@ export class BookingService {
   private calendar: any;
   private transporter!: nodemailer.Transporter;
   private prisma: PrismaService;
+  private googleCalendar: GoogleCalendarService;
 
   constructor() {
     this.prisma = new PrismaService();
+    this.googleCalendar = new GoogleCalendarService();
     this.initializeTransporter();
 
-    // Initialize Google Calendar API
+    // Keep the old Google Calendar initialization for backward compatibility
     if (process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET) {
       const auth = new google.auth.OAuth2(
         process.env.GOOGLE_CLIENT_ID,
@@ -61,7 +72,7 @@ export class BookingService {
 
     this.transporter = nodemailer.createTransport(smtpConfig);
 
-    // Vérifier la configuration SMTP
+    // Verify the SMTP configuration
     this.verifyTransporter();
   }
 
@@ -74,14 +85,105 @@ export class BookingService {
     }
   }
 
+  /**
+   * Get available slots using Google Calendar integration
+   */
   async getAvailableSlots(): Promise<TimeSlot[]> {
     try {
-      // For demo purposes, generate mock slots
-      // In production, this would fetch from Google Calendar API
-      return this.generateMockSlots();
+      if (this.googleCalendar.isReady()) {
+        return await this.googleCalendar.generateAvailableSlots(7);
+      } else {
+        console.warn('⚠️  Google Calendar not ready, using mock slots');
+        return this.generateMockSlots();
+      }
     } catch (error) {
       console.error('Error fetching calendar slots:', error);
       return this.generateMockSlots();
+    }
+  }
+
+  /**
+   * Get availability for the next 7 days (new endpoint)
+   */
+  async getAvailability(days: number = 7): Promise<TimeSlot[]> {
+    return this.getAvailableSlots();
+  }
+
+  /**
+   * Create a new booking with Google Calendar integration
+   */
+  async createBookingWithCalendar(data: CreateBookingData) {
+    try {
+      // Validate input
+      if (!data.name || !data.email || !data.datetime) {
+        throw new Error('Missing required fields: name, email, datetime');
+      }
+
+      if (!validator.isEmail(data.email)) {
+        throw new Error('Invalid email format');
+      }
+
+      // Validation plus stricte de la datetime
+      const dateTime = new Date(data.datetime);
+      if (isNaN(dateTime.getTime())) {
+        console.error('❌ Invalid datetime format received:', data.datetime);
+        throw new Error(`Invalid datetime format: ${data.datetime}`);
+      }
+
+      // Vérifier que la date est dans le futur
+      if (dateTime <= new Date()) {
+        throw new Error('Datetime must be in the future');
+      }
+
+      console.log('📅 Creating booking with validated datetime:', {
+        original: data.datetime,
+        parsed: dateTime.toISOString(),
+        isValid: !isNaN(dateTime.getTime()),
+        isFuture: dateTime > new Date()
+      });
+
+      // Create calendar event
+      const calendarResult = await this.googleCalendar.createBookingEvent({
+        name: data.name,
+        email: data.email,
+        datetime: data.datetime,
+        phone: data.phone,
+        message: data.message,
+      });
+
+      // Database creation
+      const booking = await this.prisma.booking.create({
+        data: {
+          name: data.name,
+          email: data.email,
+          phone: data.phone || '',
+          message: data.message || '',
+          selectedSlot: data.datetime, // Stocker la datetime
+          status: 'confirmed',
+        },
+      });
+
+      // Send email confirmations
+      await this.sendBookingEmails({
+        name: data.name,
+        email: data.email,
+        phone: data.phone,
+        message: data.message,
+        selectedSlot: data.datetime,
+      });
+
+      console.log(`✅ Booking created: ${booking.id}`);
+      
+      return {
+        booking: {
+          ...booking,
+          calendarEventId: calendarResult.event?.id || null,
+        },
+        calendarEvent: calendarResult.event,
+      };
+    } catch (error) {
+      console.error('❌ Booking creation failed:', error);
+      throw new Error(`Failed to create booking: ${error instanceof Error ? error.message : 'Unknown error'}`);
     }
   }
 
@@ -272,6 +374,79 @@ export class BookingService {
     }
   }
 
+  private async sendBookingEmails(data: BookingFormData): Promise<void> {
+    const senderEmail = process.env.SENDER_EMAIL;
+    const recipientEmail = process.env.RECIPIENT_EMAIL;
+
+    if (!senderEmail || !recipientEmail) {
+      console.warn('⚠️  Email configuration missing, skipping email notifications');
+      return;
+    }
+
+    try {
+      const meetingDateTime = new Date(data.selectedSlot);
+      
+      const commonMailOptions = {
+        from: {
+          name: process.env.SENDER_NAME || 'NeuraWeb',
+          address: senderEmail
+        }
+      };
+
+      // Send notification to admin
+      const adminMailOptions = {
+        ...commonMailOptions,
+        to: recipientEmail,
+        subject: `🗓️ Nouveau rendez-vous réservé - ${data.name}`,
+        html: this.getBookingEmailTemplate('admin', data, meetingDateTime),
+        text: `
+Nouveau rendez-vous réservé
+
+Nom: ${data.name}
+Email: ${data.email}
+Téléphone: ${data.phone || 'Non fourni'}
+Date du rendez-vous: ${meetingDateTime.toLocaleString('fr-FR')}
+
+${data.message ? `Message: ${data.message}` : ''}
+
+Réservé le: ${new Date().toLocaleString('fr-FR')}
+        `.trim()
+      };
+
+      // Send confirmation to user
+      const userMailOptions = {
+        ...commonMailOptions,
+        to: data.email,
+        subject: '✅ Rendez-vous confirmé - NeuraWeb',
+        html: this.getBookingEmailTemplate('user', data, meetingDateTime),
+        text: `
+Bonjour ${data.name},
+
+Votre rendez-vous est confirmé !
+
+Date et heure: ${meetingDateTime.toLocaleString('fr-FR')}
+Durée: 1 heure
+
+Nous vous enverrons le lien de la réunion 30 minutes avant le rendez-vous.
+
+Cordialement,
+L'équipe NeuraWeb
+        `.trim()
+      };
+
+      // Send emails
+      await this.transporter.sendMail(adminMailOptions);
+      console.log('✅ Admin booking notification sent');
+
+      await this.transporter.sendMail(userMailOptions);
+      console.log('✅ User booking confirmation sent');
+    } catch (emailError) {
+      console.error('❌ Failed to send booking emails:', emailError);
+      // Don't fail the booking if email fails
+    }
+  }
+
+  // Legacy method - kept for backward compatibility
   async createBooking(data: BookingFormData) {
     try {
       // Save to database
@@ -286,7 +461,7 @@ export class BookingService {
         },
       });
 
-      // Create calendar event (if Google Calendar is configured)
+      // Create calendar event (if Google Calendar is configured) - Legacy approach
       if (this.calendar && process.env.GOOGLE_CALENDAR_ID) {
         try {
           const eventDateTime = new Date(data.selectedSlot);
@@ -305,9 +480,6 @@ export class BookingService {
                 dateTime: endDateTime.toISOString(),
                 timeZone: process.env.TIMEZONE || 'Europe/Paris',
               },
-              attendees: [
-                { email: data.email },
-              ],
             },
           });
         } catch (calendarError) {
@@ -317,72 +489,7 @@ export class BookingService {
       }
 
       // Send email confirmations
-      const senderEmail = process.env.SENDER_EMAIL;
-      const recipientEmail = process.env.RECIPIENT_EMAIL;
-
-      if (senderEmail && recipientEmail) {
-        const meetingDateTime = new Date(data.selectedSlot);
-        
-        const commonMailOptions = {
-          from: {
-            name: process.env.SENDER_NAME || 'NeuraWeb',
-            address: senderEmail
-          }
-        };
-
-        // Send notification to admin
-        const adminMailOptions = {
-          ...commonMailOptions,
-          to: recipientEmail,
-          subject: `🗓️ Nouveau rendez-vous réservé - ${data.name}`,
-          html: this.getBookingEmailTemplate('admin', data, meetingDateTime),
-          text: `
-Nouveau rendez-vous réservé
-
-Nom: ${data.name}
-Email: ${data.email}
-Téléphone: ${data.phone || 'Non fourni'}
-Date du rendez-vous: ${meetingDateTime.toLocaleString('fr-FR')}
-
-${data.message ? `Message: ${data.message}` : ''}
-
-Réservé le: ${new Date().toLocaleString('fr-FR')}
-          `.trim()
-        };
-
-        // Send confirmation to user
-        const userMailOptions = {
-          ...commonMailOptions,
-          to: data.email,
-          subject: '✅ Rendez-vous confirmé - NeuraWeb',
-          html: this.getBookingEmailTemplate('user', data, meetingDateTime),
-          text: `
-Bonjour ${data.name},
-
-Votre rendez-vous est confirmé !
-
-Date et heure: ${meetingDateTime.toLocaleString('fr-FR')}
-Durée: 1 heure
-
-Nous vous enverrons le lien de la réunion 30 minutes avant le rendez-vous.
-
-Cordialement,
-L'équipe NeuraWeb
-          `.trim()
-        };
-
-        // Envoi des emails
-        try {
-          await this.transporter.sendMail(adminMailOptions);
-          console.log('✅ Admin booking notification sent');
-
-          await this.transporter.sendMail(userMailOptions);
-          console.log('✅ User booking confirmation sent');
-        } catch (emailError) {
-          console.error('❌ Failed to send booking emails:', emailError);
-          // Don't fail the booking if email fails
-        }
-      }
+      await this.sendBookingEmails(data);
 
       console.log(`✅ Booking created successfully: ${booking.id}`);
       return booking;
@@ -392,7 +499,7 @@ L'équipe NeuraWeb
     }
   }
 
-  // Méthode utilitaire pour obtenir les réservations (pour l'admin)
+  // Method to get bookings (for admin)
   async getBookings(page: number = 1, limit: number = 10) {
     try {
       const skip = (page - 1) * limit;
@@ -423,15 +530,24 @@ L'équipe NeuraWeb
     }
   }
 
-  // Méthode pour annuler une réservation
+  // Method to cancel a booking
   async cancelBooking(bookingId: string) {
     try {
-      const booking = await this.prisma.booking.update({
+      const booking = await this.prisma.booking.findUnique({
+        where: { id: bookingId }
+      });
+
+      if (!booking) {
+        throw new Error('Booking not found');
+      }
+
+      // Update booking status
+      const updatedBooking = await this.prisma.booking.update({
         where: { id: bookingId },
         data: { status: 'cancelled' }
       });
 
-      return booking;
+      return updatedBooking;
     } catch (error) {
       console.error('Error cancelling booking:', error);
       throw new Error('Failed to cancel booking');

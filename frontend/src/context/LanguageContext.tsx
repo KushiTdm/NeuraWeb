@@ -139,6 +139,17 @@ const translations = {
     'booking.booked': 'Booked',
     'booking.meeting.time': 'Meeting Time:',
     'booking.slot.select.error': 'Please select a time slot',
+
+    'booking.select.day': 'Select a Day',
+    'booking.select.time': 'Select a Time Slot',
+    'booking.back': 'Back',
+    'booking.slots.available': 'slots available',
+    'booking.slots.full': 'Full',
+    'booking.no.days': 'No days available at the moment',
+    'booking.select.preferred': 'Select your preferred time slot',
+    'booking.time.available': 'Available',
+    'booking.time.taken': 'Taken',
+    'booking.summary.title': 'Meeting Summary:',
     
     // Admin
     'admin.title': 'Admin Dashboard',
@@ -752,6 +763,17 @@ const translations = {
     'booking.booked': 'Réservé',
     'booking.meeting.time': 'Heure du Rendez-vous :',
     'booking.slot.select.error': 'Veuillez sélectionner un créneau horaire',
+
+    'booking.select.day': 'Choisir un Jour',
+    'booking.select.time': 'Choisir un Créneau',
+    'booking.back': 'Retour',
+    'booking.slots.available': 'créneaux disponibles',
+    'booking.slots.full': 'Complet',
+    'booking.no.days': 'Aucun jour disponible pour le moment',
+    'booking.select.preferred': 'Sélectionnez votre créneau préféré',
+    'booking.time.available': 'Libre',
+    'booking.time.taken': 'Pris',
+    'booking.summary.title': 'Résumé du rendez-vous :',
     
     // Admin
     'admin.title': 'Tableau de Bord Admin',

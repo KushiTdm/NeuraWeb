@@ -1,4 +1,4 @@
-// BookingPage.tsx - Version améliorée avec sélection jour/créneaux
+// BookingPage.tsx - Version complète avec traductions
 import React, { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { toast } from 'react-hot-toast';
@@ -282,7 +282,7 @@ const BookingPage: React.FC = () => {
                 <div className="flex items-center space-x-2">
                   <Calendar className="text-primary-600" size={18} />
                   <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-                    {currentStep === 'day' ? t('booking.select.day') || 'Choisir un jour' : t('booking.select.time') || 'Choisir un créneau'}
+                    {currentStep === 'day' ? t('booking.select.day') : t('booking.select.time')}
                   </h3>
                 </div>
                 {currentStep === 'time' && (
@@ -291,7 +291,7 @@ const BookingPage: React.FC = () => {
                     className="flex items-center space-x-1 text-primary-600 hover:text-primary-700 transition-colors"
                   >
                     <ChevronLeft size={16} />
-                    <span className="text-sm">Retour</span>
+                    <span className="text-sm">{t('booking.back')}</span>
                   </button>
                 )}
               </div>
@@ -339,7 +339,7 @@ const BookingPage: React.FC = () => {
                                       ? 'bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-300'
                                       : 'bg-gray-100 text-gray-600 dark:bg-gray-600 dark:text-gray-300'
                                   }`}>
-                                    {availableCount > 0 ? `${availableCount} créneaux` : 'Complet'}
+                                    {availableCount > 0 ? `${availableCount} ${t('booking.slots.available')}` : t('booking.slots.full')}
                                   </div>
                                   {availableCount > 0 && (
                                     <ChevronRight size={16} className={`mt-1 mx-auto ${
@@ -354,7 +354,7 @@ const BookingPage: React.FC = () => {
                       ) : (
                         <div className="text-center py-8 text-gray-500 dark:text-gray-400">
                           <Calendar size={40} className="mx-auto mb-3 opacity-50" />
-                          <p>Aucun jour disponible pour le moment</p>
+                          <p>{t('booking.no.days')}</p>
                         </div>
                       )}
                     </div>
@@ -375,7 +375,7 @@ const BookingPage: React.FC = () => {
                                 {dayData.displayDate} - {dayData.weekday}
                               </h4>
                               <p className="text-sm text-primary-600 dark:text-primary-400 mt-1">
-                                Sélectionnez votre créneau préféré
+                                {t('booking.select.preferred')}
                               </p>
                             </div>
 
@@ -413,7 +413,7 @@ const BookingPage: React.FC = () => {
                                         ? 'bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-300'
                                         : 'bg-gray-100 text-gray-600 dark:bg-gray-600 dark:text-gray-300'
                                     }`}>
-                                      {slot.available ? 'Libre' : 'Pris'}
+                                      {slot.available ? t('booking.time.available') : t('booking.time.taken')}
                                     </div>
                                   </div>
                                 </button>

@@ -11,6 +11,11 @@
     "start": "cd backend && npm start"
   },
   "devDependencies": {
+    "@types/validator": "^13.15.2",
     "concurrently": "^8.2.2"
+  },
+  "dependencies": {
+    "googleapis": "^159.0.0",
+    "validator": "^13.15.15"
   }
 }

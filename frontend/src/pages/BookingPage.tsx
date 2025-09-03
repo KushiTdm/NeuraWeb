@@ -1,8 +1,8 @@
-// frontend/src/pages/BookingPage.tsx
+// BookingPage.tsx - Version améliorée avec sélection jour/créneaux
 import React, { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { toast } from 'react-hot-toast';
-import { Calendar, Clock, User } from 'lucide-react';
+import { Calendar, Clock, User, ChevronLeft, ChevronRight } from 'lucide-react';
 import { useLanguage } from '../context/LanguageContext';
 import api from '../utils/api';
 
@@ -20,12 +20,22 @@ interface TimeSlot {
   available: boolean;
 }
 
+interface DaySlots {
+  date: string;
+  displayDate: string;
+  weekday: string;
+  slots: TimeSlot[];
+}
+
 const BookingPage: React.FC = () => {
   const { t } = useLanguage();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [selectedSlot, setSelectedSlot] = useState<string>('');
+  const [selectedDay, setSelectedDay] = useState<string>('');
   const [availableSlots, setAvailableSlots] = useState<TimeSlot[]>([]);
+  const [daySlots, setDaySlots] = useState<DaySlots[]>([]);
   const [loading, setLoading] = useState(true);
+  const [currentStep, setCurrentStep] = useState<'day' | 'time'>('day');
   const { register, handleSubmit, setValue, formState: { errors } } = useForm<BookingFormData>();
 
   useEffect(() => {
@@ -35,22 +45,43 @@ const BookingPage: React.FC = () => {
   const fetchAvailableSlots = async () => {
     try {
       setLoading(true);
-      const response = await api.get('/booking/slots');
-      if (Array.isArray(response.data)) {
-        setAvailableSlots(response.data);
+      console.log('🔍 Fetching slots from API...');
+      
+      const response = await api.get('/booking/availability');
+      console.log('📡 API Response:', response.data);
+
+      let slots: TimeSlot[] = [];
+
+      if (response.data && response.data.success && response.data.data && response.data.data.slots) {
+        console.log('✅ Found slots:', response.data.data.slots);
+        slots = response.data.data.slots;
+      } else if (Array.isArray(response.data)) {
+        console.log('📋 Legacy API format detected');
+        slots = response.data;
+      } else if (response.data && response.data.data && Array.isArray(response.data.data)) {
+        console.log('📋 Alternative API format detected');
+        slots = response.data.data;
       } else {
-        console.error('API response is not an array:', response.data);
-        generateMockSlots();
+        console.error('❌ Unexpected API response structure:', response.data);
+        console.log('🎭 Generating mock slots...');
+        slots = generateMockSlots();
       }
+
+      setAvailableSlots(slots);
+      organizeDaySlots(slots);
     } catch (error) {
-      console.error('Error fetching slots:', error);
-      generateMockSlots();
+      console.error('❌ Error fetching slots:', error);
+      console.log('🎭 Generating mock slots due to error...');
+      const mockSlots = generateMockSlots();
+      setAvailableSlots(mockSlots);
+      organizeDaySlots(mockSlots);
     } finally {
       setLoading(false);
     }
   };
 
-  const generateMockSlots = () => {
+  const generateMockSlots = (): TimeSlot[] => {
+    console.log('🎭 Generating mock slots...');
     const slots: TimeSlot[] = [];
     const now = new Date();
     
@@ -62,8 +93,9 @@ const BookingPage: React.FC = () => {
       // Skip weekends
       if (date.getDay() === 0 || date.getDay() === 6) continue;
       
-      // Generate time slots (9 AM to 5 PM)
-      for (let hour = 9; hour < 17; hour += 2) {
+      // Generate time slots (9 AM, 11 AM, 2 PM, 4 PM)
+      const hours = [9, 11, 14, 16];
+      hours.forEach(hour => {
         const slotDate = new Date(date);
         slotDate.setHours(hour, 0, 0, 0);
         
@@ -72,51 +104,147 @@ const BookingPage: React.FC = () => {
           datetime: slotDate.toISOString(),
           available: Math.random() > 0.3,
         });
-      }
+      });
     }
     
-    setAvailableSlots(slots);
+    console.log('✅ Generated mock slots:', slots.length);
+    return slots;
+  };
+
+  const organizeDaySlots = (slots: TimeSlot[]) => {
+    const groupedByDate = new Map<string, TimeSlot[]>();
+    
+    slots.forEach(slot => {
+      const date = new Date(slot.datetime);
+      const dateKey = date.toDateString();
+      
+      if (!groupedByDate.has(dateKey)) {
+        groupedByDate.set(dateKey, []);
+      }
+      groupedByDate.get(dateKey)!.push(slot);
+    });
+
+    const daySlots: DaySlots[] = Array.from(groupedByDate.entries())
+      .map(([dateKey, daySlots]) => {
+        const date = new Date(dateKey);
+        return {
+          date: dateKey,
+          displayDate: date.toLocaleDateString('en-US', { 
+            month: 'short', 
+            day: 'numeric' 
+          }),
+          weekday: date.toLocaleDateString('en-US', { weekday: 'long' }),
+          slots: daySlots.sort((a, b) => new Date(a.datetime).getTime() - new Date(b.datetime).getTime())
+        };
+      })
+      .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+
+    setDaySlots(daySlots);
   };
 
   const onSubmit = async (data: BookingFormData) => {
+    console.log('🚀 Form submission started');
+    console.log('📝 Form data:', data);
+    console.log('🎯 Selected slot ID:', selectedSlot);
+
     if (!selectedSlot) {
       toast.error(t('booking.slot.select.error'));
       return;
     }
 
+    const selectedSlotData = availableSlots.find(slot => slot.id === selectedSlot);
+    console.log('🔍 Found slot data:', selectedSlotData);
+
+    if (!selectedSlotData) {
+      toast.error('Slot sélectionné invalide');
+      console.error('❌ Selected slot not found in available slots');
+      return;
+    }
+
+    const testDate = new Date(selectedSlotData.datetime);
+    if (isNaN(testDate.getTime())) {
+      toast.error('Format de date invalide');
+      console.error('❌ Invalid datetime format:', selectedSlotData.datetime);
+      return;
+    }
+
     setIsSubmitting(true);
     try {
-      await api.post('/booking', { ...data, selectedSlot });
-      toast.success(t('booking.success'));
-      setSelectedSlot('');
-      fetchAvailableSlots();
-    } catch (error) {
-      toast.error(t('common.error'));
-      console.error('Booking error:', error);
+      const bookingData = {
+        name: data.name.trim(),
+        email: data.email.toLowerCase().trim(),
+        datetime: selectedSlotData.datetime,
+        phone: data.phone?.trim() || undefined,
+        message: data.message?.trim() || undefined,
+      };
+
+      console.log('📡 Sending to API:', bookingData);
+
+      const response = await api.post('/booking/create', bookingData);
+      
+      console.log('✅ Booking response:', response.data);
+      
+      if (response.data.success) {
+        toast.success(response.data.message || t('booking.success'));
+        // Reset form
+        setSelectedSlot('');
+        setSelectedDay('');
+        setCurrentStep('day');
+        setValue('name', '');
+        setValue('email', '');
+        setValue('phone', '');
+        setValue('message', '');
+        // Refresh slots
+        fetchAvailableSlots();
+      } else {
+        toast.error(response.data.error || 'Erreur lors de la réservation');
+      }
+    } catch (error: any) {
+      console.error('❌ Booking error details:', error);
+      console.error('❌ Error response:', error.response?.data);
+      
+      const errorMessage = error.response?.data?.error || error.message || t('common.error');
+      toast.error(errorMessage);
     } finally {
       setIsSubmitting(false);
     }
   };
 
-  const formatDateTime = (dateTime: string) => {
+  const formatTime = (dateTime: string) => {
     const date = new Date(dateTime);
-    return {
-      date: date.toLocaleDateString('en-US', { 
-        weekday: 'short', 
-        month: 'short', 
-        day: 'numeric' 
-      }),
-      time: date.toLocaleTimeString('en-US', { 
-        hour: 'numeric', 
-        minute: '2-digit',
-        hour12: true 
-      }),
-    };
+    if (isNaN(date.getTime())) {
+      return 'Invalid Time';
+    }
+    return date.toLocaleTimeString('en-US', { 
+      hour: 'numeric', 
+      minute: '2-digit',
+      hour12: true 
+    });
+  };
+
+  const handleDaySelect = (dayKey: string) => {
+    setSelectedDay(dayKey);
+    setCurrentStep('time');
+    setSelectedSlot(''); // Reset slot selection when changing day
   };
 
   const handleSlotSelect = (slotId: string) => {
+    console.log('🎯 Selecting slot:', slotId);
     setSelectedSlot(slotId);
     setValue('selectedSlot', slotId);
+  };
+
+  const handleBackToDay = () => {
+    setCurrentStep('day');
+    setSelectedSlot('');
+  };
+
+  const getSelectedDayData = () => {
+    return daySlots.find(day => day.date === selectedDay);
+  };
+
+  const getSelectedSlotData = () => {
+    return availableSlots.find(slot => slot.id === selectedSlot);
   };
 
   if (loading) {
@@ -132,10 +260,10 @@ const BookingPage: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 snap-y snap-mandatory overflow-y-auto">
-      {/* Section principale - Pleine hauteur avec snap */}
       <section className="min-h-screen flex flex-col justify-center px-4 sm:px-6 lg:px-8 pt-16 pb-8 snap-start">
         <div className="max-w-6xl mx-auto w-full flex-1 flex flex-col justify-center" style={{ maxHeight: 'calc(100vh - 4rem)' }}>
-          {/* Titre compact */}
+
+          {/* Titre */}
           <div className="text-center mb-6">
             <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 dark:text-white mb-3">
               {t('booking.title')}
@@ -145,81 +273,162 @@ const BookingPage: React.FC = () => {
             </p>
           </div>
 
-          {/* Contenu principal - Grid avec hauteurs calculées */}
+          {/* Contenu principal */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-6 flex-1 overflow-hidden">
             
-            {/* Available Time Slots */}
+            {/* Sélection Date/Heure */}
             <div className="order-2 lg:order-1 flex flex-col min-h-0">
-              <div className="flex items-center space-x-2 mb-3">
-                <Calendar className="text-primary-600" size={18} />
-                <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-                  {t('booking.select')}
-                </h3>
+              <div className="flex items-center justify-between mb-3">
+                <div className="flex items-center space-x-2">
+                  <Calendar className="text-primary-600" size={18} />
+                  <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+                    {currentStep === 'day' ? t('booking.select.day') || 'Choisir un jour' : t('booking.select.time') || 'Choisir un créneau'}
+                  </h3>
+                </div>
+                {currentStep === 'time' && (
+                  <button
+                    onClick={handleBackToDay}
+                    className="flex items-center space-x-1 text-primary-600 hover:text-primary-700 transition-colors"
+                  >
+                    <ChevronLeft size={16} />
+                    <span className="text-sm">Retour</span>
+                  </button>
+                )}
               </div>
 
               <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 p-4 flex-1 overflow-hidden">
-                {/* Container avec scroll snap pour les créneaux */}
-                <div className="h-full overflow-y-auto snap-y snap-mandatory scrollbar-thin scrollbar-thumb-gray-300 dark:scrollbar-thumb-gray-600 scrollbar-track-transparent pr-2 -mr-2">
-                  <div className="space-y-2">
-                    {Array.isArray(availableSlots) && availableSlots.length > 0 ? (
-                      availableSlots.map((slot) => {
-                        const { date, time } = formatDateTime(slot.datetime);
-                        const isSelected = selectedSlot === slot.id;
-                        
-                        return (
-                          <button
-                            key={slot.id}
-                            onClick={() => slot.available && handleSlotSelect(slot.id)}
-                            disabled={!slot.available}
-                            className={`w-full p-3 rounded-lg border-2 text-left transition-all snap-start ${
-                              isSelected
-                                ? 'border-primary-500 bg-primary-50 dark:bg-primary-900/20'
-                                : slot.available
-                                ? 'border-gray-200 dark:border-gray-600 hover:border-primary-300 bg-white dark:bg-gray-800 hover:shadow-md'
-                                : 'border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 opacity-50 cursor-not-allowed'
-                            }`}
-                          >
-                            <div className="flex items-center justify-between">
-                              <div className="min-w-0 flex-1">
-                                <p className={`font-medium text-sm ${
-                                  isSelected ? 'text-primary-700 dark:text-primary-300' : 'text-gray-900 dark:text-white'
-                                }`}>
-                                  {date}
-                                </p>
-                                <div className="flex items-center space-x-1 mt-1">
-                                  <Clock size={12} className={
-                                    isSelected ? 'text-primary-600' : 'text-gray-500 dark:text-gray-400'
-                                  } />
-                                  <span className={`text-xs ${
-                                    isSelected ? 'text-primary-600' : 'text-gray-500 dark:text-gray-400'
+                <div className="h-full overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 dark:scrollbar-thumb-gray-600 scrollbar-track-transparent pr-2 -mr-2">
+                  
+                  {/* Étape 1: Sélection du jour */}
+                  {currentStep === 'day' && (
+                    <div className="space-y-3">
+                      {daySlots.length > 0 ? (
+                        daySlots.map((day) => {
+                          const availableCount = day.slots.filter(slot => slot.available).length;
+                          const isSelected = selectedDay === day.date;
+                          
+                          return (
+                            <button
+                              key={day.date}
+                              onClick={() => handleDaySelect(day.date)}
+                              disabled={availableCount === 0}
+                              className={`w-full p-4 rounded-lg border-2 text-left transition-all ${
+                                isSelected
+                                  ? 'border-primary-500 bg-primary-50 dark:bg-primary-900/20'
+                                  : availableCount > 0
+                                  ? 'border-gray-200 dark:border-gray-600 hover:border-primary-300 bg-white dark:bg-gray-800 hover:shadow-md'
+                                  : 'border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 opacity-50 cursor-not-allowed'
+                              }`}
+                            >
+                              <div className="flex items-center justify-between">
+                                <div>
+                                  <h4 className={`font-semibold text-lg ${
+                                    isSelected ? 'text-primary-700 dark:text-primary-300' : 'text-gray-900 dark:text-white'
                                   }`}>
-                                    {time}
-                                  </span>
+                                    {day.displayDate}
+                                  </h4>
+                                  <p className={`text-sm mt-1 ${
+                                    isSelected ? 'text-primary-600 dark:text-primary-400' : 'text-gray-500 dark:text-gray-400'
+                                  }`}>
+                                    {day.weekday}
+                                  </p>
+                                </div>
+                                <div className="text-right">
+                                  <div className={`px-3 py-1 rounded-full text-sm font-medium ${
+                                    availableCount > 0
+                                      ? 'bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-300'
+                                      : 'bg-gray-100 text-gray-600 dark:bg-gray-600 dark:text-gray-300'
+                                  }`}>
+                                    {availableCount > 0 ? `${availableCount} créneaux` : 'Complet'}
+                                  </div>
+                                  {availableCount > 0 && (
+                                    <ChevronRight size={16} className={`mt-1 mx-auto ${
+                                      isSelected ? 'text-primary-600' : 'text-gray-400'
+                                    }`} />
+                                  )}
                                 </div>
                               </div>
-                              <div className={`px-2 py-1 rounded-full text-xs font-medium flex-shrink-0 ml-3 ${
-                                slot.available
-                                  ? 'bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-300'
-                                  : 'bg-gray-100 text-gray-800 dark:bg-gray-600 dark:text-gray-300'
-                              }`}>
-                                {slot.available ? t('booking.available') : t('booking.booked')}
-                              </div>
+                            </button>
+                          );
+                        })
+                      ) : (
+                        <div className="text-center py-8 text-gray-500 dark:text-gray-400">
+                          <Calendar size={40} className="mx-auto mb-3 opacity-50" />
+                          <p>Aucun jour disponible pour le moment</p>
+                        </div>
+                      )}
+                    </div>
+                  )}
+
+                  {/* Étape 2: Sélection de l'heure */}
+                  {currentStep === 'time' && selectedDay && (
+                    <div className="space-y-3">
+                      {(() => {
+                        const dayData = getSelectedDayData();
+                        if (!dayData) return null;
+
+                        return (
+                          <>
+                            {/* En-tête du jour sélectionné */}
+                            <div className="bg-primary-50 dark:bg-primary-900/20 rounded-lg p-3 mb-4">
+                              <h4 className="font-semibold text-primary-800 dark:text-primary-200">
+                                {dayData.displayDate} - {dayData.weekday}
+                              </h4>
+                              <p className="text-sm text-primary-600 dark:text-primary-400 mt-1">
+                                Sélectionnez votre créneau préféré
+                              </p>
                             </div>
-                          </button>
+
+                            {/* Créneaux disponibles */}
+                            {dayData.slots.map((slot) => {
+                              const isSelected = selectedSlot === slot.id;
+                              const time = formatTime(slot.datetime);
+                              
+                              return (
+                                <button
+                                  key={slot.id}
+                                  onClick={() => slot.available && handleSlotSelect(slot.id)}
+                                  disabled={!slot.available}
+                                  className={`w-full p-3 rounded-lg border-2 text-left transition-all ${
+                                    isSelected
+                                      ? 'border-primary-500 bg-primary-50 dark:bg-primary-900/20'
+                                      : slot.available
+                                      ? 'border-gray-200 dark:border-gray-600 hover:border-primary-300 bg-white dark:bg-gray-800 hover:shadow-md'
+                                      : 'border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 opacity-50 cursor-not-allowed'
+                                  }`}
+                                >
+                                  <div className="flex items-center justify-between">
+                                    <div className="flex items-center space-x-3">
+                                      <Clock size={18} className={
+                                        isSelected ? 'text-primary-600' : slot.available ? 'text-gray-500 dark:text-gray-400' : 'text-gray-300'
+                                      } />
+                                      <span className={`font-medium ${
+                                        isSelected ? 'text-primary-700 dark:text-primary-300' : 'text-gray-900 dark:text-white'
+                                      }`}>
+                                        {time}
+                                      </span>
+                                    </div>
+                                    <div className={`px-2 py-1 rounded-full text-xs font-medium ${
+                                      slot.available
+                                        ? 'bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-300'
+                                        : 'bg-gray-100 text-gray-600 dark:bg-gray-600 dark:text-gray-300'
+                                    }`}>
+                                      {slot.available ? 'Libre' : 'Pris'}
+                                    </div>
+                                  </div>
+                                </button>
+                              );
+                            })}
+                          </>
                         );
-                      })
-                    ) : (
-                      <div className="text-center py-8 text-gray-500 dark:text-gray-400 h-full flex flex-col justify-center snap-start">
-                        <Calendar size={40} className="mx-auto mb-3 opacity-50" />
-                        <p>{t('booking.no.slots') || 'No available slots at the moment.'}</p>
-                      </div>
-                    )}
-                  </div>
+                      })()}
+                    </div>
+                  )}
                 </div>
               </div>
             </div>
 
-            {/* Booking Form */}
+            {/* Formulaire de réservation */}
             <div className="order-1 lg:order-2 flex flex-col min-h-0">
               <div className="flex items-center space-x-2 mb-3">
                 <User className="text-primary-600" size={18} />
@@ -233,7 +442,7 @@ const BookingPage: React.FC = () => {
                   <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
                     <div>
                       <label htmlFor="name" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                        {t('contact.name')}
+                        {t('contact.name')} *
                       </label>
                       <input
                         type="text"
@@ -249,7 +458,7 @@ const BookingPage: React.FC = () => {
 
                     <div>
                       <label htmlFor="email" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                        {t('contact.email')}
+                        {t('contact.email')} *
                       </label>
                       <input
                         type="email"
@@ -295,21 +504,22 @@ const BookingPage: React.FC = () => {
                       />
                     </div>
 
-                    {/* Créneau sélectionné */}
+                    {/* Récapitulatif de la sélection */}
                     {selectedSlot && (
                       <div className="bg-primary-50 dark:bg-primary-900/20 border border-primary-200 dark:border-primary-800 rounded-lg p-3">
-                        <h4 className="font-medium text-primary-800 dark:text-primary-200 mb-1 flex items-center text-sm">
+                        <h4 className="font-medium text-primary-800 dark:text-primary-200 mb-2 flex items-center text-sm">
                           <Calendar size={14} className="mr-1" />
                           {t('booking.selected')}
                         </h4>
                         {(() => {
-                          const slot = availableSlots.find(s => s.id === selectedSlot);
-                          if (slot) {
-                            const { date, time } = formatDateTime(slot.datetime);
+                          const selectedSlotData = getSelectedSlotData();
+                          const selectedDayData = getSelectedDayData();
+                          if (selectedSlotData && selectedDayData) {
                             return (
-                              <p className="text-primary-700 dark:text-primary-300 text-xs">
-                                {date} {t('booking.meeting.time')} {time}
-                              </p>
+                              <div className="text-primary-700 dark:text-primary-300 text-sm">
+                                <p className="font-medium">{selectedDayData.displayDate} - {selectedDayData.weekday}</p>
+                                <p className="text-xs mt-1">{formatTime(selectedSlotData.datetime)}</p>
+                              </div>
                             );
                           }
                           return null;
@@ -338,11 +548,6 @@ const BookingPage: React.FC = () => {
             </div>
           </div>
         </div>
-      </section>
-
-      {/* Section footer avec snap pour le scroll */}
-      <section className="snap-start">
-        {/* Le footer sera ici via le Layout */}
       </section>
     </div>
   );

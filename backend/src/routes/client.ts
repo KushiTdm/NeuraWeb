@@ -1,3 +1,4 @@
+// backend/src/routes/client.ts
 import express from 'express';
 import { ClientService } from '../services/ClientService';
 import { validateClientRegistration, validateClientLogin } from '../middleware/validation';
@@ -5,6 +6,9 @@ import { validateClientRegistration, validateClientLogin } from '../middleware/v
 const router = express.Router();
 const clientService = new ClientService();
 
+// DÉSACTIVÉ - Route d'inscription client
+// Pour réactiver plus tard, décommentez le code ci-dessous
+/*
 // POST /api/client/register - Client registration
 router.post('/register', validateClientRegistration, async (req, res, next) => {
   try {
@@ -21,6 +25,7 @@ router.post('/register', validateClientRegistration, async (req, res, next) => {
     next(error);
   }
 });
+*/
 
 // POST /api/client/login - Client login
 router.post('/login', validateClientLogin, async (req, res, next) => {

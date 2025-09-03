@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { toast } from 'react-hot-toast';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
-import { LogIn, UserPlus, User, Shield } from 'lucide-react';
+import { LogIn, User, Shield } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useLanguage } from '../context/LanguageContext';
 
@@ -12,43 +12,36 @@ interface LoginFormData {
   password: string;
 }
 
+// DÉSACTIVÉ - Interface pour l'inscription
+/*
 interface RegisterFormData {
   name: string;
   email: string;
   password: string;
   confirmPassword: string;
 }
+*/
 
 const LoginPage: React.FC = () => {
-  const [isLogin, setIsLogin] = useState(true);
+  // MODIFIÉ - Suppression de l'état isLogin car seule la connexion est disponible
+  // const [isLogin, setIsLogin] = useState(true);
   const [userType, setUserType] = useState<'client' | 'admin'>('client');
   const [isLoading, setIsLoading] = useState(false);
-  const { login, register } = useAuth();
+  const { login } = useAuth(); // MODIFIÉ - Suppression de register
   const { t } = useLanguage();
   const navigate = useNavigate();
   const location = useLocation();
 
   const from = location.state?.from?.pathname || '/';
 
-  const { register: registerField, handleSubmit, formState: { errors }, reset, watch } = useForm<LoginFormData & RegisterFormData>();
+  const { register: registerField, handleSubmit, formState: { errors } } = useForm<LoginFormData>();
 
-  const onSubmit = async (data: LoginFormData & RegisterFormData) => {
+  const onSubmit = async (data: LoginFormData) => {
     setIsLoading(true);
     try {
-      if (isLogin) {
-        await login(data.email, data.password, userType);
-        toast.success(t('login.success'));
-        navigate(userType === 'admin' ? '/admin' : from);
-      } else {
-        if (data.password !== data.confirmPassword) {
-          toast.error(t('login.passwords.nomatch'));
-          return;
-        }
-        await register(data.name, data.email, data.password);
-        toast.success(t('login.register.success'));
-        setIsLogin(true);
-        reset();
-      }
+      await login(data.email, data.password, userType);
+      toast.success(t('login.success'));
+      navigate(userType === 'admin' ? '/admin' : from);
     } catch (error: any) {
       toast.error(error.message);
     } finally {
@@ -68,8 +61,11 @@ const LoginPage: React.FC = () => {
           </Link>
           
           <h2 className="text-3xl font-bold text-gray-900 dark:text-white">
-            {isLogin ? t('login.signin.title') : t('login.create.title')}
+            {t('login.signin.title')}
           </h2>
+          
+          {/* DÉSACTIVÉ - Lien vers inscription */}
+          {/*
           <p className="mt-2 text-sm text-gray-600 dark:text-gray-400">
             {isLogin ? t('login.no.account') : t('login.have.account')}
             <button
@@ -81,6 +77,12 @@ const LoginPage: React.FC = () => {
             >
               {isLogin ? t('login.signup') : t('login.signin')}
             </button>
+          </p>
+          */}
+          
+          {/* NOUVEAU - Message d'information */}
+          <p className="mt-2 text-sm text-gray-600 dark:text-gray-400">
+            {t('login.signin.description') || 'Connectez-vous avec vos identifiants'}
           </p>
         </div>
 
@@ -114,6 +116,8 @@ const LoginPage: React.FC = () => {
           </div>
 
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+            {/* DÉSACTIVÉ - Champ nom pour l'inscription */}
+            {/*
             {!isLogin && (
               <div>
                 <label htmlFor="name" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
@@ -131,6 +135,7 @@ const LoginPage: React.FC = () => {
                 )}
               </div>
             )}
+            */}
 
             <div>
               <label htmlFor="email" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
@@ -162,8 +167,8 @@ const LoginPage: React.FC = () => {
                 type="password"
                 id="password"
                 {...registerField('password', { 
-                  required: t('common.password.required'),
-                  minLength: !isLogin ? { value: 6, message: t('login.password.minlength') } : undefined
+                  required: t('common.password.required')
+                  // MODIFIÉ - Suppression de la validation minLength pour l'inscription
                 })}
                 className="input-field"
                 placeholder={userType === 'admin' ? t('login.password.placeholder.admin') : t('login.password.placeholder.client')}
@@ -173,6 +178,8 @@ const LoginPage: React.FC = () => {
               )}
             </div>
 
+            {/* DÉSACTIVÉ - Champ confirmation mot de passe */}
+            {/*
             {!isLogin && (
               <div>
                 <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
@@ -193,6 +200,7 @@ const LoginPage: React.FC = () => {
                 )}
               </div>
             )}
+            */}
 
             <button
               type="submit"
@@ -203,20 +211,38 @@ const LoginPage: React.FC = () => {
                 <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
               ) : (
                 <>
-                  {isLogin ? <LogIn size={20} /> : <UserPlus size={20} />}
-                  <span>{isLogin ? t('login.signin.button') : t('login.signup.button')}</span>
+                  <LogIn size={20} />
+                  <span>{t('login.signin.button')}</span>
                 </>
               )}
             </button>
           </form>
 
-          {userType === 'admin' && isLogin && (
+          {userType === 'admin' && (
             <div className="mt-6 p-4 bg-gray-100 dark:bg-gray-800 rounded-lg">
               <p className="text-sm text-gray-600 dark:text-gray-300 text-center">
                 <strong>{t('login.demo.credentials')}</strong><br />
                 {t('login.demo.email.text')}<br />
                 {t('login.demo.password.text')}
               </p>
+            </div>
+          )}
+
+          {/* NOUVEAU - Message d'information pour les nouveaux clients */}
+          {userType === 'client' && (
+            <div className="mt-6 p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-800">
+              <p className="text-sm text-blue-700 dark:text-blue-300 text-center">
+                <strong>Nouveau client ?</strong><br />
+                Contactez-nous pour obtenir vos identifiants de connexion.
+              </p>
+              <div className="mt-3 text-center">
+                <Link 
+                  to="/contact" 
+                  className="inline-flex items-center text-sm font-medium text-blue-600 hover:text-blue-500 dark:text-blue-400 dark:hover:text-blue-300"
+                >
+                  Nous contacter
+                </Link>
+              </div>
             </div>
           )}
         </div>

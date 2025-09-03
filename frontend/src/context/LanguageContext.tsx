@@ -41,6 +41,7 @@ const translations = {
 
     // Login
       "login.signin.title": "Sign in to your account",
+      "login.signin.description": "Sign in with your credentials",
       "login.create.title": "Create your account",
       "login.no.account": "Don't have an account? ",
       "login.have.account": "Already have an account? ",
@@ -665,6 +666,7 @@ const translations = {
 
     // Contact
     "login.signin.title": "Connectez-vous à votre compte",
+    "login.signin.description": "Connectez-vous avec vos identifiants",
     "login.create.title": "Créez votre compte",
     "login.no.account": "Vous n'avez pas de compte ? ",
     "login.have.account": "Vous avez déjà un compte ? ",

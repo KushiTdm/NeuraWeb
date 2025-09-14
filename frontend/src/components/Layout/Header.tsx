@@ -87,6 +87,8 @@ const Header: React.FC = () => {
             >
               {t('nav.contact')}
             </Link>
+            {/* DÉSACTIVÉ - Bouton Devis */}
+            {/* 
             <Link
               to="/quote"
               className={`font-medium transition-colors duration-200 ${
@@ -95,6 +97,7 @@ const Header: React.FC = () => {
             >
               {t('nav.quote')}
             </Link>
+            */}
             <Link
               to="/booking"
               className="btn-primary"
@@ -144,12 +147,15 @@ const Header: React.FC = () => {
                 >
                   {t('nav.login')}
                 </Link>
+                {/* DÉSACTIVÉ - Bouton S'inscrire */}
+                {/* 
                 <Link
                   to="/register"
                   className="text-sm font-medium btn-primary px-4 py-2"
                 >
                   {t('nav.register')}
                 </Link>
+                */}
               </div>
             )}
 
@@ -206,6 +212,8 @@ const Header: React.FC = () => {
               >
                 {t('nav.contact')}
               </Link>
+              {/* DÉSACTIVÉ - Lien Devis mobile */}
+              {/* 
               <Link
                 to="/quote"
                 onClick={() => setIsMenuOpen(false)}
@@ -215,6 +223,7 @@ const Header: React.FC = () => {
               >
                 {t('nav.quote')}
               </Link>
+              */}
               <Link
                 to="/booking"
                 onClick={() => setIsMenuOpen(false)}
@@ -267,6 +276,8 @@ const Header: React.FC = () => {
                   >
                     {t('nav.login')}
                   </Link>
+                  {/* DÉSACTIVÉ - Lien S'inscrire mobile */}
+                  {/* 
                   <Link
                     to="/register"
                     onClick={() => setIsMenuOpen(false)}
@@ -274,6 +285,7 @@ const Header: React.FC = () => {
                   >
                     {t('nav.register')}
                   </Link>
+                  */}
                 </div>
               )}
             </nav>

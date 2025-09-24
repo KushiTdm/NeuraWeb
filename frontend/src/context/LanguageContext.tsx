@@ -121,6 +121,25 @@ const translations = {
     'quote.success': 'Quote request submitted successfully!',
     'quote.details': 'Additional Details',
     'quote.details.placeholder': 'Tell us more about your project requirements...',
+
+    'quote.step.personal': 'Personal Information',
+    'quote.step.service': 'Service Type', 
+    'quote.step.options': 'Additional Options',
+    'quote.step.details': 'Project Details',
+    'quote.progress': 'Progress',
+    'quote.summary': 'Project Summary',
+    'quote.estimated.total': 'Estimated Total',
+    'quote.step.of': 'Step {current} of {total}',
+
+    // Quote Steps
+    'quote.step1.title': 'Personal Information',
+    'quote.step1.subtitle': 'Tell us who you are',
+    'quote.step2.title': 'Service Type',
+    'quote.step2.subtitle': 'Choose the service that suits you',
+    'quote.step3.title': 'Additional Options',
+    'quote.step3.subtitle': 'Customize your project',
+    'quote.step4.title': 'Project Details',
+    'quote.step4.subtitle': 'Tell us about your vision',
     
     // Booking
     'booking.title': 'Book a Meeting',
@@ -148,6 +167,13 @@ const translations = {
     'booking.time.available': 'Available',
     'booking.time.taken': 'Taken',
     'booking.summary.title': 'Meeting Summary:',
+
+    'booking.step.date': 'Choose a Date',
+    'booking.step.time': 'Select Time',
+    'booking.step.info': 'Your Information', 
+    'booking.step.confirm': 'Confirmation',
+    'booking.next': 'Next',
+    'booking.previous': 'Previous',
     
     // Admin
     'admin.title': 'Admin Dashboard',
@@ -743,6 +769,25 @@ const translations = {
     'quote.success': 'Demande de devis soumise avec succès !',
     'quote.details': 'Détails Supplémentaires',
     'quote.details.placeholder': 'Parlez-nous davantage des exigences de votre projet...',
+
+    'quote.step.personal': 'Informations personnelles',
+    'quote.step.service': 'Type de service',
+    'quote.step.options': 'Options supplémentaires', 
+    'quote.step.details': 'Détails du projet',
+    'quote.progress': 'Progression',
+    'quote.summary': 'Résumé du projet',
+    'quote.estimated.total': 'Total estimé',
+    'quote.step.of': 'Étape {current} sur {total}',
+
+    // Quote Steps
+    'quote.step1.title': 'Informations personnelles',
+    'quote.step1.subtitle': 'Dites-nous qui vous êtes',
+    'quote.step2.title': 'Type de service',
+    'quote.step2.subtitle': 'Choisissez le service qui vous convient',
+    'quote.step3.title': 'Options supplémentaires',
+    'quote.step3.subtitle': 'Personnalisez votre projet',
+    'quote.step4.title': 'Détails du projet',
+    'quote.step4.subtitle': 'Parlez-nous de votre vision',
     
     // Booking
     'booking.title': 'Réserver un Rendez-vous',
@@ -770,6 +815,13 @@ const translations = {
     'booking.time.available': 'Libre',
     'booking.time.taken': 'Pris',
     'booking.summary.title': 'Résumé du rendez-vous :',
+
+    'booking.step.date': 'Choisir une date',
+    'booking.step.time': 'Sélectionner l\'heure', 
+    'booking.step.info': 'Vos informations',
+    'booking.step.confirm': 'Confirmation',
+    'booking.next': 'Suivant',
+    'booking.previous': 'Précédent',
     
     // Admin
     'admin.title': 'Tableau de Bord Admin',

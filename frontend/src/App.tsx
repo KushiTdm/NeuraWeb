@@ -1,4 +1,4 @@
-import React from 'react';
+// frontend/src/App.tsx
 import { Routes, Route } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
 import { LanguageProvider } from './context/LanguageContext';

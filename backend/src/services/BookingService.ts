@@ -123,7 +123,7 @@ export class BookingService {
         throw new Error('Invalid email format');
       }
 
-      // Validation plus stricte de la datetime
+      // CORRECTION: Validation plus stricte de la datetime
       const dateTime = new Date(data.datetime);
       if (isNaN(dateTime.getTime())) {
         console.error('❌ Invalid datetime format received:', data.datetime);
@@ -138,6 +138,7 @@ export class BookingService {
       console.log('📅 Creating booking with validated datetime:', {
         original: data.datetime,
         parsed: dateTime.toISOString(),
+        localTime: dateTime.toLocaleString('fr-FR', { timeZone: 'Europe/Paris' }),
         isValid: !isNaN(dateTime.getTime()),
         isFuture: dateTime > new Date()
       });
@@ -158,12 +159,12 @@ export class BookingService {
           email: data.email,
           phone: data.phone || '',
           message: data.message || '',
-          selectedSlot: data.datetime, // Stocker la datetime
+          selectedSlot: data.datetime,
           status: 'confirmed',
         },
       });
 
-      // Send email confirmations
+      // Send email confirmations avec la datetime correcte
       await this.sendBookingEmails({
         name: data.name,
         email: data.email,
@@ -213,6 +214,23 @@ export class BookingService {
     }
     
     return slots;
+  }
+
+  /**
+   * CORRECTION: Formatage de la date pour les emails avec fuseau horaire français
+   */
+  private formatDateForEmail(date: Date): string {
+    const options: Intl.DateTimeFormatOptions = {
+      weekday: 'long',
+      year: 'numeric', 
+      month: 'long',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+      timeZone: 'Europe/Paris' // Force le fuseau horaire français
+    };
+    
+    return date.toLocaleDateString('fr-FR', options);
   }
 
   private getBookingEmailTemplate(type: 'user' | 'admin', data: BookingFormData, meetingDateTime: Date): string {
@@ -273,6 +291,9 @@ export class BookingService {
   }
 
   private getBookingContentByType(type: 'user' | 'admin', data: BookingFormData, meetingDateTime: Date): string {
+    // CORRECTION: Utiliser le formatage correct avec fuseau horaire
+    const formattedDateTime = this.formatDateForEmail(meetingDateTime);
+
     if (type === 'user') {
       return `
         <div class="greeting">
@@ -286,14 +307,7 @@ export class BookingService {
         
         <div class="meeting-details">
             <h3>📅 Détails du rendez-vous</h3>
-            <p><strong>Date et heure :</strong> ${meetingDateTime.toLocaleDateString('fr-FR', { 
-              weekday: 'long', 
-              year: 'numeric', 
-              month: 'long', 
-              day: 'numeric',
-              hour: '2-digit',
-              minute: '2-digit'
-            })}</p>
+            <p><strong>Date et heure :</strong> ${formattedDateTime}</p>
             <p><strong>Durée :</strong> 1 heure</p>
             <p><strong>Type :</strong> Visioconférence</p>
             ${data.phone ? `<p><strong>Téléphone :</strong> ${validator.escape(data.phone)}</p>` : ''}
@@ -333,19 +347,12 @@ export class BookingService {
             <strong>Nom :</strong> ${validator.escape(data.name)}<br>
             <strong>Email :</strong> ${validator.escape(data.email)}<br>
             ${data.phone ? `<strong>Téléphone :</strong> ${validator.escape(data.phone)}<br>` : ''}
-            <strong>Date de réservation :</strong> ${new Date().toLocaleString('fr-FR')}
+            <strong>Date de réservation :</strong> ${new Date().toLocaleString('fr-FR', { timeZone: 'Europe/Paris' })}
         </div>
         
         <div class="meeting-details">
             <h3>📅 Détails du rendez-vous</h3>
-            <p><strong>Date et heure :</strong> ${meetingDateTime.toLocaleDateString('fr-FR', { 
-              weekday: 'long', 
-              year: 'numeric', 
-              month: 'long', 
-              day: 'numeric',
-              hour: '2-digit',
-              minute: '2-digit'
-            })}</p>
+            <p><strong>Date et heure :</strong> ${formattedDateTime}</p>
             <p><strong>Durée :</strong> 1 heure</p>
         </div>
 
@@ -384,7 +391,15 @@ export class BookingService {
     }
 
     try {
+      // CORRECTION: Parsing explicite de la datetime avec debug
       const meetingDateTime = new Date(data.selectedSlot);
+      
+      console.log('📧 Email datetime processing:', {
+        selectedSlot: data.selectedSlot,
+        meetingDateTime: meetingDateTime.toISOString(),
+        localTime: meetingDateTime.toLocaleString('fr-FR', { timeZone: 'Europe/Paris' }),
+        formattedForEmail: this.formatDateForEmail(meetingDateTime)
+      });
       
       const commonMailOptions = {
         from: {
@@ -405,11 +420,11 @@ Nouveau rendez-vous réservé
 Nom: ${data.name}
 Email: ${data.email}
 Téléphone: ${data.phone || 'Non fourni'}
-Date du rendez-vous: ${meetingDateTime.toLocaleString('fr-FR')}
+Date du rendez-vous: ${this.formatDateForEmail(meetingDateTime)}
 
 ${data.message ? `Message: ${data.message}` : ''}
 
-Réservé le: ${new Date().toLocaleString('fr-FR')}
+Réservé le: ${new Date().toLocaleString('fr-FR', { timeZone: 'Europe/Paris' })}
         `.trim()
       };
 
@@ -424,7 +439,7 @@ Bonjour ${data.name},
 
 Votre rendez-vous est confirmé !
 
-Date et heure: ${meetingDateTime.toLocaleString('fr-FR')}
+Date et heure: ${this.formatDateForEmail(meetingDateTime)}
 Durée: 1 heure
 
 Nous vous enverrons le lien de la réunion 30 minutes avant le rendez-vous.

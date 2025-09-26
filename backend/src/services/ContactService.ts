@@ -44,6 +44,14 @@ export class ContactService {
   private async verifyTransporter(): Promise<void> {
     try {
       await this.transporter.verify();
+      console.log('SMTP CONFIG:', {
+      host: process.env.SMTP_HOST,
+      port: process.env.SMTP_PORT,
+      secure: process.env.SMTP_SECURE,
+      user: process.env.SMTP_USER,
+      pass: process.env.SMTP_PASSWORD ? 'SET' : 'MISSING'
+    });
+
       console.log('✅ SMTP configuration is valid');
     } catch (error) {
       console.error('❌ SMTP configuration error:', error);

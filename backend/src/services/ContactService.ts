@@ -339,7 +339,7 @@ export class ContactService {
     <div class="email-container">
         <header class="email-header">
             <div class="logo-container">
-                <img src="${process.env.DOMAIN_URL || 'https://votre-domaine.fr'}/assets/neurawebW.png" alt="NeuraWeb Logo" class="logo" style="display: block;">
+                <img src="${process.env.DOMAIN_URL || 'https://neuraweb.tech'}/assets/neurawebW.png" alt="NeuraWeb Logo" class="logo" style="display: block;">
                 <div class="logo-fallback" style="display: none;">
                     <span>NW</span>
                 </div>
@@ -394,9 +394,9 @@ export class ContactService {
             <div class="footer-bottom">
                 <p>© 2025 NeuraWeb. Tous droits réservés.</p>
                 <div class="footer-links">
-                    <a href="${process.env.DOMAIN_URL || 'https://votre-domaine.fr'}/contact">Contact</a>
-                    <a href="${process.env.DOMAIN_URL || 'https://votre-domaine.fr'}/quote">Devis</a>
-                    <a href="${process.env.DOMAIN_URL || 'https://votre-domaine.fr'}/privacy">Confidentialité</a>
+                    <a href="${process.env.DOMAIN_URL || 'https://neuraweb.tech'}/contact">Contact</a>
+                    <a href="${process.env.DOMAIN_URL || 'https://neuraweb.tech'}/quote">Devis</a>
+                    <a href="${process.env.DOMAIN_URL || 'https://neuraweb.tech'}/privacy">Confidentialité</a>
                 </div>
             </div>
         </footer>
@@ -435,7 +435,7 @@ export class ContactService {
         </div>
         
         <div style="text-align: center;">
-            <a href="${process.env.DOMAIN_URL || 'https://votre-domaine.fr'}/booking" class="cta-button">Planifier un rendez-vous</a>
+            <a href="${process.env.DOMAIN_URL || 'https://neuraweb.tech'}/booking" class="cta-button">Planifier un rendez-vous</a>
         </div>
         
         <div class="signature">
@@ -470,7 +470,7 @@ export class ContactService {
         </div>
         
         <div style="text-align: center;">
-            <a href="${process.env.DOMAIN_URL || 'https://votre-domaine.fr'}/admin/contacts" class="cta-button">Voir dans l'admin</a>
+            <a href="${process.env.DOMAIN_URL || 'https://neuraweb.tech'}/admin/contacts" class="cta-button">Voir dans l'admin</a>
         </div>
         
         <div class="signature">

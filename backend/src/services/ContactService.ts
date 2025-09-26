@@ -22,24 +22,41 @@ export class ContactService {
   }
 
   private initializeTransporter(): void {
-    const smtpConfig = {
-      host: process.env.SMTP_HOST,
-      port: parseInt(process.env.SMTP_PORT || '587'),
-      secure: process.env.SMTP_SECURE === 'true', // true pour 465, false pour autres ports
-      auth: {
-        user: process.env.SMTP_USER,
-        pass: process.env.SMTP_PASSWORD,
-      },
-      tls: {
-        rejectUnauthorized: false // Pour éviter les problèmes de certificat avec certains hébergeurs
-      }
-    };
+  const smtpConfig = {
+    host: process.env.SMTP_HOST, // mail27.lwspanel.com
+    port: parseInt(process.env.SMTP_PORT || '587'),
+    secure: false, // Important: false pour le port 587
+    auth: {
+      user: process.env.SMTP_USER,
+      pass: process.env.SMTP_PASSWORD,
+    },
+    tls: {
+      rejectUnauthorized: false,
+      // Spécifique pour les serveurs d'hébergement
+      ciphers: 'SSLv3',
+      secureProtocol: 'TLSv1_method'
+    },
+    // Configuration pour hébergeur partagé
+    connectionTimeout: 60000, // 60 secondes
+    greetingTimeout: 30000,   // 30 secondes
+    socketTimeout: 60000,     // 60 secondes
+    logger: true, // Active les logs détaillés
+    debug: process.env.NODE_ENV !== 'production', // Debug en dev
+    // Important pour les serveurs partagés
+    pool: false, // Pas de pool de connexions
+    maxConnections: 1,
+    rateDelta: 1000, // 1 seconde entre les emails
+    rateLimit: 1 // 1 email par seconde max
+  };
 
-    this.transporter = nodemailer.createTransport(smtpConfig);
+  console.log('📧 Initializing SMTP with LWS configuration...');
+  this.transporter = nodemailer.createTransport(smtpConfig);
 
-    // Vérifier la configuration SMTP au démarrage
-    this.verifyTransporter();
-  }
+  // Vérification non bloquante
+  this.verifyTransporter().catch(error => {
+    console.warn('⚠️ SMTP verification failed, but service will continue:', error.message);
+  });
+}
 
   private async verifyTransporter(): Promise<void> {
     try {

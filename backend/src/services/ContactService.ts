@@ -48,7 +48,13 @@ export class ContactService {
     rateDelta: 1000, // 1 seconde entre les emails
     rateLimit: 1 // 1 email par seconde max
   };
-
+  console.log('📧 SMTP Configuration:', {
+    host: smtpConfig.host,
+    port: smtpConfig.port,
+    secure: smtpConfig.secure,
+    user: smtpConfig.auth.user,
+    hasPassword: !!smtpConfig.auth.pass
+  });
   console.log('📧 Initializing SMTP with LWS configuration...');
   this.transporter = nodemailer.createTransport(smtpConfig);
 

@@ -25,7 +25,7 @@ export class ContactService {
   const smtpConfig = {
     host: process.env.SMTP_HOST, // mail27.lwspanel.com
     port: parseInt(process.env.SMTP_PORT || '587'),
-    secure: false, // Important: false pour le port 587
+    secure: process.env.SMTP_SECURE, // Important: false pour le port 587
     auth: {
       user: process.env.SMTP_USER,
       pass: process.env.SMTP_PASSWORD,

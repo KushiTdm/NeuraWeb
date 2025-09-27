@@ -1,5 +1,5 @@
 // backend/src/services/ContactService.ts
-import nodemailer from 'nodemailer';
+import sgMail from '@sendgrid/mail';
 import { PrismaService } from './PrismaService';
 import { ValidationUtils } from '../utils/validation';
 import validator from 'validator';
@@ -11,75 +11,67 @@ interface ContactFormData {
 }
 
 export class ContactService {
-  private transporter!: nodemailer.Transporter;
   private prisma: PrismaService;
   private readonly MAX_NAME_LENGTH = 100;
   private readonly MAX_MESSAGE_LENGTH = 2000;
+  private isInitialized = false;
 
   constructor() {
     this.prisma = new PrismaService();
-    this.initializeTransporter();
+    this.initializeSendGrid();
   }
 
-  private initializeTransporter(): void {
-  const smtpConfig = {
-    host: process.env.SMTP_HOST, // mail27.lwspanel.com
-    port: parseInt(process.env.SMTP_PORT || '587'),
-    secure: process.env.SMTP_SECURE === 'true', // Important: false pour le port 587
-    auth: {
-      user: process.env.SMTP_USER,
-      pass: process.env.SMTP_PASSWORD,
-    },
-    tls: {
-      rejectUnauthorized: false,
-      // Spécifique pour les serveurs d'hébergement
-      ciphers: 'SSLv3',
-      secureProtocol: 'TLSv1_method'
-    },
-    // Configuration pour hébergeur partagé
-    connectionTimeout: 60000, // 60 secondes
-    greetingTimeout: 30000,   // 30 secondes
-    socketTimeout: 60000,     // 60 secondes
-    logger: true, // Active les logs détaillés
-    debug: process.env.NODE_ENV !== 'production', // Debug en dev
-    // Important pour les serveurs partagés
-    pool: false, // Pas de pool de connexions
-    maxConnections: 1,
-    rateDelta: 1000, // 1 seconde entre les emails
-    rateLimit: 1 // 1 email par seconde max
-  };
-  console.log('📧 SMTP Configuration:', {
-    host: smtpConfig.host,
-    port: smtpConfig.port,
-    secure: smtpConfig.secure,
-    user: smtpConfig.auth.user,
-    hasPassword: !!smtpConfig.auth.pass
-  });
-  console.log('📧 Initializing SMTP with LWS configuration...');
-  this.transporter = nodemailer.createTransport(smtpConfig);
-
-  // Vérification non bloquante
-  this.verifyTransporter().catch(error => {
-    console.warn('⚠️ SMTP verification failed, but service will continue:', error.message);
-  });
-}
-
-  private async verifyTransporter(): Promise<void> {
-    try {
-      await this.transporter.verify();
-      console.log('SMTP CONFIG:', {
-      host: process.env.SMTP_HOST,
-      port: process.env.SMTP_PORT,
-      secure: process.env.SMTP_SECURE,
-      user: process.env.SMTP_USER,
-      pass: process.env.SMTP_PASSWORD ? 'SET' : 'MISSING'
-    });
-
-      console.log('✅ SMTP configuration is valid');
-    } catch (error) {
-      console.error('❌ SMTP configuration error:', error);
-      throw new Error('Invalid SMTP configuration');
+  private initializeSendGrid(): void {
+    const apiKey = process.env.SENDGRID_API_KEY;
+    
+    if (!apiKey) {
+      console.error('❌ SENDGRID_API_KEY is not set in environment variables');
+      throw new Error('SendGrid API key is required');
     }
+
+    try {
+      sgMail.setApiKey(apiKey);
+      this.isInitialized = true;
+      
+      console.log('✅ SendGrid initialized successfully');
+      console.log('📧 SendGrid Configuration:', {
+        hasApiKey: !!apiKey,
+        apiKeyPreview: apiKey.substring(0, 8) + '...',
+        fromEmail: process.env.SENDER_EMAIL || 'Not set',
+        toEmail: process.env.RECIPIENT_EMAIL || 'Not set'
+      });
+
+      // Vérification non bloquante
+      this.verifySendGridConfig().catch(error => {
+        console.warn('⚠️ SendGrid verification failed, but service will continue:', error.message);
+      });
+
+    } catch (error) {
+      console.error('❌ Failed to initialize SendGrid:', error);
+      throw new Error('Failed to initialize SendGrid service');
+    }
+  }
+
+  private async verifySendGridConfig(): Promise<void> {
+    if (!this.isInitialized) {
+      throw new Error('SendGrid is not initialized');
+    }
+
+    const requiredEnvVars = {
+      SENDGRID_API_KEY: process.env.SENDGRID_API_KEY,
+      SENDER_EMAIL: process.env.SENDER_EMAIL,
+      RECIPIENT_EMAIL: process.env.RECIPIENT_EMAIL
+    };
+
+    const missingVars = Object.entries(requiredEnvVars)
+      .filter(([, value]) => !value)
+      .map(([key]) => key);
+
+    if (missingVars.length > 0) {
+      throw new Error(`Missing required environment variables: ${missingVars.join(', ')}`);
+    }
+
+    console.log('✅ SendGrid configuration is valid');
   }
 
   private validateContactData(data: ContactFormData): void {
@@ -513,6 +505,10 @@ export class ContactService {
 
   async sendContactEmail(data: ContactFormData) {
     try {
+      if (!this.isInitialized) {
+        throw new Error('SendGrid is not initialized');
+      }
+
       // Validation des données
       this.validateContactData(data);
 
@@ -547,22 +543,18 @@ export class ContactService {
         throw new Error('Email configuration missing: SENDER_EMAIL or RECIPIENT_EMAIL not set');
       }
 
-      // Créer les options d'email communes
-      const commonMailOptions = {
-        from: {
-          name: process.env.SENDER_NAME || 'NeuraWeb',
-          address: senderEmail
-        }
-      };
-
-      // Send notification email to admin
-      const adminMailOptions = {
-        ...commonMailOptions,
-        to: recipientEmail,
-        subject: `🔔 Nouveau message de ${sanitizedData.name} - NeuraWeb`,
-        html: this.getEmailTemplate('admin', sanitizedData),
-        // Email en texte brut comme fallback
-        text: `
+      // Préparer les emails avec SendGrid
+      const emails = [
+        // Email de notification à l'admin
+        {
+          to: recipientEmail,
+          from: {
+            email: senderEmail,
+            name: process.env.SENDER_NAME || 'NeuraWeb'
+          },
+          subject: `🔔 Nouveau message de ${sanitizedData.name} - NeuraWeb`,
+          html: this.getEmailTemplate('admin', sanitizedData),
+          text: `
 Nouvelle demande de contact reçue
 
 Nom: ${sanitizedData.name}
@@ -574,17 +566,24 @@ ${sanitizedData.message}
 
 ---
 Système de notification NeuraWeb
-        `.trim()
-      };
-
-      // Send confirmation email to user
-      const userMailOptions = {
-        ...commonMailOptions,
-        to: sanitizedData.email,
-        subject: '✅ Merci de nous avoir contactés - NeuraWeb',
-        html: this.getEmailTemplate('user', sanitizedData),
-        // Email en texte brut comme fallback
-        text: `
+          `.trim(),
+          // Ajout de métadonnées SendGrid
+          customArgs: {
+            type: 'admin_notification',
+            contact_id: contact.id
+          },
+          categories: ['contact', 'admin-notification']
+        },
+        // Email de confirmation à l'utilisateur
+        {
+          to: sanitizedData.email,
+          from: {
+            email: senderEmail,
+            name: process.env.SENDER_NAME || 'NeuraWeb'
+          },
+          subject: '✅ Merci de nous avoir contactés - NeuraWeb',
+          html: this.getEmailTemplate('user', sanitizedData),
+          text: `
 Bonjour ${sanitizedData.name},
 
 Nous vous remercions de nous avoir contactés concernant votre projet. Notre équipe a bien reçu votre demande et nous vous répondrons dans les plus brefs délais.
@@ -604,17 +603,50 @@ Votre partenaire technologique
 ---
 NeuraWeb - Solutions Web & IA sur mesure
 ${process.env.CONTACT_EMAIL || 'contact@neuraweb.tech'}
-        `.trim()
-      };
+          `.trim(),
+          // Ajout de métadonnées SendGrid
+          customArgs: {
+            type: 'user_confirmation',
+            contact_id: contact.id
+          },
+          categories: ['contact', 'user-confirmation']
+        }
+      ];
 
-      // Envoi des emails avec gestion d'erreurs
-      console.log('📧 Sending admin notification email...');
-      await this.transporter.sendMail(adminMailOptions);
-      console.log('✅ Admin notification email sent successfully');
+      // Envoi des emails avec SendGrid
+      console.log('📧 Sending emails via SendGrid...');
+      
+      try {
+        // Envoi de l'email admin
+        console.log('📧 Sending admin notification email...');
+        const adminResponse = await sgMail.send(emails[0]);
+        console.log('✅ Admin notification email sent successfully', {
+          messageId: adminResponse[0]?.headers?.['x-message-id'],
+          statusCode: adminResponse[0]?.statusCode
+        });
 
-      console.log('📧 Sending user confirmation email...');
-      await this.transporter.sendMail(userMailOptions);
-      console.log('✅ User confirmation email sent successfully');
+        // Envoi de l'email utilisateur
+        console.log('📧 Sending user confirmation email...');
+        const userResponse = await sgMail.send(emails[1]);
+        console.log('✅ User confirmation email sent successfully', {
+          messageId: userResponse[0]?.headers?.['x-message-id'],
+          statusCode: userResponse[0]?.statusCode
+        });
+
+      } catch (emailError: any) {
+        console.error('❌ SendGrid email error:', emailError);
+        
+        // Log des détails d'erreur SendGrid
+        if (emailError.response) {
+          console.error('SendGrid error details:', {
+            statusCode: emailError.response.statusCode,
+            body: emailError.response.body,
+            headers: emailError.response.headers
+          });
+        }
+        
+        throw new Error(`Email sending failed: ${emailError.message}`);
+      }
 
       console.log(`✅ Contact form submitted successfully: ${contact.id}`);
       return contact;
@@ -640,43 +672,71 @@ ${process.env.CONTACT_EMAIL || 'contact@neuraweb.tech'}
     }
   }
 
-  // Méthode utilitaire pour tester la configuration email
+  // Méthode utilitaire pour tester la configuration SendGrid
   async testEmailConfiguration(): Promise<boolean> {
     try {
-      await this.transporter.verify();
-      
-      // Test d'envoi d'un email de test (optionnel)
+      if (!this.isInitialized) {
+        console.error('❌ SendGrid is not initialized');
+        return false;
+      }
+
+      await this.verifySendGridConfig();
+
+      const senderEmail = process.env.SENDER_EMAIL;
+      const recipientEmail = process.env.RECIPIENT_EMAIL;
+
+      if (!senderEmail || !recipientEmail) {
+        console.error('❌ Missing email configuration');
+        return false;
+      }
+
+      // Test d'envoi d'un email de test
       const testEmail = {
+        to: recipientEmail,
         from: {
-          name: process.env.SENDER_NAME || 'NeuraWeb',
-          address: process.env.SENDER_EMAIL!
+          email: senderEmail,
+          name: process.env.SENDER_NAME || 'NeuraWeb'
         },
-        to: process.env.RECIPIENT_EMAIL!,
-        subject: '🧪 Test de configuration SMTP - NeuraWeb',
+        subject: '🧪 Test de configuration SendGrid - NeuraWeb',
         html: `
-          <h2>Test de configuration SMTP</h2>
-          <p>Cet email confirme que la configuration SMTP fonctionne correctement.</p>
+          <h2>Test de configuration SendGrid</h2>
+          <p>Cet email confirme que la configuration SendGrid fonctionne correctement.</p>
           <p><strong>Date:</strong> ${new Date().toLocaleString('fr-FR')}</p>
-          <p><strong>Serveur:</strong> ${process.env.SMTP_HOST}</p>
+          <p><strong>API Key:</strong> ${process.env.SENDGRID_API_KEY?.substring(0, 8)}...</p>
           <p><em>Email de test automatique</em></p>
         `,
         text: `
-Test de configuration SMTP
+Test de configuration SendGrid
 
-Cet email confirme que la configuration SMTP fonctionne correctement.
+Cet email confirme que la configuration SendGrid fonctionne correctement.
 Date: ${new Date().toLocaleString('fr-FR')}
-Serveur: ${process.env.SMTP_HOST}
+API Key: ${process.env.SENDGRID_API_KEY?.substring(0, 8)}...
 
 Email de test automatique
-        `.trim()
+        `.trim(),
+        customArgs: {
+          type: 'configuration_test'
+        },
+        categories: ['test', 'configuration']
       };
 
       // Décommenter pour envoyer un email de test
-      // await this.transporter.sendMail(testEmail);
+      // const response = await sgMail.send(testEmail);
+      // console.log('✅ Test email sent successfully:', response[0]?.headers?.['x-message-id']);
       
+      console.log('✅ SendGrid configuration test passed');
       return true;
-    } catch (error) {
-      console.error('❌ Email configuration test failed:', error);
+      
+    } catch (error: any) {
+      console.error('❌ SendGrid configuration test failed:', error);
+      
+      if (error.response) {
+        console.error('SendGrid error details:', {
+          statusCode: error.response.statusCode,
+          body: error.response.body
+        });
+      }
+      
       return false;
     }
   }
@@ -747,6 +807,26 @@ Email de test automatique
     } catch (error) {
       console.error('Error cleaning up old contacts:', error);
       throw new Error('Failed to cleanup old contacts');
+    }
+  }
+
+  // Méthode pour obtenir les statistiques d'envoi SendGrid (optionnel)
+  async getEmailStats(): Promise<any> {
+    try {
+      // Cette méthode nécessiterait l'utilisation de l'API SendGrid pour les statistiques
+      // Pour l'instant, on retourne les informations de base
+      return {
+        service: 'SendGrid',
+        initialized: this.isInitialized,
+        hasApiKey: !!process.env.SENDGRID_API_KEY,
+        configuredEmails: {
+          sender: process.env.SENDER_EMAIL,
+          recipient: process.env.RECIPIENT_EMAIL
+        }
+      };
+    } catch (error) {
+      console.error('Error getting email stats:', error);
+      throw new Error('Failed to get email statistics');
     }
   }
 }

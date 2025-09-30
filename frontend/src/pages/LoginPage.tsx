@@ -3,9 +3,10 @@ import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { toast } from 'react-hot-toast';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
-import { LogIn, User, Shield } from 'lucide-react';
+import { LogIn, User, Shield, ArrowLeft } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useLanguage } from '../context/LanguageContext';
+import { useTheme } from '../context/ThemeContext';
 
 interface LoginFormData {
   email: string;
@@ -17,6 +18,7 @@ const LoginPage: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
   const { login } = useAuth();
   const { t } = useLanguage();
+  const { isDark } = useTheme();
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -41,11 +43,33 @@ const LoginPage: React.FC = () => {
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-md w-full space-y-8">
         <div className="text-center">
-          <Link to="/" className="flex items-center justify-center space-x-2 mb-8">
-            <div className="w-10 h-10 bg-gradient-to-r from-primary-500 to-secondary-500 rounded-lg flex items-center justify-center">
-              <span className="text-white font-bold">NW</span>
+          {/* Bouton retour */}
+          <Link 
+            to="/" 
+            className="inline-flex items-center text-sm font-medium text-gray-600 dark:text-gray-400 hover:text-primary-600 dark:hover:text-primary-400 mb-6 transition-colors"
+          >
+            <ArrowLeft size={16} className="mr-1" />
+            Retour à l'accueil
+          </Link>
+          
+          {/* Logo */}
+          <Link to="/" className="flex items-center justify-center mb-8">
+            <img 
+              src={isDark ? "/assets/neurawebW.png" : "/assets/neurawebB.png"}
+              alt="NeuraWeb Logo" 
+              className="h-14 w-auto object-contain"
+              onError={(e) => {
+                e.currentTarget.style.display = 'none';
+                const fallback = e.currentTarget.nextElementSibling as HTMLElement;
+                if (fallback) fallback.style.display = 'flex';
+              }}
+            />
+            <div 
+              className="h-14 w-14 bg-gradient-to-r from-primary-500 to-secondary-500 rounded-lg flex items-center justify-center"
+              style={{ display: 'none' }}
+            >
+              <span className="text-white font-bold text-lg">NW</span>
             </div>
-            <span className="text-2xl font-bold text-gray-900 dark:text-white">NeuraWeb</span>
           </Link>
           
           <h2 className="text-3xl font-bold text-gray-900 dark:text-white">
@@ -114,7 +138,6 @@ const LoginPage: React.FC = () => {
                 <label htmlFor="password" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
                   {t('login.password')}
                 </label>
-                {/* NOUVEAU - Lien mot de passe oublié */}
                 <Link 
                   to="/request-password-reset" 
                   className="text-sm font-medium text-primary-600 hover:text-primary-500 dark:text-primary-400 dark:hover:text-primary-300"

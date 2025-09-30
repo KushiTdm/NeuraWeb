@@ -13,7 +13,7 @@ model Contact {
   name      String
   email     String
   message   String   @db.Text
-  status    String   @default("pending") // pending, reviewing, completed
+  status    String   @default("pending")
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -24,11 +24,11 @@ model Quote {
   id             String   @id @default(cuid())
   name           String
   email          String
-  serviceType    String   // showcase, ecommerce, automation, ai
-  options        String[] // design, maintenance, support
+  serviceType    String
+  options        String[]
   message        String?  @db.Text
   estimatedPrice Int
-  status         String   @default("pending") // pending, reviewing, completed
+  status         String   @default("pending")
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
 
@@ -41,12 +41,11 @@ model Booking {
   email        String
   phone        String?
   message      String?  @db.Text
-  selectedSlot String   // ISO date string
-  status       String   @default("confirmed") // pending, confirmed, completed, cancelled
-  isFake       Boolean  @default(false) // Nouveau champ pour distinguer les réservations de test
+  selectedSlot String
+  status       String   @default("confirmed")
+  isFake       Boolean  @default(false)
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
-  
 
   @@map("bookings")
 }
@@ -71,7 +70,6 @@ model Client {
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
 
-  // Relations
   wizardResponses WizardResponse[]
   sessions        ClientSession[]
 
@@ -87,7 +85,6 @@ model WizardResponse {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  // Relations
   client Client @relation(fields: [clientId], references: [id], onDelete: Cascade)
 
   @@unique([clientId, step])
@@ -101,8 +98,25 @@ model ClientSession {
   userAgent String?
   loggedAt  DateTime @default(now())
 
-  // Relations
   client Client @relation(fields: [clientId], references: [id], onDelete: Cascade)
 
   @@map("client_sessions")
+}
+
+// TABLE: Password Reset
+model PasswordReset {
+  id        String   @id @default(cuid())
+  token     String   @unique
+  userId    String
+  userType  String   // 'client' ou 'admin'
+  email     String
+  expiresAt DateTime
+  used      Boolean  @default(false)
+  usedAt    DateTime?
+  createdAt DateTime @default(now())
+
+  @@index([token])
+  @@index([email])
+  @@index([expiresAt])
+  @@map("password_resets")
 }

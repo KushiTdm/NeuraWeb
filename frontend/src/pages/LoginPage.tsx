@@ -12,22 +12,10 @@ interface LoginFormData {
   password: string;
 }
 
-// DÉSACTIVÉ - Interface pour l'inscription
-/*
-interface RegisterFormData {
-  name: string;
-  email: string;
-  password: string;
-  confirmPassword: string;
-}
-*/
-
 const LoginPage: React.FC = () => {
-  // MODIFIÉ - Suppression de l'état isLogin car seule la connexion est disponible
-  // const [isLogin, setIsLogin] = useState(true);
   const [userType, setUserType] = useState<'client' | 'admin'>('client');
   const [isLoading, setIsLoading] = useState(false);
-  const { login } = useAuth(); // MODIFIÉ - Suppression de register
+  const { login } = useAuth();
   const { t } = useLanguage();
   const navigate = useNavigate();
   const location = useLocation();
@@ -64,23 +52,6 @@ const LoginPage: React.FC = () => {
             {t('login.signin.title')}
           </h2>
           
-          {/* DÉSACTIVÉ - Lien vers inscription */}
-          {/*
-          <p className="mt-2 text-sm text-gray-600 dark:text-gray-400">
-            {isLogin ? t('login.no.account') : t('login.have.account')}
-            <button
-              onClick={() => {
-                setIsLogin(!isLogin);
-                reset();
-              }}
-              className="font-medium text-primary-600 hover:text-primary-500"
-            >
-              {isLogin ? t('login.signup') : t('login.signin')}
-            </button>
-          </p>
-          */}
-          
-          {/* NOUVEAU - Message d'information */}
           <p className="mt-2 text-sm text-gray-600 dark:text-gray-400">
             {t('login.signin.description') || 'Connectez-vous avec vos identifiants'}
           </p>
@@ -116,27 +87,6 @@ const LoginPage: React.FC = () => {
           </div>
 
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-            {/* DÉSACTIVÉ - Champ nom pour l'inscription */}
-            {/*
-            {!isLogin && (
-              <div>
-                <label htmlFor="name" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  {t('login.fullname')}
-                </label>
-                <input
-                  type="text"
-                  id="name"
-                  {...registerField('name', { required: !isLogin && t('login.name.required') })}
-                  className="input-field"
-                  placeholder={t('login.fullname.placeholder')}
-                />
-                {errors.name && (
-                  <p className="mt-1 text-sm text-error-600">{errors.name.message}</p>
-                )}
-              </div>
-            )}
-            */}
-
             <div>
               <label htmlFor="email" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 {t('login.email')}
@@ -160,15 +110,23 @@ const LoginPage: React.FC = () => {
             </div>
 
             <div>
-              <label htmlFor="password" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                {t('login.password')}
-              </label>
+              <div className="flex items-center justify-between mb-2">
+                <label htmlFor="password" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                  {t('login.password')}
+                </label>
+                {/* NOUVEAU - Lien mot de passe oublié */}
+                <Link 
+                  to="/request-password-reset" 
+                  className="text-sm font-medium text-primary-600 hover:text-primary-500 dark:text-primary-400 dark:hover:text-primary-300"
+                >
+                  Mot de passe oublié ?
+                </Link>
+              </div>
               <input
                 type="password"
                 id="password"
                 {...registerField('password', { 
                   required: t('common.password.required')
-                  // MODIFIÉ - Suppression de la validation minLength pour l'inscription
                 })}
                 className="input-field"
                 placeholder={userType === 'admin' ? t('login.password.placeholder.admin') : t('login.password.placeholder.client')}
@@ -177,30 +135,6 @@ const LoginPage: React.FC = () => {
                 <p className="mt-1 text-sm text-error-600">{errors.password.message}</p>
               )}
             </div>
-
-            {/* DÉSACTIVÉ - Champ confirmation mot de passe */}
-            {/*
-            {!isLogin && (
-              <div>
-                <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  {t('login.confirm.password')}
-                </label>
-                <input
-                  type="password"
-                  id="confirmPassword"
-                  {...registerField('confirmPassword', { 
-                    required: !isLogin && t('login.confirm.password.required'),
-                    validate: !isLogin ? (value) => value === watch('password') || t('login.passwords.nomatch') : undefined
-                  })}
-                  className="input-field"
-                  placeholder={t('login.confirm.password.placeholder')}
-                />
-                {errors.confirmPassword && (
-                  <p className="mt-1 text-sm text-error-600">{errors.confirmPassword.message}</p>
-                )}
-              </div>
-            )}
-            */}
 
             <button
               type="submit"
@@ -218,9 +152,6 @@ const LoginPage: React.FC = () => {
             </button>
           </form>
 
-          
-
-          {/* NOUVEAU - Message d'information pour les nouveaux clients */}
           {userType === 'client' && (
             <div className="mt-6 p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-800">
               <p className="text-sm text-blue-700 dark:text-blue-300 text-center">

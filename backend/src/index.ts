@@ -1,3 +1,4 @@
+// backend/src/index.ts
 import express from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
@@ -15,6 +16,7 @@ import bookingRoutes from './routes/booking';
 import adminRoutes from './routes/admin';
 import clientRoutes from './routes/client';
 import wizardRoutes from './routes/wizard';
+import authRoutes from './routes/auth';
 
 // Load environment variables
 dotenv.config();
@@ -42,7 +44,7 @@ const limiter = rateLimit({
 });
 app.use(limiter);
 
-// CORS configuration CORRIGÉE
+// CORS configuration
 const allowedOrigins = [
   'http://localhost:5173',
   'http://localhost:3000',
@@ -56,7 +58,7 @@ if (process.env.FRONTEND_URL) {
   allowedOrigins.push(process.env.FRONTEND_URL);
 }
 
-console.log('🌐 CORS allowed origins:', allowedOrigins);
+console.log('CORS allowed origins:', allowedOrigins);
 
 app.use(cors({
   origin: function (origin, callback) {
@@ -74,8 +76,8 @@ app.use(cors({
     if (allowedOrigins.includes(origin)) {
       callback(null, true);
     } else {
-      console.error(`❌ CORS blocked origin: ${origin}`);
-      console.log(`✅ Allowed origins: ${allowedOrigins.join(', ')}`);
+      console.error(`CORS blocked origin: ${origin}`);
+      console.log(`Allowed origins: ${allowedOrigins.join(', ')}`);
       callback(new Error(`Origin ${origin} not allowed by CORS`));
     }
   },
@@ -102,7 +104,7 @@ app.use(express.urlencoded({ extended: true }));
 // Request timeout middleware
 app.use((req, res, next) => {
   res.setTimeout(30000, () => {
-    console.log(`⏰ Request timeout: ${req.method} ${req.url}`);
+    console.log(`Request timeout: ${req.method} ${req.url}`);
     if (!res.headersSent) {
       res.status(408).json({ 
         error: 'Request timeout',
@@ -113,7 +115,7 @@ app.use((req, res, next) => {
   next();
 });
 
-// Logging middleware avec plus de détails
+// Logging middleware
 if (isDevelopment) {
   app.use(morgan('dev'));
 } else {
@@ -123,7 +125,7 @@ if (isDevelopment) {
 // Request debugging middleware
 app.use((req, res, next) => {
   const origin = req.get('Origin') || req.get('Referer') || 'none';
-  console.log(`📡 ${new Date().toISOString()} - ${req.method} ${req.url} - Origin: ${origin}`);
+  console.log(`${new Date().toISOString()} - ${req.method} ${req.url} - Origin: ${origin}`);
   next();
 });
 
@@ -154,7 +156,7 @@ app.post('/api/test-cors', (req, res) => {
 
 // Preflight handling pour toutes les routes API
 app.options('/api/*', (req, res) => {
-  console.log(`🚁 Preflight request: ${req.method} ${req.url} - Origin: ${req.get('Origin')}`);
+  console.log(`Preflight request: ${req.method} ${req.url} - Origin: ${req.get('Origin')}`);
   res.header('Access-Control-Allow-Origin', req.get('Origin') || '*');
   res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,PATCH,OPTIONS');
   res.header('Access-Control-Allow-Headers', 'Origin,X-Requested-With,Content-Type,Accept,Authorization,X-Access-Token');
@@ -169,15 +171,22 @@ app.use('/api/booking', bookingRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/client', clientRoutes);
 app.use('/api/wizard', wizardRoutes);
+app.use('/api/auth', authRoutes);
 
 // Catch-all pour routes API non trouvées
 app.use('/api/*', (req, res) => {
-  console.log(`❌ API route not found: ${req.method} ${req.url}`);
+  console.log(`API route not found: ${req.method} ${req.url}`);
   res.status(404).json({
     error: 'API endpoint not found',
     path: req.path,
     method: req.method,
-    availableRoutes: ['/api/health', '/api/contact', '/api/quotes', '/api/booking']
+    availableRoutes: [
+      '/api/health', 
+      '/api/contact', 
+      '/api/quotes', 
+      '/api/booking', 
+      '/api/auth'
+    ]
   });
 });
 
@@ -187,7 +196,7 @@ app.use(errorHandler);
 
 // Global error handler
 app.use((err: any, req: any, res: any, next: any) => {
-  console.error('🚨 Global error handler:', err);
+  console.error('Global error handler:', err);
   
   if (err.message && err.message.includes('CORS')) {
     res.status(403).json({
@@ -220,15 +229,16 @@ process.on('SIGINT', () => {
 
 // Start server
 const server = app.listen(PORT, () => {
-  console.log(`🚀 Server running on port ${PORT}`);
-  console.log(`🌍 Environment: ${process.env.NODE_ENV || 'development'}`);
-  console.log(`📋 API Health: http://localhost:${PORT}/api/health`);
-  console.log(`🌐 CORS Origins: ${allowedOrigins.join(', ')}`);
+  console.log(`Server running on port ${PORT}`);
+  console.log(`Environment: ${process.env.NODE_ENV || 'development'}`);
+  console.log(`API Health: http://localhost:${PORT}/api/health`);
+  console.log(`CORS Origins: ${allowedOrigins.join(', ')}`);
   
   // Log environment variables pour debugging
-  console.log('📝 Environment check:');
+  console.log('Environment check:');
   console.log(`   FRONTEND_URL: ${process.env.FRONTEND_URL || 'NOT SET'}`);
   console.log(`   NODE_ENV: ${process.env.NODE_ENV || 'NOT SET'}`);
+  console.log(`   SENDGRID_API_KEY: ${process.env.SENDGRID_API_KEY ? 'SET' : 'NOT SET'}`);
 });
 
 server.timeout = 30000;

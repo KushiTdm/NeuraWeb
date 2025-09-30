@@ -13,6 +13,8 @@ import AdminPage from './pages/AdminPage';
 import LoginPage from './pages/LoginPage';
 import WizardPage from './pages/WizardPage';
 import AdminDashboardPage from './pages/AdminDashboardPage';
+import RequestPasswordResetPage from './pages/RequestPasswordResetPage';
+import ResetPasswordPage from './pages/ResetPasswordPage';
 
 function App() {
   return (
@@ -22,6 +24,8 @@ function App() {
           <div className="App">
             <Routes>
               <Route path="/login" element={<LoginPage />} />
+              <Route path="/request-password-reset" element={<RequestPasswordResetPage />} />
+              <Route path="/reset-password" element={<ResetPasswordPage />} />
               <Route path="/*" element={
                 <Layout>
                   <Routes>

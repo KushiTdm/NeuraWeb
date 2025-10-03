@@ -188,8 +188,8 @@ export const PortfolioSection: React.FC = () => {
 
   return (
     <>
-      <section className="section-snap bg-white dark:bg-gradient-to-br dark:from-gray-900 dark:via-purple-900 dark:to-gray-900 bg-gradient-to-br from-gray-50 via-purple-50 to-gray-50 overflow-hidden relative">
-        <div className="max-w-7xl mx-auto h-full flex flex-col justify-center px-4 py-6 md:py-8">
+      <section className="section-snap bg-white dark:bg-gradient-to-br dark:from-gray-900 dark:via-purple-900 dark:to-gray-900 bg-gradient-to-br from-gray-50 via-purple-50 to-gray-50 overflow-hidden relative min-h-screen">
+        <div className="max-w-7xl mx-auto h-full min-h-screen flex flex-col justify-center px-4 py-8 md:py-12">
           {/* Header */}
           <div className="text-center mb-4 md:mb-6 relative z-[60]">
             <h2 className="portfolio-title text-2xl md:text-4xl lg:text-5xl font-bold text-gray-900 dark:text-white mb-2">

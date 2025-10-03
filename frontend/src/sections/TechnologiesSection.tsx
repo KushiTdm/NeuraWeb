@@ -19,8 +19,12 @@ export const TechnologiesSection: React.FC<TechnologiesSectionProps> = ({ mouseP
   const techSectionRef = useRef<HTMLDivElement>(null);
 
   return (
-    <section className="section-snap bg-gradient-to-br from-gray-900 via-purple-900 to-gray-900 relative overflow-hidden" ref={techSectionRef}>
-      <div className="absolute inset-0">
+    <section 
+      className="section-snap bg-gradient-to-br from-gray-900 via-purple-900 to-gray-900 relative overflow-hidden min-h-screen flex items-center justify-center" 
+      ref={techSectionRef}
+    >
+      {/* Desktop & Tablet Layout (md and up) */}
+      <div className="hidden md:block absolute inset-0">
         {technologies.map((tech, i) => (
           <div
             key={i}
@@ -33,29 +37,57 @@ export const TechnologiesSection: React.FC<TechnologiesSectionProps> = ({ mouseP
             }}
           >
             <div 
-              className="w-24 h-24 rounded-2xl flex flex-col items-center justify-center text-white shadow-2xl transform hover:scale-125 transition-transform duration-300 cursor-pointer"
+              className="w-20 h-20 lg:w-24 lg:h-24 rounded-2xl flex flex-col items-center justify-center text-white shadow-2xl transform hover:scale-125 transition-transform duration-300 cursor-pointer"
               style={{ 
                 backgroundColor: tech.color,
                 boxShadow: `0 20px 60px ${tech.color}50`
               }}
             >
-              <span className="text-3xl mb-1">{tech.icon}</span>
+              <span className="text-2xl lg:text-3xl mb-1">{tech.icon}</span>
               <span className="text-xs font-bold">{tech.name}</span>
             </div>
           </div>
         ))}
       </div>
 
-      <div className="relative z-10 text-center max-w-4xl mx-auto px-6">
-        <h2 className="text-5xl font-bold text-white mb-6 animate-on-scroll fade-up">
+      {/* Mobile Layout (below md) */}
+      <div className="md:hidden absolute inset-0 flex items-center justify-center px-4 py-20">
+        <div className="grid grid-cols-2 gap-4 sm:gap-6 max-w-sm mx-auto">
+          {technologies.map((tech, i) => (
+            <div
+              key={i}
+              className="tech-float-mobile"
+              style={{
+                animationDelay: `${i * 0.3}s`
+              }}
+            >
+              <div 
+                className="w-full aspect-square rounded-2xl flex flex-col items-center justify-center text-white shadow-2xl active:scale-95 transition-transform duration-300"
+                style={{ 
+                  backgroundColor: tech.color,
+                  boxShadow: `0 10px 40px ${tech.color}50`
+                }}
+              >
+                <span className="text-3xl sm:text-4xl mb-2">{tech.icon}</span>
+                <span className="text-xs sm:text-sm font-bold">{tech.name}</span>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Content */}
+      <div className="relative z-10 text-center max-w-4xl mx-auto px-6 py-8">
+        <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-white mb-4 md:mb-6 animate-on-scroll fade-up">
           Nos Technologies en Action
         </h2>
-        <p className="text-xl text-gray-300 animate-on-scroll fade-up delay-200">
+        <p className="text-base sm:text-lg md:text-xl text-gray-300 animate-on-scroll fade-up delay-200">
           Un écosystème technologique moderne pour des solutions performantes
         </p>
       </div>
 
       <style>{`
+        /* Desktop floating animation */
         .tech-float {
           animation: float 6s ease-in-out infinite;
         }
@@ -63,6 +95,37 @@ export const TechnologiesSection: React.FC<TechnologiesSectionProps> = ({ mouseP
         @keyframes float {
           0%, 100% { transform: translateY(0px) rotate(0deg); }
           50% { transform: translateY(-20px) rotate(5deg); }
+        }
+
+        /* Mobile floating animation (less movement) */
+        .tech-float-mobile {
+          animation: float-mobile 4s ease-in-out infinite;
+        }
+
+        @keyframes float-mobile {
+          0%, 100% { transform: translateY(0px) scale(1); }
+          50% { transform: translateY(-10px) scale(1.05); }
+        }
+
+        /* Fade up animation */
+        .animate-on-scroll {
+          opacity: 0;
+          animation: fadeUp 0.8s ease-out forwards;
+        }
+
+        .delay-200 {
+          animation-delay: 0.2s;
+        }
+
+        @keyframes fadeUp {
+          from {
+            opacity: 0;
+            transform: translateY(30px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
         }
       `}</style>
     </section>

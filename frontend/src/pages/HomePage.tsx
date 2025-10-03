@@ -193,7 +193,7 @@ const HomePage: React.FC = () => {
 
         @media (max-width: 768px) {
           .section-snap {
-            min-height: auto;
+            min-height: 100vh;
             padding: 3rem 1rem;
           }
         }

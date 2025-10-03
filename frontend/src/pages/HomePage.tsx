@@ -19,11 +19,29 @@ const HomePage: React.FC = () => {
 
   // Auto-scroll vers Hero après 5 secondes
   useEffect(() => {
+    let hasUserScrolled = false;
+
+    const handleUserScroll = () => {
+      hasUserScrolled = true;
+    };
+
+    // Écouter les événements de scroll
+    window.addEventListener('scroll', handleUserScroll, { once: true });
+    window.addEventListener('wheel', handleUserScroll, { once: true });
+    window.addEventListener('touchmove', handleUserScroll, { once: true });
+
     const timer = setTimeout(() => {
-      heroRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      if (!hasUserScrolled) {
+        heroRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
     }, 5000);
 
-    return () => clearTimeout(timer);
+    return () => {
+      clearTimeout(timer);
+      window.removeEventListener('scroll', handleUserScroll);
+      window.removeEventListener('wheel', handleUserScroll);
+      window.removeEventListener('touchmove', handleUserScroll);
+    };
   }, []);
 
   // Mouse parallax effect

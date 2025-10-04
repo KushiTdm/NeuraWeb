@@ -2,35 +2,43 @@
 import { useEffect, useRef, useState } from 'react';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { Sparkles, Zap, Crown, Check } from 'lucide-react';
+import { Check } from 'lucide-react';
 import { useLanguage } from '../../context/LanguageContext';
+import { useTheme } from '../../context/ThemeContext';
 
 gsap.registerPlugin(ScrollTrigger);
 
 export default function PricingSection() {
   const { t, language } = useLanguage();
+  const { isDark } = useTheme();
   const sectionRef = useRef<HTMLDivElement>(null);
   const titleRef = useRef<HTMLHeadingElement>(null);
   const cardsRef = useRef<HTMLDivElement[]>([]);
   const [flippedCards, setFlippedCards] = useState<Set<number>>(new Set());
 
-  const packs = [
+  const packs: Array<{
+    id: string;
+    icon: string;
+    gradient: string;
+    popular?: boolean;
+    featuresCount: number;
+  }> = [
     {
       id: 'starter',
-      icon: Sparkles,
+      icon: '/assets/etoile.png', // Remplacez par votre chemin d'image
       gradient: 'from-blue-500 to-cyan-500',
       featuresCount: 5,
     },
     {
       id: 'business',
-      icon: Zap,
+      icon: '/assets/eclair.png', // Remplacez par votre chemin d'image
       gradient: 'from-purple-500 to-pink-500',
       popular: true,
       featuresCount: 6,
     },
     {
       id: 'premium',
-      icon: Crown,
+      icon: '/assets/couronne.png',
       gradient: 'from-orange-500 to-red-500',
       featuresCount: 7,
     },
@@ -91,18 +99,17 @@ export default function PricingSection() {
   };
 
   return (
-    <section ref={sectionRef} className="min-h-screen py-36 px-6 bg-gradient-to-b from-slate-800 to-slate-900 flex items-center">
+    <section ref={sectionRef} className={`min-h-screen py-36 px-6 ${isDark ? 'bg-gradient-to-b from-slate-800 to-slate-900' : 'bg-gradient-to-b from-gray-50 to-gray-100'} flex items-center transition-colors duration-300`}>
       <div className="max-w-7xl mx-auto w-full">
         <h2
           ref={titleRef}
-          className="text-5xl md:text-7xl font-bold text-white text-center mb-24"
+          className={`text-5xl md:text-7xl font-bold ${isDark ? 'text-white' : 'text-slate-900'} text-center mb-24 transition-colors duration-300`}
         >
           {t('servicePage.pricing.title')}
         </h2>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           {packs.map((pack, index) => {
-            const Icon = pack.icon;
             const isFlipped = flippedCards.has(index);
 
             return (
@@ -132,17 +139,23 @@ export default function PricingSection() {
                       </div>
                     )}
                     <div>
-                      <Icon className="w-16 h-16 text-white mb-6" />
+                      <img 
+                        src={pack.icon} 
+                        alt={t(`servicePage.pricing.${pack.id}.name`)}
+                        className="w-16 h-16 mb-6 object-contain drop-shadow-lg"
+                      />
                       <h3 className="text-4xl font-bold text-white mb-4">
                         {t(`servicePage.pricing.${pack.id}.name`)}
                       </h3>
                       <div className="text-4xl font-bold text-white mb-2">
                         {t(`servicePage.pricing.${pack.id}.price`)}
                       </div>
-                      <p className="text-white/80 text-sm mb-6">{t('servicePage.pricing.vat')}</p>
-                      <p className="text-white/90 text-base leading-relaxed">
-                        {t(`servicePage.pricing.${pack.id}.desc`)}
-                      </p>
+                      <p className="text-white/80 text-sm mb-8">{t('servicePage.pricing.vat')}</p>
+                      <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4 border border-white/20">
+                        <p className="text-white/95 text-base leading-relaxed">
+                          {t(`servicePage.pricing.${pack.id}.desc`)}
+                        </p>
+                      </div>
                     </div>
                     <div className="text-center text-white/90 text-lg">
                       {t('servicePage.pricing.clickDetails')}
@@ -150,27 +163,27 @@ export default function PricingSection() {
                   </div>
 
                   <div
-                    className={`absolute w-full h-full rounded-3xl bg-white p-8 shadow-2xl flex flex-col justify-between overflow-y-auto`}
+                    className={`absolute w-full h-full rounded-3xl ${isDark ? 'bg-white' : 'bg-white'} p-8 shadow-2xl flex flex-col justify-between overflow-y-auto transition-colors duration-300`}
                     style={{
                       backfaceVisibility: 'hidden',
                       transform: 'rotateY(180deg)',
                     }}
                   >
                     <div>
-                      <h3 className="text-3xl font-bold text-slate-900 mb-6">
+                      <h3 className={`text-3xl font-bold ${isDark ? 'text-slate-900' : 'text-slate-900'} mb-6 transition-colors duration-300`}>
                         {t(`servicePage.pricing.${pack.id}.name`)}
                       </h3>
                       <ul className="space-y-3 mb-8">
                         {Array.from({ length: pack.featuresCount }).map((_, i) => (
                           <li key={i} className="flex items-start gap-3">
                             <Check className="w-5 h-5 text-green-500 flex-shrink-0 mt-1" />
-                            <span className="text-slate-700 text-base">
+                            <span className={`${isDark ? 'text-slate-700' : 'text-slate-700'} text-base transition-colors duration-300`}>
                               {t(`servicePage.pricing.${pack.id}.features.${i + 1}`)}
                             </span>
                           </li>
                         ))}
                       </ul>
-                      <div className="bg-slate-100 rounded-xl p-4 mb-6">
+                      <div className={`${isDark ? 'bg-slate-100' : 'bg-slate-50'} rounded-xl p-4 mb-6 transition-colors duration-300`}>
                         <p className="text-slate-600 text-sm font-semibold mb-1">
                           {t('servicePage.pricing.deadline')}
                         </p>
@@ -195,7 +208,7 @@ export default function PricingSection() {
         </div>
 
         <div className="mt-16 text-center">
-          <button className="px-8 py-4 bg-white text-slate-900 font-bold text-lg rounded-full hover:scale-105 transition-transform shadow-lg">
+          <button className={`px-8 py-4 ${isDark ? 'bg-white text-slate-900' : 'bg-slate-900 text-white'} font-bold text-lg rounded-full hover:scale-105 transition-all duration-300 shadow-lg`}>
             {t('servicePage.pricing.cta')}
           </button>
         </div>

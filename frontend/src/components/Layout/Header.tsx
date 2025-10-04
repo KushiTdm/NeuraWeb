@@ -204,13 +204,13 @@ const Header: React.FC = () => {
                 {t('nav.home')}
               </Link>
               <Link
-                to="/contact"
+                to="/services"
                 onClick={() => setIsMenuOpen(false)}
                 className={`font-medium transition-colors duration-200 ${
                   isActive('/contact') ? 'text-primary-600' : 'text-gray-700 dark:text-gray-300'
                 }`}
               >
-                {t('nav.contact')}
+                Services
               </Link>
               {/* DÉSACTIVÉ - Lien Devis mobile */}
               {/* 

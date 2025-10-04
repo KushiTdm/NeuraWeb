@@ -2,12 +2,13 @@ import { useEffect, useRef } from 'react';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { useLanguage } from '../../context/LanguageContext';
-
+import { useTheme } from '../../context/ThemeContext';
 
 gsap.registerPlugin(ScrollTrigger);
 
 export default function ProcessSection() {
   const { t, language } = useLanguage();
+  const { isDark } = useTheme();
   const sectionRef = useRef<HTMLDivElement>(null);
   const titleRef = useRef<HTMLHeadingElement>(null);
   const pathRef = useRef<SVGPathElement>(null);
@@ -126,13 +127,19 @@ export default function ProcessSection() {
   return (
     <section
       ref={sectionRef}
-      className="relative py-32 px-6 bg-gradient-to-b from-slate-900 to-slate-800 overflow-hidden"
+      className={`relative py-32 px-6 overflow-hidden transition-colors duration-500 ${
+        isDark
+          ? 'bg-gradient-to-b from-slate-900 to-slate-800'
+          : 'bg-gradient-to-b from-slate-50 to-slate-100'
+      }`}
       style={{ perspective: '2000px' }}
     >
       <div className="max-w-6xl mx-auto">
         <h2
           ref={titleRef}
-          className="text-5xl md:text-7xl font-bold text-white text-center mb-32"
+          className={`text-5xl md:text-7xl font-bold text-center mb-32 transition-colors duration-500 ${
+            isDark ? 'text-white' : 'text-slate-900'
+          }`}
           style={{ transformStyle: 'preserve-3d' }}
         >
           {t('servicePage.process.title')}
@@ -149,17 +156,24 @@ export default function ProcessSection() {
               ref={pathRef}
               d="M 400 0 Q 600 200 400 400 Q 200 600 400 800 Q 600 1000 400 1200 Q 200 1400 400 1600 Q 500 1800 400 2000"
               fill="none"
-              stroke="url(#gradient)"
+              stroke={isDark ? "url(#gradient-dark)" : "url(#gradient-light)"}
               strokeWidth="4"
               strokeLinecap="round"
             />
             <defs>
-              <linearGradient id="gradient" x1="0%" y1="0%" x2="0%" y2="100%">
+              <linearGradient id="gradient-dark" x1="0%" y1="0%" x2="0%" y2="100%">
                 <stop offset="0%" stopColor="#3b82f6" stopOpacity="0.8" />
                 <stop offset="25%" stopColor="#a855f7" stopOpacity="0.8" />
                 <stop offset="50%" stopColor="#f97316" stopOpacity="0.8" />
                 <stop offset="75%" stopColor="#10b981" stopOpacity="0.8" />
                 <stop offset="100%" stopColor="#eab308" stopOpacity="0.8" />
+              </linearGradient>
+              <linearGradient id="gradient-light" x1="0%" y1="0%" x2="0%" y2="100%">
+                <stop offset="0%" stopColor="#3b82f6" stopOpacity="0.5" />
+                <stop offset="25%" stopColor="#a855f7" stopOpacity="0.5" />
+                <stop offset="50%" stopColor="#f97316" stopOpacity="0.5" />
+                <stop offset="75%" stopColor="#10b981" stopOpacity="0.5" />
+                <stop offset="100%" stopColor="#eab308" stopOpacity="0.5" />
               </linearGradient>
             </defs>
           </svg>
@@ -185,7 +199,9 @@ export default function ProcessSection() {
                     className={`group relative w-full bg-gradient-to-br ${step.gradient} rounded-3xl overflow-hidden shadow-2xl`}
                     style={{ transformStyle: 'preserve-3d' }}
                   >
-                    <div className="absolute inset-0 bg-black/40 z-10"></div>
+                    <div className={`absolute inset-0 z-10 ${
+                      isDark ? 'bg-black/40' : 'bg-black/20'
+                    }`}></div>
 
                     <img
                       src={step.image}
@@ -194,14 +210,22 @@ export default function ProcessSection() {
                     />
 
                     <div className="relative z-20 p-8">
-                      <div className="absolute top-4 right-4 w-16 h-16 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center text-white text-2xl font-bold">
+                      <div className={`absolute top-4 right-4 w-16 h-16 backdrop-blur-sm rounded-full flex items-center justify-center text-2xl font-bold ${
+                        isDark 
+                          ? 'bg-white/20 text-white' 
+                          : 'bg-white/40 text-slate-900'
+                      }`}>
                         {index + 1}
                       </div>
 
-                      <h3 className="text-4xl font-bold text-white mb-4 drop-shadow-lg">
+                      <h3 className={`text-4xl font-bold mb-4 drop-shadow-lg ${
+                        isDark ? 'text-white' : 'text-white'
+                      }`}>
                         {step.title}
                       </h3>
-                      <p className="text-white/90 text-lg leading-relaxed drop-shadow-md">
+                      <p className={`text-lg leading-relaxed drop-shadow-md ${
+                        isDark ? 'text-white/90' : 'text-white/95'
+                      }`}>
                         {step.description}
                       </p>
                     </div>
@@ -215,9 +239,17 @@ export default function ProcessSection() {
         </div>
 
         <div className="mt-32 text-center">
-          <div className="inline-flex items-center gap-4 px-8 py-4 bg-white/10 backdrop-blur-sm rounded-full">
+          <div className={`inline-flex items-center gap-4 px-8 py-4 backdrop-blur-sm rounded-full ${
+            isDark 
+              ? 'bg-white/10' 
+              : 'bg-slate-900/10'
+          }`}>
             <div className="w-3 h-3 bg-green-500 rounded-full animate-pulse"></div>
-            <span className="text-white text-lg font-medium">{t('servicePage.process.badge')}</span>
+            <span className={`text-lg font-medium transition-colors duration-500 ${
+              isDark ? 'text-white' : 'text-slate-900'
+            }`}>
+              {t('servicePage.process.badge')}
+            </span>
           </div>
         </div>
       </div>

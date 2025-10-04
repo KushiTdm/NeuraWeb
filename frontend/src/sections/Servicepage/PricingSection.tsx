@@ -147,8 +147,13 @@ export default function PricingSection() {
                       <h3 className="text-4xl font-bold text-white mb-4">
                         {t(`servicePage.pricing.${pack.id}.name`)}
                       </h3>
-                      <div className="text-4xl font-bold text-white mb-2">
-                        {t(`servicePage.pricing.${pack.id}.price`)}
+                      <div className="mb-2">
+                        <p className="text-white/70 text-sm font-medium mb-1">
+                          {t(`servicePage.pricing.priceLabel`)}
+                        </p>
+                        <div className="text-5xl font-bold text-white">
+                          {t(`servicePage.pricing.${pack.id}.price`)}
+                        </div>
                       </div>
                       <p className="text-white/80 text-sm mb-8">{t('servicePage.pricing.vat')}</p>
                       <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4 border border-white/20">

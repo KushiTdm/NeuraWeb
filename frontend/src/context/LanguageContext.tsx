@@ -121,8 +121,11 @@ const translations = {
       'servicePage.pricing.vat': 'excl. VAT',
       
       // Packs
+
+      'servicePage.pricing.priceLabel': 'Starting from',
+
       'servicePage.pricing.starter.name': 'Starter',
-      'servicePage.pricing.starter.price': 'Starting from €1,490',
+      'servicePage.pricing.starter.price': '€1,490',
       'servicePage.pricing.starter.features.1': '3–5 pages',
       'servicePage.pricing.starter.features.2': 'Responsive design',
       'servicePage.pricing.starter.features.3': 'Basic SEO',
@@ -132,7 +135,7 @@ const translations = {
       'servicePage.pricing.starter.desc': 'Perfect to launch your online presence with a clean, professional website.',
 
       'servicePage.pricing.business.name': 'Business',
-      'servicePage.pricing.business.price': 'Starting from €3,490',
+      'servicePage.pricing.business.price': '€3,490',
       'servicePage.pricing.business.features.1': '8–12 pages',
       'servicePage.pricing.business.features.2': 'Custom design',
       'servicePage.pricing.business.features.3': 'Advanced SEO',
@@ -144,7 +147,7 @@ const translations = {
       'servicePage.pricing.business.desc': 'Designed for businesses looking for a high-performing, scalable, and well-optimized website.',
 
       'servicePage.pricing.premium.name': 'Premium',
-      'servicePage.pricing.premium.price': 'Starting from €6,900',
+      'servicePage.pricing.premium.price': '€6,900',
       'servicePage.pricing.premium.features.1': 'Up to 20 pages (expandable)',
       'servicePage.pricing.premium.features.2': 'Premium design',
       'servicePage.pricing.premium.features.3': 'Expert-level SEO',
@@ -899,8 +902,11 @@ const translations = {
     'servicePage.pricing.vat': 'HT',
     
     // Packs
+    
+      'servicePage.pricing.priceLabel': 'À partir de ',
+
     'servicePage.pricing.starter.name': 'Starter',
-    'servicePage.pricing.starter.price': 'À partir de 1 490€',
+    'servicePage.pricing.starter.price': '1 490€',
     'servicePage.pricing.starter.features.1': '3-5 pages',
     'servicePage.pricing.starter.features.2': 'Design responsive',
     'servicePage.pricing.starter.features.3': 'SEO de base',
@@ -911,7 +917,7 @@ const translations = {
 
 
     'servicePage.pricing.business.name': 'Business',
-    'servicePage.pricing.business.price': 'À partir de 3 490€',
+    'servicePage.pricing.business.price': '3 490€',
     'servicePage.pricing.business.features.1': '8-12 pages',
     'servicePage.pricing.business.features.2': 'Design sur-mesure',
     'servicePage.pricing.business.features.3': 'SEO avancé',
@@ -924,7 +930,7 @@ const translations = {
 
 
     'servicePage.pricing.premium.name': 'Premium',
-    'servicePage.pricing.premium.price': 'À partir de 6 900€',
+    'servicePage.pricing.premium.price': '6 900€',
     'servicePage.pricing.premium.features.1': 'Pages illimitées',
     'servicePage.pricing.premium.features.2': 'Design premium',
     'servicePage.pricing.premium.features.3': 'SEO expert',

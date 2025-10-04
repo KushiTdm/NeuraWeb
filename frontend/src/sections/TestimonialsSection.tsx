@@ -1,49 +1,51 @@
 import React, { useState, useEffect } from 'react';
 import { Star, CheckCircle } from 'lucide-react';
+import { useLanguage } from '../context/LanguageContext';
 
-const testimonials = [
-  {
-    name: 'Marie Dupont',
-    company: 'TechCorp',
-    text: 'Un travail exceptionnel sur notre site e-commerce. L\'équipe a su comprendre nos besoins et livrer un produit qui dépasse nos attentes.',
-    rating: 5,
-    avatar: 'https://images.unsplash.com/photo-1494790108755-2616b612b77c?w=150&h=150&fit=crop&crop=faces'
-  },
-  {
-    name: 'Jean Martin',
-    company: 'StartupX',
-    text: 'Développement rapide et professionnel. Notre application mobile a été livrée dans les délais avec une qualité remarquable.',
-    rating: 5,
-    avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=faces'
-  },
-  {
-    name: 'Sophie Chen',
-    company: 'DigitalFlow',
-    text: 'L\'intégration d\'IA dans notre workflow a révolutionné notre productivité. Un partenaire technique de confiance.',
-    rating: 5,
-    avatar: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=150&h=150&fit=crop&crop=faces'
-  },
-];
-
-export const TestimonialsSection: React.FC = () => {
+export const TestimonialsSection = () => {
+  const { t } = useLanguage();
   const [currentTestimonial, setCurrentTestimonial] = useState(0);
+
+  const testimonials = [
+    {
+      nameKey: 'testimonials.marie.name',
+      companyKey: 'testimonials.marie.company',
+      textKey: 'testimonials.marie.text',
+      rating: 5,
+      avatar: 'assets/dupont.jpg'
+    },
+    {
+      nameKey: 'testimonials.jean.name',
+      companyKey: 'testimonials.jean.company',
+      textKey: 'testimonials.jean.text',
+      rating: 5,
+      avatar: 'assets/Martin.jpg'
+    },
+    {
+      nameKey: 'testimonials.sophie.name',
+      companyKey: 'testimonials.sophie.company',
+      textKey: 'testimonials.sophie.text',
+      rating: 5,
+      avatar: 'assets/chen.jpg'
+    },
+  ];
 
   useEffect(() => {
     const interval = setInterval(() => {
       setCurrentTestimonial((prev) => (prev + 1) % testimonials.length);
     }, 5000);
     return () => clearInterval(interval);
-  }, []);
+  }, [testimonials.length]);
 
   return (
     <section className="section-snap bg-gray-50 dark:bg-gray-900 min-h-screen flex items-center justify-center">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 md:py-16 w-full">
         <div className="text-center mb-8 md:mb-12">
           <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-gray-900 dark:text-white mb-3 md:mb-4 animate-on-scroll fade-up">
-            Ils Nous Font Confiance
+            {t('testimonials.title')}
           </h2>
           <p className="text-base sm:text-lg md:text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto animate-on-scroll fade-up delay-200 px-4">
-            Des clients satisfaits qui parlent de leur expérience
+            {t('testimonials.subtitle')}
           </p>
         </div>
 
@@ -68,13 +70,13 @@ export const TestimonialsSection: React.FC = () => {
                     ))}
                   </div>
                   <blockquote className="text-base sm:text-lg md:text-xl lg:text-2xl text-gray-700 dark:text-gray-300 text-center mb-6 md:mb-8 leading-relaxed italic px-2">
-                    "{testimonial.text}"
+                    "{t(testimonial.textKey)}"
                   </blockquote>
                   <div className="flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-0">
                     <div className="relative flex-shrink-0">
                       <img 
                         src={testimonial.avatar} 
-                        alt={testimonial.name}
+                        alt={t(testimonial.nameKey)}
                         className="w-16 h-16 sm:w-18 sm:h-18 md:w-20 md:h-20 rounded-full object-cover shadow-xl border-4 border-white dark:border-gray-700"
                       />
                       <div className="absolute -bottom-1 -right-1 sm:-bottom-2 sm:-right-2 w-6 h-6 sm:w-7 sm:h-7 md:w-8 md:h-8 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full flex items-center justify-center border-2 border-white dark:border-gray-800">
@@ -83,10 +85,10 @@ export const TestimonialsSection: React.FC = () => {
                     </div>
                     <div className="sm:ml-6 text-center sm:text-left">
                       <div className="text-lg sm:text-xl font-bold text-gray-900 dark:text-white">
-                        {testimonial.name}
+                        {t(testimonial.nameKey)}
                       </div>
                       <div className="text-base sm:text-lg text-gray-600 dark:text-gray-400">
-                        {testimonial.company}
+                        {t(testimonial.companyKey)}
                       </div>
                     </div>
                   </div>
@@ -105,7 +107,7 @@ export const TestimonialsSection: React.FC = () => {
                     ? 'bg-gradient-to-r from-blue-600 to-purple-600 w-10 h-3 sm:w-12 sm:h-4' 
                     : 'bg-gray-300 dark:bg-gray-600 w-3 h-3 sm:w-4 sm:h-4 hover:bg-gray-400'
                 }`}
-                aria-label={`Voir le témoignage ${index + 1}`}
+                aria-label={`${t('testimonials.viewTestimonial')} ${index + 1}`}
               />
             ))}
           </div>
@@ -152,3 +154,5 @@ export const TestimonialsSection: React.FC = () => {
     </section>
   );
 };
+
+export default TestimonialsSection;

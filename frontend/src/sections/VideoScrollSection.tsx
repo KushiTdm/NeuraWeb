@@ -3,10 +3,12 @@ import { useEffect, useRef } from 'react';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { Section } from '../components/Section';
+import { useLanguage } from '../context/LanguageContext';
 
 gsap.registerPlugin(ScrollTrigger);
 
 export const VideoScrollSection = () => {
+  const { t } = useLanguage();
   const sectionRef = useRef<HTMLDivElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
   const overlayTextRef = useRef<HTMLDivElement>(null);
@@ -107,7 +109,7 @@ export const VideoScrollSection = () => {
         className="relative z-10 text-center max-w-4xl px-6 pointer-events-none"
       >
         <h2 className="text-5xl md:text-7xl font-bold text-white mb-4 drop-shadow-2xl">
-          Tout commence par une idée ...
+          {t('video.title')}
         </h2>
 
       </div>
@@ -115,7 +117,7 @@ export const VideoScrollSection = () => {
       {/* Indicateur de scroll */}
       <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 z-20">
         <div className="flex flex-col items-center text-white animate-bounce">
-          <span className="text-sm mb-2">Scrollez pour découvrir</span>
+          <span className="text-sm mb-2">{t('hero.scroll.discover')}</span>
           <svg
             className="w-6 h-6"
             fill="none"

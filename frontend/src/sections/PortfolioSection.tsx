@@ -1,9 +1,11 @@
+// frontend/src/sections/PortfolioSection.tsx
 import React, { useState, useEffect, useRef } from 'react';
 import { ChevronLeft, ChevronRight, X } from 'lucide-react';
+import { useLanguage } from '../context/LanguageContext';
 
 interface Project {
-  title: string;
-  description: string;
+  titleKey: string;
+  descriptionKey: string;
   image: string;
   technologies: string[];
   category: string;
@@ -11,43 +13,43 @@ interface Project {
 
 const portfolio: Project[] = [
   {
-    title: 'Plateforme E-commerce',
-    description: 'Solution complète de vente en ligne avec paiement sécurisé',
+    titleKey: 'portfolio.ecommerce.title',
+    descriptionKey: 'portfolio.ecommerce.description',
     image: 'https://images.unsplash.com/photo-1563013544-824ae1b704d3?w=600&h=400&fit=crop',
     technologies: ['React', 'Node.js', 'Stripe'],
     category: 'web'
   },
   {
-    title: 'App Mobile Fitness',
-    description: 'Application de suivi d\'entraînement et nutrition',
+    titleKey: 'portfolio.fitness.title',
+    descriptionKey: 'portfolio.fitness.description',
     image: 'https://images.unsplash.com/photo-1512941937669-90a1b58e7e9c?w=600&h=400&fit=crop',
     technologies: ['React Native', 'Firebase'],
     category: 'mobile'
   },
   {
-    title: 'Chatbot IA',
-    description: 'Assistant virtuel intelligent pour service client',
+    titleKey: 'portfolio.chatbot.title',
+    descriptionKey: 'portfolio.chatbot.description',
     image: 'https://images.unsplash.com/photo-1677442136019-21780ecad995?w=600&h=400&fit=crop',
     technologies: ['Python', 'OpenAI', 'FastAPI'],
     category: 'ai'
   },
   {
-    title: 'Dashboard Analytics',
-    description: 'Tableau de bord de visualisation de données en temps réel',
+    titleKey: 'portfolio.dashboard.title',
+    descriptionKey: 'portfolio.dashboard.description',
     image: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=600&h=400&fit=crop',
     technologies: ['React', 'D3.js', 'MongoDB'],
     category: 'web'
   },
   {
-    title: 'App de Réservation',
-    description: 'Système de réservation et calendrier intelligent',
+    titleKey: 'portfolio.booking.title',
+    descriptionKey: 'portfolio.booking.description',
     image: 'https://images.unsplash.com/photo-1506784983877-45594efa4cbe?w=600&h=400&fit=crop',
     technologies: ['Vue.js', 'Laravel', 'MySQL'],
     category: 'web'
   },
   {
-    title: 'Automation Pipeline',
-    description: 'Pipeline d\'automatisation DevOps et CI/CD',
+    titleKey: 'portfolio.automation.title',
+    descriptionKey: 'portfolio.automation.description',
     image: 'https://images.unsplash.com/photo-1667372393119-3d4c48d07fc9?w=600&h=400&fit=crop',
     technologies: ['Docker', 'Jenkins', 'AWS'],
     category: 'automation'
@@ -55,6 +57,7 @@ const portfolio: Project[] = [
 ];
 
 export const PortfolioSection: React.FC = () => {
+  const { t } = useLanguage();
   const [currentIndex, setCurrentIndex] = useState(0);
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
   const [isAutoPlay, setIsAutoPlay] = useState(true);
@@ -193,10 +196,10 @@ export const PortfolioSection: React.FC = () => {
           {/* Header */}
           <div className="text-center mb-4 md:mb-6 relative z-[60]">
             <h2 className="portfolio-title text-2xl md:text-4xl lg:text-5xl font-bold text-gray-900 dark:text-white mb-2">
-              Nos <span className="bg-gradient-to-r from-blue-600 to-purple-600 dark:from-blue-400 dark:to-purple-400 bg-clip-text text-transparent">Réalisations</span>
+              {t('portfolio.section.title.start')} <span className="bg-gradient-to-r from-blue-600 to-purple-600 dark:from-blue-400 dark:to-purple-400 bg-clip-text text-transparent">{t('portfolio.section.title.highlight')}</span>
             </h2>
             <p className="text-sm md:text-base lg:text-lg text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
-              Découvrez nos projets
+              {t('portfolio.section.subtitle')}
             </p>
           </div>
 
@@ -219,17 +222,17 @@ export const PortfolioSection: React.FC = () => {
                     <div className="relative h-36 sm:h-40 md:h-48 overflow-hidden">
                       <img
                         src={project.image}
-                        alt={project.title}
+                        alt={t(project.titleKey)}
                         className="w-full h-full object-cover"
                       />
                       <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent" />
                     </div>
                     <div className="p-4 md:p-5 lg:p-6">
                       <h3 className="text-base md:text-lg lg:text-xl font-bold text-gray-900 dark:text-white mb-2">
-                        {project.title}
+                        {t(project.titleKey)}
                       </h3>
                       <p className="text-gray-600 dark:text-gray-300 mb-3 text-xs md:text-sm line-clamp-2">
-                        {project.description}
+                        {t(project.descriptionKey)}
                       </p>
                       <div className="flex flex-wrap gap-1.5 md:gap-2">
                         {project.technologies.map((tech, techIndex) => (
@@ -251,14 +254,14 @@ export const PortfolioSection: React.FC = () => {
             <button
               onClick={prevSlide}
               className="absolute left-2 md:left-4 lg:left-8 top-1/2 -translate-y-1/2 bg-white/90 dark:bg-white/10 hover:bg-white dark:hover:bg-white/20 backdrop-blur-sm text-gray-900 dark:text-white p-2 md:p-3 rounded-full transition-all duration-300 hover:scale-110 z-50 shadow-lg"
-              aria-label="Projet précédent"
+              aria-label={t('portfolio.nav.previous')}
             >
               <ChevronLeft size={20} className="md:w-6 md:h-6" />
             </button>
             <button
               onClick={nextSlide}
               className="absolute right-2 md:right-4 lg:right-8 top-1/2 -translate-y-1/2 bg-white/90 dark:bg-white/10 hover:bg-white dark:hover:bg-white/20 backdrop-blur-sm text-gray-900 dark:text-white p-2 md:p-3 rounded-full transition-all duration-300 hover:scale-110 z-50 shadow-lg"
-              aria-label="Projet suivant"
+              aria-label={t('portfolio.nav.next')}
             >
               <ChevronRight size={20} className="md:w-6 md:h-6" />
             </button>
@@ -278,7 +281,7 @@ export const PortfolioSection: React.FC = () => {
                     ? 'w-6 md:w-8 bg-gradient-to-r from-blue-600 to-purple-600 dark:from-blue-400 dark:to-purple-400' 
                     : 'w-1.5 md:w-2 bg-gray-300 dark:bg-white/30 hover:bg-gray-400 dark:hover:bg-white/50'
                 }`}
-                aria-label={`Aller au projet ${index + 1}`}
+                aria-label={t('portfolio.nav.goto') + ` ${index + 1}`}
               />
             ))}
           </div>
@@ -298,23 +301,23 @@ export const PortfolioSection: React.FC = () => {
             <div className="relative">
               <img
                 src={selectedProject.image}
-                alt={selectedProject.title}
+                alt={t(selectedProject.titleKey)}
                 className="w-full h-48 md:h-64 lg:h-96 object-cover rounded-t-3xl"
               />
               <button
                 onClick={closeProject}
                 className="absolute top-4 right-4 bg-white/90 dark:bg-white/10 hover:bg-white dark:hover:bg-white/20 backdrop-blur-sm text-gray-900 dark:text-white p-2 rounded-full transition-all duration-300"
-                aria-label="Fermer"
+                aria-label={t('portfolio.modal.close')}
               >
                 <X size={24} />
               </button>
             </div>
             <div className="p-6 md:p-8">
               <h3 className="text-2xl md:text-3xl lg:text-4xl font-bold text-gray-900 dark:text-white mb-4">
-                {selectedProject.title}
+                {t(selectedProject.titleKey)}
               </h3>
               <p className="text-gray-600 dark:text-gray-300 text-base md:text-lg mb-6">
-                {selectedProject.description}
+                {t(selectedProject.descriptionKey)}
               </p>
               <div className="flex flex-wrap gap-3 mb-6">
                 {selectedProject.technologies.map((tech, index) => (
@@ -327,7 +330,7 @@ export const PortfolioSection: React.FC = () => {
                 ))}
               </div>
               <button className="w-full md:w-auto bg-gradient-to-r from-blue-600 to-purple-600 dark:from-blue-500 dark:to-purple-500 text-white px-8 py-3 rounded-full font-bold text-lg hover:shadow-lg hover:shadow-purple-500/50 transition-all duration-300 hover:scale-105">
-                Voir le projet complet
+                {t('portfolio.modal.view')}
               </button>
             </div>
           </div>

@@ -60,7 +60,6 @@ const Footer: React.FC = () => {
             </p>
             <div className="text-white/70 text-xs">
               <div className="mb-1">contact@neuraweb.tech</div>
-              <div>+1 (555) 123-4567</div>
             </div>
           </div>
 

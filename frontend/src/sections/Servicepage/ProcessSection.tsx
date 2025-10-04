@@ -1,47 +1,50 @@
 import { useEffect, useRef } from 'react';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import { useLanguage } from '../../context/LanguageContext';
+
 
 gsap.registerPlugin(ScrollTrigger);
 
-const steps = [
-  {
-    title: 'Audit',
-    description: 'Analyse approfondie de vos besoins et de votre marché pour définir la stratégie optimale.',
-    image: 'https://images.pexels.com/photos/3184291/pexels-photo-3184291.jpeg?auto=compress&cs=tinysrgb&w=800',
-    gradient: 'from-blue-500 to-cyan-500',
-  },
-  {
-    title: 'Design',
-    description: 'Création d\'une interface moderne et intuitive, parfaitement alignée avec votre identité.',
-    image: 'https://images.pexels.com/photos/196644/pexels-photo-196644.jpeg?auto=compress&cs=tinysrgb&w=800',
-    gradient: 'from-purple-500 to-pink-500',
-  },
-  {
-    title: 'Développement',
-    description: 'Codage avec les technologies les plus performantes pour un site rapide et scalable.',
-    image: 'https://images.pexels.com/photos/270348/pexels-photo-270348.jpeg?auto=compress&cs=tinysrgb&w=800',
-    gradient: 'from-orange-500 to-red-500',
-  },
-  {
-    title: 'Tests',
-    description: 'Validation rigoureuse sur tous les appareils et navigateurs pour garantir la qualité.',
-    image: 'https://images.pexels.com/photos/1181263/pexels-photo-1181263.jpeg?auto=compress&cs=tinysrgb&w=800',
-    gradient: 'from-green-500 to-emerald-500',
-  },
-  {
-    title: 'Livraison',
-    description: 'Mise en ligne et accompagnement pour un lancement réussi de votre projet.',
-    image: 'https://images.pexels.com/photos/73873/rocket-launch-rocket-take-off-nasa-73873.jpeg?auto=compress&cs=tinysrgb&w=800',
-    gradient: 'from-yellow-500 to-amber-500',
-  },
-];
-
 export default function ProcessSection() {
+  const { t, language } = useLanguage();
   const sectionRef = useRef<HTMLDivElement>(null);
   const titleRef = useRef<HTMLHeadingElement>(null);
   const pathRef = useRef<SVGPathElement>(null);
   const stepsRef = useRef<HTMLDivElement[]>([]);
+
+  const steps = [
+    {
+      title: t('servicePage.process.audit.title'),
+      description: t('servicePage.process.audit.description'),
+      image: 'https://images.pexels.com/photos/3184291/pexels-photo-3184291.jpeg?auto=compress&cs=tinysrgb&w=800',
+      gradient: 'from-blue-500 to-cyan-500',
+    },
+    {
+      title: t('servicePage.process.design.title'),
+      description: t('servicePage.process.design.description'),
+      image: 'https://images.pexels.com/photos/196644/pexels-photo-196644.jpeg?auto=compress&cs=tinysrgb&w=800',
+      gradient: 'from-purple-500 to-pink-500',
+    },
+    {
+      title: t('servicePage.process.development.title'),
+      description: t('servicePage.process.development.description'),
+      image: 'https://images.pexels.com/photos/270348/pexels-photo-270348.jpeg?auto=compress&cs=tinysrgb&w=800',
+      gradient: 'from-orange-500 to-red-500',
+    },
+    {
+      title: t('servicePage.process.tests.title'),
+      description: t('servicePage.process.tests.description'),
+      image: 'https://images.pexels.com/photos/1181263/pexels-photo-1181263.jpeg?auto=compress&cs=tinysrgb&w=800',
+      gradient: 'from-green-500 to-emerald-500',
+    },
+    {
+      title: t('servicePage.process.delivery.title'),
+      description: t('servicePage.process.delivery.description'),
+      image: 'assets/livraison.jpg',
+      gradient: 'from-yellow-500 to-amber-500',
+    },
+  ];
 
   useEffect(() => {
     const ctx = gsap.context(() => {
@@ -118,7 +121,7 @@ export default function ProcessSection() {
     }, sectionRef);
 
     return () => ctx.revert();
-  }, []);
+  }, [language]);
 
   return (
     <section
@@ -132,7 +135,7 @@ export default function ProcessSection() {
           className="text-5xl md:text-7xl font-bold text-white text-center mb-32"
           style={{ transformStyle: 'preserve-3d' }}
         >
-          Mon Process
+          {t('servicePage.process.title')}
         </h2>
 
         <div className="relative" style={{ transformStyle: 'preserve-3d' }}>
@@ -214,7 +217,7 @@ export default function ProcessSection() {
         <div className="mt-32 text-center">
           <div className="inline-flex items-center gap-4 px-8 py-4 bg-white/10 backdrop-blur-sm rounded-full">
             <div className="w-3 h-3 bg-green-500 rounded-full animate-pulse"></div>
-            <span className="text-white text-lg font-medium">Processus éprouvé avec +50 projets réussis</span>
+            <span className="text-white text-lg font-medium">{t('servicePage.process.badge')}</span>
           </div>
         </div>
       </div>

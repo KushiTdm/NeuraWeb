@@ -96,6 +96,82 @@ const translations = {
       'cta.secure': '100% Secure',
       'cta.dedicatedSupport': 'Dedicated Support',
 
+    // Service Page CTA Section
+      'servicePage.cta.title.word1': 'Any',
+      'servicePage.cta.title.word2': 'questions',
+      'servicePage.cta.title.word3': 'before',
+      'servicePage.cta.title.word4': 'launching',
+      'servicePage.cta.title.word5': 'your',
+      'servicePage.cta.title.word6': 'project?',
+      'servicePage.cta.subtitle': 'Let\'s discuss your vision together and transform it into digital reality.',
+      'servicePage.cta.button': 'Start my project',
+      'servicePage.cta.feature1': 'Response within 24h',
+      'servicePage.cta.feature2': 'Free quote',
+      'servicePage.cta.feature3': 'No commitment',
+
+      // Hero Section
+      'servicePage.hero.title': 'Services & Pricing',
+      'servicePage.hero.subtitle': 'Custom web solutions to propel your business',
+
+      // Pricing Section
+      'servicePage.pricing.title': 'Packages & Pricing',
+      'servicePage.pricing.clickDetails': 'Click to see details',
+      'servicePage.pricing.choosePack': 'Choose this package',
+      'servicePage.pricing.deadline': 'Delivery time',
+      'servicePage.pricing.vat': 'excl. VAT',
+      
+      // Packs
+      'servicePage.pricing.starter.name': 'Starter',
+      'servicePage.pricing.starter.price': '€1,500',
+      'servicePage.pricing.starter.features.1': '3-5 pages',
+      'servicePage.pricing.starter.features.2': 'Responsive design',
+      'servicePage.pricing.starter.features.3': 'Basic SEO',
+      'servicePage.pricing.starter.features.4': 'Contact form',
+      'servicePage.pricing.starter.features.5': '1 month support',
+      'servicePage.pricing.starter.delay': '2-3 weeks',
+
+      'servicePage.pricing.business.name': 'Business',
+      'servicePage.pricing.business.price': '€3,500',
+      'servicePage.pricing.business.features.1': '8-12 pages',
+      'servicePage.pricing.business.features.2': 'Custom design',
+      'servicePage.pricing.business.features.3': 'Advanced SEO',
+      'servicePage.pricing.business.features.4': 'Admin panel',
+      'servicePage.pricing.business.features.5': 'Integrated blog',
+      'servicePage.pricing.business.features.6': '3 months support',
+      'servicePage.pricing.business.delay': '4-6 weeks',
+      'servicePage.pricing.business.popular': 'POPULAR',
+
+      'servicePage.pricing.premium.name': 'Premium',
+      'servicePage.pricing.premium.price': '€6,500',
+      'servicePage.pricing.premium.features.1': 'Unlimited pages',
+      'servicePage.pricing.premium.features.2': 'Premium design',
+      'servicePage.pricing.premium.features.3': 'Expert SEO',
+      'servicePage.pricing.premium.features.4': 'Advanced dashboard',
+      'servicePage.pricing.premium.features.5': 'E-commerce',
+      'servicePage.pricing.premium.features.6': '3D animations',
+      'servicePage.pricing.premium.features.7': '6 months support',
+      'servicePage.pricing.premium.delay': '8-10 weeks',
+
+      // Process Section
+      'servicePage.process.title': 'My Process',
+      'servicePage.process.badge': 'Proven process with 50+ delivered projects',
+      
+      'servicePage.process.audit.title': 'Audit',
+      'servicePage.process.audit.description': 'In-depth analysis of your needs and market to define the optimal strategy.',
+      
+      'servicePage.process.design.title': 'Design',
+      'servicePage.process.design.description': 'Creation of a modern and intuitive interface, perfectly aligned with your identity.',
+      
+      'servicePage.process.development.title': 'Development',
+      'servicePage.process.development.description': 'Coding with the most efficient technologies for a fast and scalable site.',
+      
+      'servicePage.process.tests.title': 'Testing',
+      'servicePage.process.tests.description': 'Rigorous validation on all devices and browsers to ensure quality.',
+      
+      'servicePage.process.delivery.title': 'Delivery',
+      'servicePage.process.delivery.description': 'Launch and support for a successful start of your project.',
+  
+
     // Login
       "login.signin.title": "Sign in to your account",
       "login.signin.description": "Sign in with your credentials",
@@ -790,6 +866,82 @@ const translations = {
     'cta.guaranteedGrowth': 'Croissance Garantie',
     'cta.secure': '100% Sécurisé',
     'cta.dedicatedSupport': 'Support Dédié',
+
+    // Service Page - Section CTA
+    'servicePage.cta.title.word1': 'Des',
+    'servicePage.cta.title.word2': 'questions',
+    'servicePage.cta.title.word3': 'avant',
+    'servicePage.cta.title.word4': 'de',
+    'servicePage.cta.title.word5': 'lancer',
+    'servicePage.cta.title.word6': 'votre',
+    'servicePage.cta.title.word7': 'projet ?',
+    'servicePage.cta.subtitle': 'Discutons ensemble de votre vision et transformons-la en réalité digitale.',
+    'servicePage.cta.button': 'Démarrer mon projet',
+    'servicePage.cta.feature1': 'Réponse en 24h',
+    'servicePage.cta.feature2': 'Devis gratuit',
+    'servicePage.cta.feature3': 'Sans engagement',
+
+    // Hero Section
+    'servicePage.hero.title': 'Services & Tarifs',
+    'servicePage.hero.subtitle': 'Des solutions web sur mesure pour propulser votre business',
+
+    // Pricing Section
+    'servicePage.pricing.title': 'Packs & Tarifs',
+    'servicePage.pricing.clickDetails': 'Cliquez pour voir les détails',
+    'servicePage.pricing.choosePack': 'Choisir ce pack',
+    'servicePage.pricing.deadline': 'Délai de réalisation',
+    'servicePage.pricing.vat': 'HT',
+    
+    // Packs
+    'servicePage.pricing.starter.name': 'Starter',
+    'servicePage.pricing.starter.price': '1 500€',
+    'servicePage.pricing.starter.features.1': '3-5 pages',
+    'servicePage.pricing.starter.features.2': 'Design responsive',
+    'servicePage.pricing.starter.features.3': 'SEO de base',
+    'servicePage.pricing.starter.features.4': 'Formulaire de contact',
+    'servicePage.pricing.starter.features.5': '1 mois de support',
+    'servicePage.pricing.starter.delay': '2-3 semaines',
+
+    'servicePage.pricing.business.name': 'Business',
+    'servicePage.pricing.business.price': '3 500€',
+    'servicePage.pricing.business.features.1': '8-12 pages',
+    'servicePage.pricing.business.features.2': 'Design sur-mesure',
+    'servicePage.pricing.business.features.3': 'SEO avancé',
+    'servicePage.pricing.business.features.4': 'Espace admin',
+    'servicePage.pricing.business.features.5': 'Blog intégré',
+    'servicePage.pricing.business.features.6': '3 mois de support',
+    'servicePage.pricing.business.delay': '4-6 semaines',
+    'servicePage.pricing.business.popular': 'POPULAIRE',
+
+    'servicePage.pricing.premium.name': 'Premium',
+    'servicePage.pricing.premium.price': '6 500€',
+    'servicePage.pricing.premium.features.1': 'Pages illimitées',
+    'servicePage.pricing.premium.features.2': 'Design premium',
+    'servicePage.pricing.premium.features.3': 'SEO expert',
+    'servicePage.pricing.premium.features.4': 'Dashboard avancé',
+    'servicePage.pricing.premium.features.5': 'E-commerce',
+    'servicePage.pricing.premium.features.6': 'Animations 3D',
+    'servicePage.pricing.premium.features.7': '6 mois de support',
+    'servicePage.pricing.premium.delay': '8-10 semaines',
+
+    // Process Section
+    'servicePage.process.title': 'Mon Process',
+    'servicePage.process.badge': 'Processus éprouvé avec +50 projets livrés',
+    
+    'servicePage.process.audit.title': 'Audit',
+    'servicePage.process.audit.description': 'Analyse approfondie de vos besoins et de votre marché pour définir la stratégie optimale.',
+    
+    'servicePage.process.design.title': 'Design',
+    'servicePage.process.design.description': 'Création d\'une interface moderne et intuitive, parfaitement alignée avec votre identité.',
+    
+    'servicePage.process.development.title': 'Développement',
+    'servicePage.process.development.description': 'Codage avec les technologies les plus performantes pour un site rapide et scalable.',
+    
+    'servicePage.process.tests.title': 'Tests',
+    'servicePage.process.tests.description': 'Validation rigoureuse sur tous les appareils et navigateurs pour garantir la qualité.',
+    
+    'servicePage.process.delivery.title': 'Livraison',
+    'servicePage.process.delivery.description': 'Mise en ligne et accompagnement pour un lancement réussi de votre projet.',
 
     // Contact
     "login.signin.title": "Connectez-vous à votre compte",

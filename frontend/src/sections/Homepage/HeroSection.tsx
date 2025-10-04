@@ -57,10 +57,10 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ mousePosition, onScrol
               <ArrowRight className="ml-2 group-hover:translate-x-2 transition-transform" />
             </button>
             <Link 
-              to="/quote" 
+              to="/services" 
               className="border-2 border-purple-600 text-purple-600 dark:text-purple-400 font-semibold px-8 py-4 rounded-full hover:bg-purple-600 hover:text-white transition-all duration-300"
             >
-              {t('hero.cta.quote')}
+              Services
             </Link>
           </div>
         </div>

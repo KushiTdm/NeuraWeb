@@ -2,63 +2,38 @@ import { useEffect, useRef, useState } from 'react';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { Sparkles, Zap, Crown, Check } from 'lucide-react';
+import { useLanguage } from '../../context/LanguageContext';
 
 gsap.registerPlugin(ScrollTrigger);
 
-const packs = [
-  {
-    name: 'Starter',
-    icon: Sparkles,
-    price: '1 500€',
-    features: [
-      '3-5 pages',
-      'Design responsive',
-      'SEO de base',
-      'Formulaire de contact',
-      '1 mois de support',
-    ],
-    delay: '2-3 semaines',
-    gradient: 'from-blue-500 to-cyan-500',
-  },
-  {
-    name: 'Business',
-    icon: Zap,
-    price: '3 500€',
-    features: [
-      '8-12 pages',
-      'Design sur-mesure',
-      'SEO avancé',
-      'Espace admin',
-      'Blog intégré',
-      '3 mois de support',
-    ],
-    delay: '4-6 semaines',
-    gradient: 'from-purple-500 to-pink-500',
-    popular: true,
-  },
-  {
-    name: 'Premium',
-    icon: Crown,
-    price: '6 500€',
-    features: [
-      'Pages illimitées',
-      'Design premium',
-      'SEO expert',
-      'Dashboard avancé',
-      'E-commerce',
-      'Animations 3D',
-      '6 mois de support',
-    ],
-    delay: '8-10 semaines',
-    gradient: 'from-orange-500 to-red-500',
-  },
-];
-
 export default function PricingSection() {
+  const { t, language } = useLanguage();
   const sectionRef = useRef<HTMLDivElement>(null);
   const titleRef = useRef<HTMLHeadingElement>(null);
   const cardsRef = useRef<HTMLDivElement[]>([]);
   const [flippedCards, setFlippedCards] = useState<Set<number>>(new Set());
+
+  const packs = [
+    {
+      id: 'starter',
+      icon: Sparkles,
+      gradient: 'from-blue-500 to-cyan-500',
+      featuresCount: 5,
+    },
+    {
+      id: 'business',
+      icon: Zap,
+      gradient: 'from-purple-500 to-pink-500',
+      popular: true,
+      featuresCount: 6,
+    },
+    {
+      id: 'premium',
+      icon: Crown,
+      gradient: 'from-orange-500 to-red-500',
+      featuresCount: 7,
+    },
+  ];
 
   useEffect(() => {
     const ctx = gsap.context(() => {
@@ -100,7 +75,7 @@ export default function PricingSection() {
     }, sectionRef);
 
     return () => ctx.revert();
-  }, []);
+  }, [language]);
 
   const toggleFlip = (index: number) => {
     setFlippedCards((prev) => {
@@ -115,13 +90,13 @@ export default function PricingSection() {
   };
 
   return (
-    <section ref={sectionRef} className="py-32 px-6 bg-gradient-to-b from-slate-800 to-slate-900">
+    <section ref={sectionRef} className="py-36 px-6 bg-gradient-to-b from-slate-800 to-slate-900">
       <div className="max-w-7xl mx-auto">
         <h2
           ref={titleRef}
           className="text-5xl md:text-7xl font-bold text-white text-center mb-24"
         >
-          Packs & Tarifs
+          {t('servicePage.pricing.title')}
         </h2>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
@@ -152,17 +127,21 @@ export default function PricingSection() {
                   >
                     {pack.popular && (
                       <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-yellow-400 text-slate-900 px-6 py-2 rounded-full font-bold text-sm">
-                        POPULAIRE
+                        {t(`servicePage.pricing.${pack.id}.popular`)}
                       </div>
                     )}
                     <div>
                       <Icon className="w-16 h-16 text-white mb-6" />
-                      <h3 className="text-4xl font-bold text-white mb-4">{pack.name}</h3>
-                      <div className="text-5xl font-bold text-white mb-2">{pack.price}</div>
-                      <p className="text-white/80 text-sm">HT</p>
+                      <h3 className="text-4xl font-bold text-white mb-4">
+                        {t(`servicePage.pricing.${pack.id}.name`)}
+                      </h3>
+                      <div className="text-5xl font-bold text-white mb-2">
+                        {t(`servicePage.pricing.${pack.id}.price`)}
+                      </div>
+                      <p className="text-white/80 text-sm">{t('servicePage.pricing.vat')}</p>
                     </div>
                     <div className="text-center text-white/90 text-lg">
-                      Cliquez pour voir les détails
+                      {t('servicePage.pricing.clickDetails')}
                     </div>
                   </div>
 
@@ -174,18 +153,26 @@ export default function PricingSection() {
                     }}
                   >
                     <div>
-                      <h3 className="text-3xl font-bold text-slate-900 mb-6">{pack.name}</h3>
+                      <h3 className="text-3xl font-bold text-slate-900 mb-6">
+                        {t(`servicePage.pricing.${pack.id}.name`)}
+                      </h3>
                       <ul className="space-y-4 mb-8">
-                        {pack.features.map((feature, i) => (
+                        {Array.from({ length: pack.featuresCount }).map((_, i) => (
                           <li key={i} className="flex items-start gap-3">
                             <Check className="w-6 h-6 text-green-500 flex-shrink-0 mt-1" />
-                            <span className="text-slate-700 text-lg">{feature}</span>
+                            <span className="text-slate-700 text-lg">
+                              {t(`servicePage.pricing.${pack.id}.features.${i + 1}`)}
+                            </span>
                           </li>
                         ))}
                       </ul>
                       <div className="bg-slate-100 rounded-xl p-4 mb-6">
-                        <p className="text-slate-600 text-sm font-semibold mb-1">Délai de réalisation</p>
-                        <p className="text-slate-900 text-xl font-bold">{pack.delay}</p>
+                        <p className="text-slate-600 text-sm font-semibold mb-1">
+                          {t('servicePage.pricing.deadline')}
+                        </p>
+                        <p className="text-slate-900 text-xl font-bold">
+                          {t(`servicePage.pricing.${pack.id}.delay`)}
+                        </p>
                       </div>
                     </div>
                     <button
@@ -194,7 +181,7 @@ export default function PricingSection() {
                         e.stopPropagation();
                       }}
                     >
-                      Choisir ce pack
+                      {t('servicePage.pricing.choosePack')}
                     </button>
                   </div>
                 </div>

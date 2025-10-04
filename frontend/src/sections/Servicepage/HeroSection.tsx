@@ -1,12 +1,13 @@
-//src/components/HeroSection.tsx
 import { useEffect, useRef } from 'react';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { ChevronDown } from 'lucide-react';
+import { useLanguage } from '../../context/LanguageContext';
 
 gsap.registerPlugin(ScrollTrigger);
 
 export default function HeroSection() {
+  const { t, language } = useLanguage();
   const heroRef = useRef<HTMLDivElement>(null);
   const bgRef = useRef<HTMLDivElement>(null);
   const titleRef = useRef<HTMLHeadingElement>(null);
@@ -71,7 +72,7 @@ export default function HeroSection() {
     }, heroRef);
 
     return () => ctx.revert();
-  }, []);
+  }, [language]);
 
   const splitText = (text: string) => {
     return text.split('').map((char, i) => (
@@ -104,13 +105,13 @@ export default function HeroSection() {
           ref={titleRef}
           className="text-6xl md:text-8xl font-bold text-white mb-6 leading-tight"
         >
-          {splitText('Services & Tarifs')}
+          {splitText(t('servicePage.hero.title'))}
         </h1>
         <p
           ref={subtitleRef}
           className="text-xl md:text-3xl text-white/90 mb-12 font-light"
         >
-          Des solutions web sur mesure pour propulser votre business
+          {t('servicePage.hero.subtitle')}
         </p>
         <div ref={ctaRef} className="flex justify-center">
           <div className="cursor-pointer animate-bounce">

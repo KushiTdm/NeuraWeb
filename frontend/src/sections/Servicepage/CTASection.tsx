@@ -1,12 +1,15 @@
 //src/components/CTASection.tsx
 import { useEffect, useRef } from 'react';
+import { Link } from 'react-router-dom';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { MessageCircle, ArrowRight } from 'lucide-react';
+import { useLanguage } from '../../context/LanguageContext';
 
 gsap.registerPlugin(ScrollTrigger);
 
 export default function CTASection() {
+  const { t, language } = useLanguage();
   const sectionRef = useRef<HTMLDivElement>(null);
   const titleRef = useRef<HTMLHeadingElement>(null);
   const buttonRef = useRef<HTMLButtonElement>(null);
@@ -62,7 +65,7 @@ export default function CTASection() {
     }, sectionRef);
 
     return () => ctx.revert();
-  }, []);
+  }, [language]);
 
   const handleButtonHover = (isHovering: boolean) => {
     gsap.to(buttonRef.current, {
@@ -74,6 +77,9 @@ export default function CTASection() {
       ease: 'power2.out',
     });
   };
+
+  // Déterminer le nombre de mots selon la langue
+  const titleWords = language === 'fr' ? 7 : 6;
 
   return (
     <section
@@ -103,21 +109,31 @@ export default function CTASection() {
         <MessageCircle className="w-20 h-20 text-violet-400 mx-auto mb-8 animate-pulse" />
 
         <h2 ref={titleRef} className="text-5xl md:text-7xl font-bold text-white mb-12 leading-tight">
-          <span className="word inline-block mr-4">Des</span>
-          <span className="word inline-block mr-4">questions</span>
-          <span className="word inline-block mr-4">avant</span>
-          <span className="word inline-block mr-4">de</span>
-          <span className="word inline-block mr-4">lancer</span>
-          <span className="word inline-block mr-4">votre</span>
-          <span className="word inline-block mr-4 bg-gradient-to-r from-violet-400 to-fuchsia-400 bg-clip-text text-transparent">
-            projet ?
-          </span>
+          <span className="word inline-block mr-4">{t('servicePage.cta.title.word1')}</span>
+          <span className="word inline-block mr-4">{t('servicePage.cta.title.word2')}</span>
+          <span className="word inline-block mr-4">{t('servicePage.cta.title.word3')}</span>
+          <span className="word inline-block mr-4">{t('servicePage.cta.title.word4')}</span>
+          <span className="word inline-block mr-4">{t('servicePage.cta.title.word5')}</span>
+          {titleWords === 7 ? (
+            <>
+              <span className="word inline-block mr-4">{t('servicePage.cta.title.word6')}</span>
+              <span className="word inline-block bg-gradient-to-r from-violet-400 to-fuchsia-400 bg-clip-text text-transparent">
+                {t('servicePage.cta.title.word7')}
+              </span>
+            </>
+          ) : (
+            <span className="word inline-block bg-gradient-to-r from-violet-400 to-fuchsia-400 bg-clip-text text-transparent">
+              {t('servicePage.cta.title.word6')}
+            </span>
+          )}
         </h2>
 
         <p className="text-xl text-white/70 mb-16 max-w-2xl mx-auto">
-          Discutons ensemble de votre vision et transformons-la en réalité digitale.
+          {t('servicePage.cta.subtitle')}
         </p>
-
+        <Link
+        to="/quote" >
+                      
         <button
           ref={buttonRef}
           onMouseEnter={() => handleButtonHover(true)}
@@ -125,24 +141,24 @@ export default function CTASection() {
           className="group relative px-12 py-6 bg-gradient-to-r from-violet-600 to-fuchsia-600 text-white text-xl font-bold rounded-full shadow-lg hover:shadow-2xl transition-all duration-300 overflow-hidden"
         >
           <span className="relative z-10 flex items-center gap-3">
-            Démarrer mon projet
+            {t('servicePage.cta.button')}
             <ArrowRight className="w-6 h-6 group-hover:translate-x-2 transition-transform duration-300" />
           </span>
           <div className="absolute inset-0 bg-gradient-to-r from-fuchsia-600 to-violet-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
         </button>
-
+        </Link>
         <div className="mt-16 flex justify-center gap-8 text-white/60 text-sm">
           <div className="flex items-center gap-2">
             <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
-            <span>Réponse en 24h</span>
+            <span>{t('servicePage.cta.feature1')}</span>
           </div>
           <div className="flex items-center gap-2">
             <div className="w-2 h-2 bg-blue-500 rounded-full animate-pulse"></div>
-            <span>Devis gratuit</span>
+            <span>{t('servicePage.cta.feature2')}</span>
           </div>
           <div className="flex items-center gap-2">
             <div className="w-2 h-2 bg-purple-500 rounded-full animate-pulse"></div>
-            <span>Sans engagement</span>
+            <span>{t('servicePage.cta.feature3')}</span>
           </div>
         </div>
       </div>

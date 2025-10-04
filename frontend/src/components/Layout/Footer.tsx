@@ -66,7 +66,7 @@ const Footer: React.FC = () => {
 
           {/* Services */}
           <div className="footer-section text-center">
-            <h4 className="text-white font-medium mb-3">{t('services.title')}</h4>
+            <h4 className="text-white font-medium mb-3">Services</h4>
             <ul className="space-y-2 text-white/80 text-xs">
               <li>{t('services.web.title')}</li>
               <li>{t('services.automation.title')}</li>

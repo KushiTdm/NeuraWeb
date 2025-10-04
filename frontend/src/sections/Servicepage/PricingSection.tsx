@@ -1,3 +1,4 @@
+//frontend/src/sections/Servicepage/PricingSection.tsx
 import { useEffect, useRef, useState } from 'react';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
@@ -90,8 +91,8 @@ export default function PricingSection() {
   };
 
   return (
-    <section ref={sectionRef} className="py-36 px-6 bg-gradient-to-b from-slate-800 to-slate-900">
-      <div className="max-w-7xl mx-auto">
+    <section ref={sectionRef} className="min-h-screen py-36 px-6 bg-gradient-to-b from-slate-800 to-slate-900 flex items-center">
+      <div className="max-w-7xl mx-auto w-full">
         <h2
           ref={titleRef}
           className="text-5xl md:text-7xl font-bold text-white text-center mb-24"
@@ -110,7 +111,7 @@ export default function PricingSection() {
                 ref={(el) => {
                   if (el) cardsRef.current[index] = el;
                 }}
-                className="relative h-[600px] cursor-pointer"
+                className="relative h-[650px] cursor-pointer"
                 style={{ perspective: '1000px' }}
                 onClick={() => toggleFlip(index)}
               >
@@ -135,10 +136,13 @@ export default function PricingSection() {
                       <h3 className="text-4xl font-bold text-white mb-4">
                         {t(`servicePage.pricing.${pack.id}.name`)}
                       </h3>
-                      <div className="text-5xl font-bold text-white mb-2">
+                      <div className="text-4xl font-bold text-white mb-2">
                         {t(`servicePage.pricing.${pack.id}.price`)}
                       </div>
-                      <p className="text-white/80 text-sm">{t('servicePage.pricing.vat')}</p>
+                      <p className="text-white/80 text-sm mb-6">{t('servicePage.pricing.vat')}</p>
+                      <p className="text-white/90 text-base leading-relaxed">
+                        {t(`servicePage.pricing.${pack.id}.desc`)}
+                      </p>
                     </div>
                     <div className="text-center text-white/90 text-lg">
                       {t('servicePage.pricing.clickDetails')}
@@ -146,7 +150,7 @@ export default function PricingSection() {
                   </div>
 
                   <div
-                    className={`absolute w-full h-full rounded-3xl bg-white p-8 shadow-2xl flex flex-col justify-between`}
+                    className={`absolute w-full h-full rounded-3xl bg-white p-8 shadow-2xl flex flex-col justify-between overflow-y-auto`}
                     style={{
                       backfaceVisibility: 'hidden',
                       transform: 'rotateY(180deg)',
@@ -156,11 +160,11 @@ export default function PricingSection() {
                       <h3 className="text-3xl font-bold text-slate-900 mb-6">
                         {t(`servicePage.pricing.${pack.id}.name`)}
                       </h3>
-                      <ul className="space-y-4 mb-8">
+                      <ul className="space-y-3 mb-8">
                         {Array.from({ length: pack.featuresCount }).map((_, i) => (
                           <li key={i} className="flex items-start gap-3">
-                            <Check className="w-6 h-6 text-green-500 flex-shrink-0 mt-1" />
-                            <span className="text-slate-700 text-lg">
+                            <Check className="w-5 h-5 text-green-500 flex-shrink-0 mt-1" />
+                            <span className="text-slate-700 text-base">
                               {t(`servicePage.pricing.${pack.id}.features.${i + 1}`)}
                             </span>
                           </li>
@@ -170,7 +174,7 @@ export default function PricingSection() {
                         <p className="text-slate-600 text-sm font-semibold mb-1">
                           {t('servicePage.pricing.deadline')}
                         </p>
-                        <p className="text-slate-900 text-xl font-bold">
+                        <p className="text-slate-900 text-lg font-bold">
                           {t(`servicePage.pricing.${pack.id}.delay`)}
                         </p>
                       </div>
@@ -188,6 +192,12 @@ export default function PricingSection() {
               </div>
             );
           })}
+        </div>
+
+        <div className="mt-16 text-center">
+          <button className="px-8 py-4 bg-white text-slate-900 font-bold text-lg rounded-full hover:scale-105 transition-transform shadow-lg">
+            {t('servicePage.pricing.cta')}
+          </button>
         </div>
       </div>
     </section>

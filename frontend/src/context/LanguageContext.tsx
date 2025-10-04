@@ -122,35 +122,41 @@ const translations = {
       
       // Packs
       'servicePage.pricing.starter.name': 'Starter',
-      'servicePage.pricing.starter.price': '€1,500',
-      'servicePage.pricing.starter.features.1': '3-5 pages',
+      'servicePage.pricing.starter.price': 'Starting from €1,490',
+      'servicePage.pricing.starter.features.1': '3–5 pages',
       'servicePage.pricing.starter.features.2': 'Responsive design',
       'servicePage.pricing.starter.features.3': 'Basic SEO',
       'servicePage.pricing.starter.features.4': 'Contact form',
-      'servicePage.pricing.starter.features.5': '1 month support',
-      'servicePage.pricing.starter.delay': '2-3 weeks',
+      'servicePage.pricing.starter.features.5': '1 month of support',
+      'servicePage.pricing.starter.delay': '2–3 weeks',
+      'servicePage.pricing.starter.desc': 'Perfect to launch your online presence with a clean, professional website.',
 
       'servicePage.pricing.business.name': 'Business',
-      'servicePage.pricing.business.price': '€3,500',
-      'servicePage.pricing.business.features.1': '8-12 pages',
+      'servicePage.pricing.business.price': 'Starting from €3,490',
+      'servicePage.pricing.business.features.1': '8–12 pages',
       'servicePage.pricing.business.features.2': 'Custom design',
       'servicePage.pricing.business.features.3': 'Advanced SEO',
-      'servicePage.pricing.business.features.4': 'Admin panel',
+      'servicePage.pricing.business.features.4': 'Admin dashboard',
       'servicePage.pricing.business.features.5': 'Integrated blog',
-      'servicePage.pricing.business.features.6': '3 months support',
-      'servicePage.pricing.business.delay': '4-6 weeks',
+      'servicePage.pricing.business.features.6': '3 months of support',
+      'servicePage.pricing.business.delay': '4–8 weeks depending on complexity',
       'servicePage.pricing.business.popular': 'POPULAR',
+      'servicePage.pricing.business.desc': 'Designed for businesses looking for a high-performing, scalable, and well-optimized website.',
 
       'servicePage.pricing.premium.name': 'Premium',
-      'servicePage.pricing.premium.price': '€6,500',
-      'servicePage.pricing.premium.features.1': 'Unlimited pages',
+      'servicePage.pricing.premium.price': 'Starting from €6,900',
+      'servicePage.pricing.premium.features.1': 'Up to 20 pages (expandable)',
       'servicePage.pricing.premium.features.2': 'Premium design',
-      'servicePage.pricing.premium.features.3': 'Expert SEO',
+      'servicePage.pricing.premium.features.3': 'Expert-level SEO',
       'servicePage.pricing.premium.features.4': 'Advanced dashboard',
-      'servicePage.pricing.premium.features.5': 'E-commerce',
-      'servicePage.pricing.premium.features.6': '3D animations',
-      'servicePage.pricing.premium.features.7': '6 months support',
-      'servicePage.pricing.premium.delay': '8-10 weeks',
+      'servicePage.pricing.premium.features.5': 'Full e-commerce integration',
+      'servicePage.pricing.premium.features.6': 'Custom animations & effects',
+      'servicePage.pricing.premium.features.7': '6 months of support',
+      'servicePage.pricing.premium.delay': '8–12 weeks depending on complexity',
+      'servicePage.pricing.premium.desc': 'A high-end solution for ambitious brands: design, performance, and complete e-commerce capabilities.',
+
+      'servicePage.pricing.cta': 'Request a custom quote',
+
 
       // Process Section
       'servicePage.process.title': 'My Process',
@@ -894,35 +900,44 @@ const translations = {
     
     // Packs
     'servicePage.pricing.starter.name': 'Starter',
-    'servicePage.pricing.starter.price': '1 500€',
+    'servicePage.pricing.starter.price': 'À partir de 1 490€',
     'servicePage.pricing.starter.features.1': '3-5 pages',
     'servicePage.pricing.starter.features.2': 'Design responsive',
     'servicePage.pricing.starter.features.3': 'SEO de base',
     'servicePage.pricing.starter.features.4': 'Formulaire de contact',
     'servicePage.pricing.starter.features.5': '1 mois de support',
     'servicePage.pricing.starter.delay': '2-3 semaines',
+    'servicePage.pricing.starter.desc': 'Idéal pour lancer votre présence en ligne avec un site professionnel simple et efficace.',
+
 
     'servicePage.pricing.business.name': 'Business',
-    'servicePage.pricing.business.price': '3 500€',
+    'servicePage.pricing.business.price': 'À partir de 3 490€',
     'servicePage.pricing.business.features.1': '8-12 pages',
     'servicePage.pricing.business.features.2': 'Design sur-mesure',
     'servicePage.pricing.business.features.3': 'SEO avancé',
     'servicePage.pricing.business.features.4': 'Espace admin',
     'servicePage.pricing.business.features.5': 'Blog intégré',
     'servicePage.pricing.business.features.6': '3 mois de support',
-    'servicePage.pricing.business.delay': '4-6 semaines',
+    'servicePage.pricing.business.delay': '4-8 semaines selon complexité',
     'servicePage.pricing.business.popular': 'POPULAIRE',
+    'servicePage.pricing.business.desc': 'Conçu pour les entreprises souhaitant un site performant, évolutif et bien référencé.',
+
 
     'servicePage.pricing.premium.name': 'Premium',
-    'servicePage.pricing.premium.price': '6 500€',
+    'servicePage.pricing.premium.price': 'À partir de 6 900€',
     'servicePage.pricing.premium.features.1': 'Pages illimitées',
     'servicePage.pricing.premium.features.2': 'Design premium',
     'servicePage.pricing.premium.features.3': 'SEO expert',
     'servicePage.pricing.premium.features.4': 'Dashboard avancé',
     'servicePage.pricing.premium.features.5': 'E-commerce',
-    'servicePage.pricing.premium.features.6': 'Animations 3D',
+    'servicePage.pricing.premium.features.6': 'Animations spécifiques',
     'servicePage.pricing.premium.features.7': '6 mois de support',
-    'servicePage.pricing.premium.delay': '8-10 semaines',
+    'servicePage.pricing.premium.delay': '8-12 semaines selon complexité',
+    'servicePage.pricing.premium.desc': 'Une solution haut de gamme pour les marques ambitieuses : design, performance et e-commerce complet.',
+
+    'servicePage.pricing.cta': 'Demander un devis personnalisé',
+
+
 
     // Process Section
     'servicePage.process.title': 'Mon Process',

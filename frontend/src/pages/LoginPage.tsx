@@ -68,7 +68,11 @@ const LoginPage: React.FC = () => {
               className="h-14 w-14 bg-gradient-to-r from-primary-500 to-secondary-500 rounded-lg flex items-center justify-center"
               style={{ display: 'none' }}
             >
-              <span className="text-white font-bold text-lg">NW</span>
+              <img 
+                src="/assets/neurawebB.png" 
+                alt="Logo" 
+                className="h-10 w-10 object-contain"
+              />
             </div>
           </Link>
           

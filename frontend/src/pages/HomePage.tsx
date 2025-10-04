@@ -4,12 +4,8 @@ import { HeroSection } from '../sections/HeroSection';
 import  {VideoScrollSection}  from '../sections/VideoScrollSection';
 import { ServicesSection } from '../sections/ServicesSection';
 import { PortfolioSection } from '../sections/PortfolioSection';
-import { TechnologiesSection } from '../sections/TechnologiesSection';
-import { ProcessSection } from '../sections/ProcessSection';
-import { StatsSection } from '../sections/StatsSection';
 import { TestimonialsSection } from '../sections/TestimonialsSection';
 import { AboutSection } from '../sections/AboutSection';
-import { FAQSection } from '../sections/FAQSection';
 import { CTASection } from '../sections/CTASection';
 
 const HomePage: React.FC = () => {
@@ -194,7 +190,7 @@ const HomePage: React.FC = () => {
         @media (max-width: 768px) {
           .section-snap {
             min-height: 100vh;
-            padding: 3rem 1rem;
+            padding: 5rem 1rem;
           }
         }
       `}</style>
@@ -205,12 +201,9 @@ const HomePage: React.FC = () => {
       <div ref={servicesRef}>
         <ServicesSection />
       </div>
-      <PortfolioSection />
-      <TechnologiesSection mousePosition={mousePosition} />
-      <ProcessSection />
-      <TestimonialsSection />
       <AboutSection />
-      <FAQSection />
+      <PortfolioSection />
+      <TestimonialsSection />
       <CTASection />
     </div>
   );

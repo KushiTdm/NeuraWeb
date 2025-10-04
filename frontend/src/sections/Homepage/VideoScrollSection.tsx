@@ -2,8 +2,8 @@
 import { useEffect, useRef } from 'react';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { Section } from '../components/Section';
-import { useLanguage } from '../context/LanguageContext';
+import { Section } from '../../components/Section';
+import { useLanguage } from '../../context/LanguageContext';
 
 gsap.registerPlugin(ScrollTrigger);
 

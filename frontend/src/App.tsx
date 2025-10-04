@@ -15,6 +15,7 @@ import WizardPage from './pages/WizardPage';
 import AdminDashboardPage from './pages/AdminDashboardPage';
 import RequestPasswordResetPage from './pages/RequestPasswordResetPage';
 import ResetPasswordPage from './pages/ResetPasswordPage';
+import ServicePage from './pages/ServicePage';
 
 function App() {
   return (
@@ -30,6 +31,7 @@ function App() {
                 <Layout>
                   <Routes>
                     <Route path="/" element={<HomePage />} />
+                    <Route path="/services" element={<ServicePage />} />
                     <Route path="/contact" element={<ContactPage />} />
                     <Route path="/quote" element={<QuotePage />} />
                     <Route path="/booking" element={<BookingPage />} />

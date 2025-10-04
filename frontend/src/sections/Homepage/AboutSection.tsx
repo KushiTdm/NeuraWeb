@@ -1,6 +1,6 @@
 // frontend/src/sections/AboutSection.tsx
 import React from 'react';
-import { useLanguage } from '../context/LanguageContext';
+import { useLanguage } from '../../context/LanguageContext';
 
 export const AboutSection: React.FC = () => {
   const { t } = useLanguage();

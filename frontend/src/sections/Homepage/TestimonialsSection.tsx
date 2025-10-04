@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Star, CheckCircle } from 'lucide-react';
-import { useLanguage } from '../context/LanguageContext';
+import { useLanguage } from '../../context/LanguageContext';
 
 export const TestimonialsSection = () => {
   const { t } = useLanguage();

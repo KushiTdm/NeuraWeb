@@ -1,12 +1,12 @@
 // frontend/src/pages/HomePage.tsx
 import React, { useEffect, useState, useRef } from 'react';
-import { HeroSection } from '../sections/HeroSection';
-import  {VideoScrollSection}  from '../sections/VideoScrollSection';
-import { ServicesSection } from '../sections/ServicesSection';
-import { PortfolioSection } from '../sections/PortfolioSection';
-import { TestimonialsSection } from '../sections/TestimonialsSection';
-import { AboutSection } from '../sections/AboutSection';
-import { CTASection } from '../sections/CTASection';
+import { HeroSection } from '../sections/Homepage/HeroSection';
+import  {VideoScrollSection}  from '../sections/Homepage/VideoScrollSection';
+import { ServicesSection } from '../sections/Homepage/ServicesSection';
+import { PortfolioSection } from '../sections/Homepage/PortfolioSection';
+import { TestimonialsSection } from '../sections/Homepage/TestimonialsSection';
+import { AboutSection } from '../sections/Homepage/AboutSection';
+import { CTASection } from '../sections/Homepage/CTASection';
 
 const HomePage: React.FC = () => {
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });

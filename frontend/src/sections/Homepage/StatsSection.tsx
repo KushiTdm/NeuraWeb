@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Rocket, Users, Award } from 'lucide-react';
-import { useAnimatedCounter } from '../hooks/useAnimatedCounter';
+import { useAnimatedCounter } from '../../hooks/useAnimatedCounter';
 
 const stats = [
   { number: 50, label: 'Projets Réalisés', icon: Rocket },

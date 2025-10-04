@@ -1,7 +1,7 @@
 // frontend/src/sections/ServicesSection.tsx
 import React from 'react';
 import { Code, Bot, Brain } from 'lucide-react';
-import { useLanguage } from '../context/LanguageContext';
+import { useLanguage } from '../../context/LanguageContext';
 
 
 const services = [

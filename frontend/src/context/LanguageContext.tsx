@@ -246,7 +246,7 @@ const translations = {
     'contact.why.tech': '• Cutting-edge technologies and best practices',
     'contact.why.support': '• Dedicated support throughout the project',
     'contact.why.pricing': '• Transparent pricing and timelines',
-    'ontact.form.title': 'Contact Form',
+    'contact.form.title': 'Contact Form',
     'contact.message.placeholder': 'Write your message here...',
     
 ///////////////////////////////////////////////////////////////////////

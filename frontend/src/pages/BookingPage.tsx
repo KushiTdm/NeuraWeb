@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useForm } from 'react-hook-form';
 import { toast } from 'react-hot-toast';
-import { Calendar, Clock, User, CheckCircle, ChevronLeft, ChevronRight, Mail, Phone, MessageSquare, ArrowRight } from 'lucide-react';
+import { Calendar, Clock, User, CheckCircle, ChevronLeft, ChevronRight, Mail, Phone, MessageSquare } from 'lucide-react';
 import { useLanguage } from '../context/LanguageContext';
 import api from '../utils/api';
 
@@ -37,6 +37,8 @@ const BookingPage: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const { register, handleSubmit, setValue, formState: { errors } } = useForm<BookingFormData>();
 
+  const progressRef = useRef<HTMLDivElement>(null);
+
   const steps = [
     { id: 'date', title: t('booking.step.date') || 'Choisir une date', icon: Calendar },
     { id: 'time', title: t('booking.step.time') || 'Sélectionner l\'heure', icon: Clock },
@@ -47,6 +49,13 @@ const BookingPage: React.FC = () => {
   useEffect(() => {
     fetchAvailableSlots();
   }, []);
+
+  useEffect(() => {
+    if (progressRef.current) {
+      const progress = ((currentStep + 1) / steps.length) * 100;
+      progressRef.current.style.width = `${progress}%`;
+    }
+  }, [currentStep]);
 
   const fetchAvailableSlots = async () => {
     try {
@@ -245,7 +254,7 @@ const BookingPage: React.FC = () => {
     switch (currentStep) {
       case 0: return selectedDay !== '';
       case 1: return selectedSlot !== '';
-      case 2: return true; // La validation du formulaire se fait dans onSubmit
+      case 2: return true;
       default: return true;
     }
   };
@@ -260,68 +269,99 @@ const BookingPage: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800 flex items-center justify-center pt-16">
+      <div className="min-h-screen bg-gradient-to-br from-slate-950 via-purple-950 to-slate-950 flex items-center justify-center pt-16">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-4 border-blue-500 border-t-transparent mx-auto mb-4"></div>
-          <p className="text-gray-600 dark:text-gray-300">{t('common.loading') || 'Chargement...'}</p>
+          <div className="animate-spin rounded-full h-12 w-12 border-4 border-purple-500 border-t-transparent mx-auto mb-4"></div>
+          <p className="text-white/70">{t('common.loading') || 'Chargement...'}</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800 py-8 px-4 pt-20">
-      <div className="max-w-4xl mx-auto">
+    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-purple-950 to-slate-950 py-8 px-4 pt-20 relative overflow-hidden">
+      {/* Particles background */}
+      <div className="absolute inset-0 pointer-events-none">
+        {[...Array(20)].map((_, i) => (
+          <div
+            key={i}
+            className="absolute w-2 h-2 bg-white/20 rounded-full animate-pulse"
+            style={{
+              left: `${Math.random() * 100}%`,
+              top: `${Math.random() * 100}%`,
+              animationDelay: `${Math.random() * 2}s`
+            }}
+          />
+        ))}
+      </div>
+
+      <div className="max-w-4xl mx-auto relative z-10">
         {/* Header */}
         <div className="text-center mb-8">
-          <h1 className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white mb-4">
+          <h1 className="text-4xl md:text-5xl font-bold text-white mb-4">
             {t('booking.title') || 'Réserver un rendez-vous'}
           </h1>
-          <p className="text-lg text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
+          <p className="text-xl text-white/70 max-w-2xl mx-auto">
             {t('booking.subtitle') || 'Choisissez votre créneau préféré et remplissez vos informations'}
           </p>
         </div>
 
         {/* Progress Bar */}
         <div className="mb-8">
-          <div className="flex items-center justify-between max-w-2xl mx-auto">
+          <div className="flex items-center justify-between max-w-2xl mx-auto mb-4">
             {steps.map((step, index) => (
               <div key={step.id} className="flex items-center">
-                <div className={`flex items-center justify-center w-10 h-10 rounded-full border-2 transition-all duration-300 ${
+                <div className={`flex items-center justify-center w-12 h-12 rounded-full transition-all duration-300 ${
                   index <= currentStep 
-                    ? 'bg-blue-600 border-blue-600 text-white' 
-                    : 'bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-400 dark:text-gray-500'
+                    ? 'bg-gradient-to-r from-blue-500 to-purple-600 shadow-lg shadow-purple-500/50' 
+                    : 'bg-white/10 border-2 border-white/20'
                 }`}>
-                  <step.icon size={20} />
+                  {index < currentStep ? (
+                    <CheckCircle className="w-6 h-6 text-white" />
+                  ) : (
+                    <step.icon size={20} className="text-white" />
+                  )}
                 </div>
                 <div className="ml-3 hidden sm:block">
                   <p className={`text-sm font-medium transition-colors duration-300 ${
-                    index <= currentStep ? 'text-blue-600 dark:text-blue-400' : 'text-gray-500 dark:text-gray-400'
+                    index <= currentStep ? 'text-white' : 'text-white/50'
                   }`}>
                     {step.title}
                   </p>
                 </div>
                 {index < steps.length - 1 && (
-                  <div className={`w-8 md:w-16 h-0.5 mx-4 transition-colors duration-300 ${
-                    index < currentStep ? 'bg-blue-600' : 'bg-gray-300 dark:bg-gray-600'
-                  }`} />
+                  <div className="h-1 w-16 mx-4 bg-white/10 relative overflow-hidden">
+                    <div className={`h-full bg-gradient-to-r from-blue-500 to-purple-600 transition-all duration-500 ${
+                      index < currentStep ? 'w-full' : 'w-0'
+                    }`} />
+                  </div>
                 )}
               </div>
             ))}
           </div>
+          <div className="h-2 bg-white/10 rounded-full overflow-hidden max-w-2xl mx-auto">
+            <div
+              ref={progressRef}
+              className="h-full bg-gradient-to-r from-blue-500 via-purple-600 to-pink-500 transition-all duration-500"
+              style={{ width: '0%' }}
+            />
+          </div>
         </div>
 
         {/* Wizard Content */}
-        <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl overflow-hidden">
-          <div className="p-6 md:p-8">
+        <div className="bg-white/5 backdrop-blur-xl rounded-3xl shadow-2xl overflow-hidden border border-white/10">
+          <div className="p-6 md:p-12">
             
             {/* Step 0: Date Selection */}
             {currentStep === 0 && (
               <div className="animate-fade-in">
-                <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6 text-center">
+                <h2 className="text-3xl font-bold text-white mb-2 text-center">
                   {t('booking.select.day') || 'Sélectionnez un jour'}
                 </h2>
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 max-h-96 overflow-y-auto">
+                <p className="text-white/60 text-center mb-8">
+                  Choisissez la date qui vous convient le mieux
+                </p>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                   {daySlots.length > 0 ? (
                     daySlots.map((day) => {
                       const availableCount = day.slots.filter(slot => slot.available).length;
@@ -332,29 +372,29 @@ const BookingPage: React.FC = () => {
                           key={day.date}
                           onClick={() => handleDaySelect(day.date)}
                           disabled={availableCount === 0}
-                          className={`p-4 rounded-xl border-2 text-left transition-all duration-200 transform hover:scale-105 ${
+                          className={`p-6 rounded-xl border transition-all duration-300 transform hover:scale-105 ${
                             isSelected
-                              ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20 shadow-lg'
+                              ? 'bg-gradient-to-r from-blue-500 to-purple-600 border-transparent shadow-lg shadow-purple-500/50'
                               : availableCount > 0
-                              ? 'border-gray-200 dark:border-gray-600 hover:border-blue-300 hover:shadow-md'
-                              : 'border-gray-200 dark:border-gray-600 opacity-50 cursor-not-allowed'
+                              ? 'bg-white/5 border-white/10 hover:bg-white/10 hover:border-purple-500/50'
+                              : 'bg-white/5 border-white/10 opacity-50 cursor-not-allowed'
                           }`}
                         >
                           <div className="flex flex-col items-center text-center">
-                            <h3 className={`font-bold text-lg ${
-                              isSelected ? 'text-blue-700 dark:text-blue-300' : 'text-gray-900 dark:text-white'
-                            }`}>
+                            <h3 className="font-bold text-xl text-white mb-1">
                               {day.displayDate}
                             </h3>
-                            <p className={`text-sm capitalize ${
-                              isSelected ? 'text-blue-600 dark:text-blue-400' : 'text-gray-500 dark:text-gray-400'
+                            <p className={`text-sm capitalize mb-3 ${
+                              isSelected ? 'text-white/90' : 'text-white/60'
                             }`}>
                               {day.weekday}
                             </p>
-                            <div className={`mt-2 px-3 py-1 rounded-full text-xs font-medium ${
+                            <div className={`px-3 py-1 rounded-full text-xs font-medium ${
                               availableCount > 0
-                                ? 'bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-300'
-                                : 'bg-gray-100 text-gray-600 dark:bg-gray-600 dark:text-gray-300'
+                                ? isSelected 
+                                  ? 'bg-white/20 text-white'
+                                  : 'bg-green-500/20 text-green-300'
+                                : 'bg-white/10 text-white/50'
                             }`}>
                               {availableCount > 0 
                                 ? `${availableCount} ${t('booking.slots.available') || 'créneaux disponibles'}` 
@@ -365,7 +405,7 @@ const BookingPage: React.FC = () => {
                       );
                     })
                   ) : (
-                    <div className="col-span-full text-center py-8 text-gray-500 dark:text-gray-400">
+                    <div className="col-span-full text-center py-8 text-white/50">
                       <Calendar size={40} className="mx-auto mb-3 opacity-50" />
                       <p>{t('booking.no.days') || 'Aucun jour disponible'}</p>
                     </div>
@@ -377,20 +417,20 @@ const BookingPage: React.FC = () => {
             {/* Step 1: Time Selection */}
             {currentStep === 1 && (
               <div className="animate-fade-in">
-                <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2 text-center">
+                <h2 className="text-3xl font-bold text-white mb-2 text-center">
                   {t('booking.select.time') || 'Choisissez votre heure'}
                 </h2>
                 {selectedDay && (
                   <>
                     <div className="text-center mb-6">
-                      <div className="inline-flex items-center bg-blue-100 dark:bg-blue-900/20 px-4 py-2 rounded-lg">
-                        <Calendar size={16} className="text-blue-600 mr-2" />
-                        <span className="text-blue-700 dark:text-blue-300 font-medium">
+                      <div className="inline-flex items-center bg-white/10 px-4 py-2 rounded-lg border border-white/10">
+                        <Calendar size={16} className="text-purple-400 mr-2" />
+                        <span className="text-white font-medium">
                           {getSelectedDayData()?.displayDate} - {getSelectedDayData()?.weekday}
                         </span>
                       </div>
                     </div>
-                    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 max-h-80 overflow-y-auto">
+                    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
                       {getSelectedDayData()?.slots.map((slot) => {
                         const isSelected = selectedSlot === slot.id;
                         const time = formatTime(slot.datetime);
@@ -400,27 +440,27 @@ const BookingPage: React.FC = () => {
                             key={slot.id}
                             onClick={() => slot.available && handleSlotSelect(slot.id)}
                             disabled={!slot.available}
-                            className={`p-4 rounded-xl border-2 text-center transition-all duration-200 transform hover:scale-105 ${
+                            className={`p-4 rounded-xl border transition-all duration-300 transform hover:scale-105 ${
                               isSelected
-                                ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20 shadow-lg'
+                                ? 'bg-gradient-to-r from-blue-500 to-purple-600 border-transparent shadow-lg shadow-purple-500/50'
                                 : slot.available
-                                ? 'border-gray-200 dark:border-gray-600 hover:border-blue-300 hover:shadow-md'
-                                : 'border-gray-200 dark:border-gray-600 opacity-50 cursor-not-allowed'
+                                ? 'bg-white/5 border-white/10 hover:bg-white/10 hover:border-purple-500/50'
+                                : 'bg-white/5 border-white/10 opacity-50 cursor-not-allowed'
                             }`}
                           >
                             <div className="flex flex-col items-center">
                               <Clock size={20} className={`mb-2 ${
-                                isSelected ? 'text-blue-600' : slot.available ? 'text-gray-500 dark:text-gray-400' : 'text-gray-300'
+                                isSelected ? 'text-white' : slot.available ? 'text-purple-400' : 'text-white/30'
                               }`} />
-                              <span className={`font-medium ${
-                                isSelected ? 'text-blue-700 dark:text-blue-300' : 'text-gray-900 dark:text-white'
-                              }`}>
+                              <span className="font-medium text-white">
                                 {time}
                               </span>
-                              <div className={`mt-1 px-2 py-0.5 rounded text-xs ${
+                              <div className={`mt-2 px-2 py-0.5 rounded text-xs ${
                                 slot.available
-                                  ? 'bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-300'
-                                  : 'bg-gray-100 text-gray-600 dark:bg-gray-600 dark:text-gray-300'
+                                  ? isSelected
+                                    ? 'bg-white/20 text-white'
+                                    : 'bg-green-500/20 text-green-300'
+                                  : 'bg-white/10 text-white/50'
                               }`}>
                                 {slot.available 
                                   ? t('booking.time.available') || 'Disponible' 
@@ -439,28 +479,31 @@ const BookingPage: React.FC = () => {
             {/* Step 2: Information Form */}
             {currentStep === 2 && (
               <div className="animate-fade-in">
-                <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6 text-center">
+                <h2 className="text-3xl font-bold text-white mb-2 text-center">
                   {t('booking.info.title') || 'Vos Informations'}
                 </h2>
+                <p className="text-white/60 text-center mb-8">
+                  Quelques détails pour finaliser votre réservation
+                </p>
                 <div className="max-w-lg mx-auto space-y-6">
                   <div>
-                    <label className="flex items-center text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    <label className="flex items-center text-sm font-medium text-white/80 mb-2">
                       <User size={16} className="mr-2" />
                       {t('contact.name') || 'Nom complet'} *
                     </label>
                     <input
                       type="text"
                       {...register('name', { required: t('common.name.required') || 'Le nom est requis' })}
-                      className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white transition-all"
+                      className="w-full px-6 py-4 bg-white/5 border border-white/10 rounded-xl text-white placeholder-white/40 focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 transition-all"
                       placeholder="John Doe"
                     />
                     {errors.name && (
-                      <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.name.message}</p>
+                      <p className="mt-1 text-sm text-red-400">{errors.name.message}</p>
                     )}
                   </div>
 
                   <div>
-                    <label className="flex items-center text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    <label className="flex items-center text-sm font-medium text-white/80 mb-2">
                       <Mail size={16} className="mr-2" />
                       {t('contact.email') || 'Email'} *
                     </label>
@@ -473,44 +516,44 @@ const BookingPage: React.FC = () => {
                           message: t('common.email.invalid') || 'Email invalide'
                         }
                       })}
-                      className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white transition-all"
+                      className="w-full px-6 py-4 bg-white/5 border border-white/10 rounded-xl text-white placeholder-white/40 focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 transition-all"
                       placeholder="john@example.com"
                     />
                     {errors.email && (
-                      <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.email.message}</p>
+                      <p className="mt-1 text-sm text-red-400">{errors.email.message}</p>
                     )}
                   </div>
 
                   <div>
-                    <label className="flex items-center text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    <label className="flex items-center text-sm font-medium text-white/80 mb-2">
                       <Phone size={16} className="mr-2" />
                       {t('booking.phone') || 'Téléphone'}
                     </label>
                     <input
                       type="tel"
                       {...register('phone')}
-                      className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white transition-all"
+                      className="w-full px-6 py-4 bg-white/5 border border-white/10 rounded-xl text-white placeholder-white/40 focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 transition-all"
                       placeholder="+33 6 12 34 56 78"
                     />
                   </div>
 
                   <div>
-                    <label className="flex items-center text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    <label className="flex items-center text-sm font-medium text-white/80 mb-2">
                       <MessageSquare size={16} className="mr-2" />
                       {t('booking.discuss') || 'Message (optionnel)'}
                     </label>
                     <textarea
                       rows={4}
                       {...register('message')}
-                      className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white transition-all resize-vertical"
+                      className="w-full px-6 py-4 bg-white/5 border border-white/10 rounded-xl text-white placeholder-white/40 focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 transition-all resize-vertical"
                       placeholder={t('booking.discuss.placeholder') || 'Dites-nous ce que vous aimeriez discuter...'}
                     />
                   </div>
 
                   {/* Récapitulatif de la sélection */}
                   {selectedSlot && (
-                    <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
-                      <h4 className="font-medium text-blue-800 dark:text-blue-200 mb-3 flex items-center">
+                    <div className="bg-purple-500/10 border border-purple-500/30 rounded-xl p-4">
+                      <h4 className="font-medium text-purple-300 mb-3 flex items-center">
                         <Calendar size={16} className="mr-2" />
                         {t('booking.selected') || 'Créneau sélectionné'}
                       </h4>
@@ -519,9 +562,9 @@ const BookingPage: React.FC = () => {
                         const selectedDayData = getSelectedDayData();
                         if (selectedSlotData && selectedDayData) {
                           return (
-                            <div className="text-blue-700 dark:text-blue-300">
+                            <div className="text-white">
                               <p className="font-medium">{selectedDayData.displayDate} - {selectedDayData.weekday}</p>
-                              <p className="text-sm mt-1">{formatTime(selectedSlotData.datetime)}</p>
+                              <p className="text-sm mt-1 text-white/70">{formatTime(selectedSlotData.datetime)}</p>
                             </div>
                           );
                         }
@@ -537,27 +580,27 @@ const BookingPage: React.FC = () => {
             {currentStep === 3 && (
               <div className="animate-fade-in text-center">
                 <div className="mb-6">
-                  <div className="w-16 h-16 bg-green-100 dark:bg-green-900/20 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <CheckCircle size={32} className="text-green-600 dark:text-green-400" />
+                  <div className="w-20 h-20 bg-green-500/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <CheckCircle size={48} className="text-green-400" />
                   </div>
-                  <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
+                  <h2 className="text-4xl font-bold text-white mb-2">
                     {t('booking.success') || 'Réservation confirmée !'}
                   </h2>
-                  <p className="text-gray-600 dark:text-gray-300">
+                  <p className="text-white/70 text-lg">
                     Votre rendez-vous a été confirmé avec succès !
                   </p>
                 </div>
 
-                <div className="bg-gray-50 dark:bg-gray-700 rounded-xl p-6 max-w-md mx-auto">
-                  <h3 className="font-semibold text-gray-900 dark:text-white mb-4">Récapitulatif</h3>
+                <div className="bg-white/5 rounded-xl p-6 max-w-md mx-auto border border-white/10">
+                  <h3 className="font-semibold text-white mb-4">Récapitulatif</h3>
                   <div className="space-y-3 text-sm">
                     <div className="flex justify-between">
-                      <span className="text-gray-500">Date:</span>
-                      <span className="font-medium text-gray-900 dark:text-white">{getSelectedDayData()?.displayDate}</span>
+                      <span className="text-white/60">Date:</span>
+                      <span className="font-medium text-white">{getSelectedDayData()?.displayDate}</span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-gray-500">Heure:</span>
-                      <span className="font-medium text-gray-900 dark:text-white">{getSelectedSlotData() && formatTime(getSelectedSlotData()!.datetime)}</span>
+                      <span className="text-white/60">Heure:</span>
+                      <span className="font-medium text-white">{getSelectedSlotData() && formatTime(getSelectedSlotData()!.datetime)}</span>
                     </div>
                   </div>
                 </div>
@@ -567,12 +610,12 @@ const BookingPage: React.FC = () => {
 
           {/* Navigation Buttons */}
           {currentStep < 3 && (
-            <div className="bg-gray-50 dark:bg-gray-700 px-6 py-4 md:px-8">
+            <div className="bg-white/5 px-6 py-4 md:px-8 border-t border-white/10">
               <div className="flex justify-between items-center">
                 <button
                   onClick={prevStep}
                   disabled={currentStep === 0}
-                  className="flex items-center px-4 py-2 text-gray-600 dark:text-gray-300 hover:text-gray-800 dark:hover:text-white disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                  className="flex items-center px-6 py-3 text-white/80 hover:text-white disabled:opacity-50 disabled:cursor-not-allowed transition-all bg-white/5 rounded-lg border border-white/10 hover:bg-white/10"
                 >
                   <ChevronLeft size={20} className="mr-1" />
                   {t('booking.previous') || 'Précédent'}
@@ -582,7 +625,7 @@ const BookingPage: React.FC = () => {
                   <button
                     onClick={nextStep}
                     disabled={!canProceed()}
-                    className="flex items-center px-6 py-3 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 text-white font-medium rounded-lg transition-all duration-200 transform hover:scale-105 disabled:scale-100 disabled:cursor-not-allowed"
+                    className="flex items-center px-8 py-3 bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 disabled:from-gray-600 disabled:to-gray-600 text-white font-medium rounded-lg transition-all duration-200 transform hover:scale-105 disabled:scale-100 disabled:cursor-not-allowed shadow-lg hover:shadow-purple-500/50"
                   >
                     {t('booking.next') || 'Suivant'}
                     <ChevronRight size={20} className="ml-1" />
@@ -591,14 +634,19 @@ const BookingPage: React.FC = () => {
                   <button
                     onClick={handleSubmit(onSubmit)}
                     disabled={!canProceed() || isSubmitting}
-                    className="flex items-center px-6 py-3 bg-green-600 hover:bg-green-700 disabled:bg-gray-400 text-white font-medium rounded-lg transition-all duration-200 transform hover:scale-105 disabled:scale-100 disabled:cursor-not-allowed"
+                    className="flex items-center px-8 py-3 bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 disabled:from-gray-600 disabled:to-gray-600 text-white font-medium rounded-lg transition-all duration-200 transform hover:scale-105 disabled:scale-100 disabled:cursor-not-allowed shadow-lg hover:shadow-green-500/50"
                   >
                     {isSubmitting ? (
-                      <div className="animate-spin rounded-full h-5 w-5 border-2 border-white border-t-transparent mr-2"></div>
+                      <>
+                        <div className="animate-spin rounded-full h-5 w-5 border-2 border-white border-t-transparent mr-2"></div>
+                        En cours...
+                      </>
                     ) : (
-                      <CheckCircle size={20} className="mr-2" />
+                      <>
+                        <CheckCircle size={20} className="mr-2" />
+                        {t('booking.book') || 'Confirmer la réservation'}
+                      </>
                     )}
-                    {t('booking.book') || 'Confirmer la réservation'}
                   </button>
                 )}
               </div>

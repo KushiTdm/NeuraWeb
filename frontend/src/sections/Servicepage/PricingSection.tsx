@@ -1,5 +1,5 @@
-//frontend/src/sections/Servicepage/PricingSection.tsx
 import { useEffect, useRef, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { Check } from 'lucide-react';
@@ -11,6 +11,7 @@ gsap.registerPlugin(ScrollTrigger);
 export default function PricingSection() {
   const { t, language } = useLanguage();
   const { isDark } = useTheme();
+  const navigate = useNavigate();
   const sectionRef = useRef<HTMLDivElement>(null);
   const titleRef = useRef<HTMLHeadingElement>(null);
   const cardsRef = useRef<HTMLDivElement[]>([]);
@@ -25,13 +26,13 @@ export default function PricingSection() {
   }> = [
     {
       id: 'starter',
-      icon: '/assets/etoile.png', // Remplacez par votre chemin d'image
+      icon: '/assets/etoile.png',
       gradient: 'from-blue-500 to-cyan-500',
       featuresCount: 5,
     },
     {
       id: 'business',
-      icon: '/assets/eclair.png', // Remplacez par votre chemin d'image
+      icon: '/assets/eclair.png',
       gradient: 'from-purple-500 to-pink-500',
       popular: true,
       featuresCount: 6,
@@ -41,6 +42,12 @@ export default function PricingSection() {
       icon: '/assets/couronne.png',
       gradient: 'from-orange-500 to-red-500',
       featuresCount: 7,
+    },
+    {
+      id: 'ai',
+      icon: '/assets/robot.png', 
+      gradient: 'from-green-500 to-teal-500',
+      featuresCount: 5,
     },
   ];
 
@@ -98,6 +105,16 @@ export default function PricingSection() {
     });
   };
 
+  const handleChoosePack = (packId: string, e: React.MouseEvent) => {
+    e.stopPropagation();
+    navigate('/quote', { 
+      state: { 
+        selectedPack: packId,
+        packName: t(`servicePage.pricing.${packId}.name`)
+      } 
+    });
+  };
+
   return (
     <section ref={sectionRef} className={`min-h-screen py-36 px-6 ${isDark ? 'bg-gradient-to-b from-slate-800 to-slate-900' : 'bg-gradient-to-b from-gray-50 to-gray-100'} flex items-center transition-colors duration-300`}>
       <div className="max-w-7xl mx-auto w-full">
@@ -108,7 +125,7 @@ export default function PricingSection() {
           {t('servicePage.pricing.title')}
         </h2>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
           {packs.map((pack, index) => {
             const isFlipped = flippedCards.has(index);
 
@@ -199,9 +216,7 @@ export default function PricingSection() {
                     </div>
                     <button
                       className={`w-full py-4 rounded-xl bg-gradient-to-r ${pack.gradient} text-white font-bold text-lg hover:scale-105 transition-transform shadow-lg`}
-                      onClick={(e) => {
-                        e.stopPropagation();
-                      }}
+                      onClick={(e) => handleChoosePack(pack.id, e)}
                     >
                       {t('servicePage.pricing.choosePack')}
                     </button>
@@ -213,7 +228,10 @@ export default function PricingSection() {
         </div>
 
         <div className="mt-16 text-center">
-          <button className={`px-8 py-4 ${isDark ? 'bg-white text-slate-900' : 'bg-slate-900 text-white'} font-bold text-lg rounded-full hover:scale-105 transition-all duration-300 shadow-lg`}>
+          <button 
+            onClick={() => navigate('/quote')}
+            className={`px-8 py-4 ${isDark ? 'bg-white text-slate-900' : 'bg-slate-900 text-white'} font-bold text-lg rounded-full hover:scale-105 transition-all duration-300 shadow-lg`}
+          >
             {t('servicePage.pricing.cta')}
           </button>
         </div>

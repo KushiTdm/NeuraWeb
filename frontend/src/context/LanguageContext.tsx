@@ -122,43 +122,60 @@ const translations = {
       
       // Packs
 
-      'servicePage.pricing.priceLabel': 'Starting from',
+      // Pricing Packs 
 
+      'servicePage.pricing.priceLabel': 'Starting from ',
+
+      // --- STARTER ---
       'servicePage.pricing.starter.name': 'Starter',
       'servicePage.pricing.starter.price': '€1,490',
-      'servicePage.pricing.starter.features.1': '3–5 pages',
+      'servicePage.pricing.starter.features.1': '3-5 pages',
       'servicePage.pricing.starter.features.2': 'Responsive design',
       'servicePage.pricing.starter.features.3': 'Basic SEO',
       'servicePage.pricing.starter.features.4': 'Contact form',
       'servicePage.pricing.starter.features.5': '1 month of support',
-      'servicePage.pricing.starter.delay': '2–3 weeks',
-      'servicePage.pricing.starter.desc': 'Perfect to launch your online presence with a clean, professional website.',
+      'servicePage.pricing.starter.delay': '2-3 weeks',
+      'servicePage.pricing.starter.desc': 'Perfect for launching your online presence with a simple, professional website.',
 
+      // --- BUSINESS ---
       'servicePage.pricing.business.name': 'Business',
       'servicePage.pricing.business.price': '€3,490',
-      'servicePage.pricing.business.features.1': '8–12 pages',
+      'servicePage.pricing.business.features.1': '8-12 pages',
       'servicePage.pricing.business.features.2': 'Custom design',
       'servicePage.pricing.business.features.3': 'Advanced SEO',
-      'servicePage.pricing.business.features.4': 'Admin dashboard',
+      'servicePage.pricing.business.features.4': 'Admin panel',
       'servicePage.pricing.business.features.5': 'Integrated blog',
       'servicePage.pricing.business.features.6': '3 months of support',
-      'servicePage.pricing.business.delay': '4–8 weeks depending on complexity',
+      'servicePage.pricing.business.delay': '4-8 weeks depending on complexity',
       'servicePage.pricing.business.popular': 'POPULAR',
-      'servicePage.pricing.business.desc': 'Designed for businesses looking for a high-performing, scalable, and well-optimized website.',
+      'servicePage.pricing.business.desc': 'Designed for businesses that need a high-performance, scalable, and well-optimized website.',
 
+      // --- PREMIUM ---
       'servicePage.pricing.premium.name': 'Premium',
       'servicePage.pricing.premium.price': '€6,900',
-      'servicePage.pricing.premium.features.1': 'Up to 20 pages (expandable)',
+      'servicePage.pricing.premium.features.1': 'Unlimited pages',
       'servicePage.pricing.premium.features.2': 'Premium design',
-      'servicePage.pricing.premium.features.3': 'Expert-level SEO',
+      'servicePage.pricing.premium.features.3': 'Expert SEO',
       'servicePage.pricing.premium.features.4': 'Advanced dashboard',
-      'servicePage.pricing.premium.features.5': 'Full e-commerce integration',
-      'servicePage.pricing.premium.features.6': 'Custom animations & effects',
+      'servicePage.pricing.premium.features.5': 'E-commerce integration',
+      'servicePage.pricing.premium.features.6': 'Custom animations',
       'servicePage.pricing.premium.features.7': '6 months of support',
-      'servicePage.pricing.premium.delay': '8–12 weeks depending on complexity',
-      'servicePage.pricing.premium.desc': 'A high-end solution for ambitious brands: design, performance, and complete e-commerce capabilities.',
+      'servicePage.pricing.premium.delay': '8-12 weeks depending on complexity',
+      'servicePage.pricing.premium.desc': 'A high-end solution for ambitious brands: premium design, performance, and complete e-commerce integration.',
+
+      // --- AI SOLUTIONS ---
+      'servicePage.pricing.ai.name': 'Artificial Intelligence',
+      'servicePage.pricing.ai.price': '€4,500',
+      'servicePage.pricing.ai.features.1': 'Business needs analysis',
+      'servicePage.pricing.ai.features.2': 'AI API integration (ChatGPT, Claude, etc.)',
+      'servicePage.pricing.ai.features.3': 'Workflow automation',
+      'servicePage.pricing.ai.features.4': 'Custom AI dashboard',
+      'servicePage.pricing.ai.features.5': 'Training and onboarding support',
+      'servicePage.pricing.ai.delay': '6-10 weeks depending on project scope',
+      'servicePage.pricing.ai.desc': 'Custom AI solutions to automate tasks, streamline workflows, and enhance performance.',
 
       'servicePage.pricing.cta': 'Request a custom quote',
+
 
 
       // Process Section
@@ -903,45 +920,61 @@ const translations = {
     
     // Packs
     
+      // Pricing Packs - NeuraWeb
+
       'servicePage.pricing.priceLabel': 'À partir de ',
 
-    'servicePage.pricing.starter.name': 'Starter',
-    'servicePage.pricing.starter.price': '1 490€',
-    'servicePage.pricing.starter.features.1': '3-5 pages',
-    'servicePage.pricing.starter.features.2': 'Design responsive',
-    'servicePage.pricing.starter.features.3': 'SEO de base',
-    'servicePage.pricing.starter.features.4': 'Formulaire de contact',
-    'servicePage.pricing.starter.features.5': '1 mois de support',
-    'servicePage.pricing.starter.delay': '2-3 semaines',
-    'servicePage.pricing.starter.desc': 'Idéal pour lancer votre présence en ligne avec un site professionnel simple et efficace.',
+      // --- STARTER ---
+      'servicePage.pricing.starter.name': 'Starter',
+      'servicePage.pricing.starter.price': '1 490€',
+      'servicePage.pricing.starter.features.1': '3-5 pages',
+      'servicePage.pricing.starter.features.2': 'Design responsive',
+      'servicePage.pricing.starter.features.3': 'SEO de base',
+      'servicePage.pricing.starter.features.4': 'Formulaire de contact',
+      'servicePage.pricing.starter.features.5': '1 mois de support',
+      'servicePage.pricing.starter.delay': '2-3 semaines',
+      'servicePage.pricing.starter.desc': 'Idéal pour lancer votre présence en ligne avec un site professionnel simple et efficace.',
+
+      // --- BUSINESS ---
+      'servicePage.pricing.business.name': 'Business',
+      'servicePage.pricing.business.price': '3 490€',
+      'servicePage.pricing.business.features.1': '8-12 pages',
+      'servicePage.pricing.business.features.2': 'Design sur-mesure',
+      'servicePage.pricing.business.features.3': 'SEO avancé',
+      'servicePage.pricing.business.features.4': 'Espace admin',
+      'servicePage.pricing.business.features.5': 'Blog intégré',
+      'servicePage.pricing.business.features.6': '3 mois de support',
+      'servicePage.pricing.business.delay': '4-8 semaines selon complexité',
+      'servicePage.pricing.business.popular': 'POPULAIRE',
+      'servicePage.pricing.business.desc': 'Conçu pour les entreprises souhaitant un site performant, évolutif et bien référencé.',
+
+      // --- PREMIUM ---
+      'servicePage.pricing.premium.name': 'Premium',
+      'servicePage.pricing.premium.price': '6 900€',
+      'servicePage.pricing.premium.features.1': 'Pages illimitées',
+      'servicePage.pricing.premium.features.2': 'Design premium',
+      'servicePage.pricing.premium.features.3': 'SEO expert',
+      'servicePage.pricing.premium.features.4': 'Dashboard avancé',
+      'servicePage.pricing.premium.features.5': 'E-commerce',
+      'servicePage.pricing.premium.features.6': 'Animations spécifiques',
+      'servicePage.pricing.premium.features.7': '6 mois de support',
+      'servicePage.pricing.premium.delay': '8-12 semaines selon complexité',
+      'servicePage.pricing.premium.desc': 'Une solution haut de gamme pour les marques ambitieuses : design, performance et e-commerce complet.',
+
+      // --- AI SOLUTIONS ---
+      'servicePage.pricing.ai.name': 'Intelligence Artificielle',
+      'servicePage.pricing.ai.price': '4 500€',
+      'servicePage.pricing.ai.features.1': 'Analyse des besoins métiers',
+      'servicePage.pricing.ai.features.2': 'Intégration API IA (ChatGPT, Claude, etc.)',
+      'servicePage.pricing.ai.features.3': 'Automatisation des processus internes',
+      'servicePage.pricing.ai.features.4': 'Tableau de bord IA personnalisé',
+      'servicePage.pricing.ai.features.5': 'Formation et accompagnement à l’outil IA',
+      'servicePage.pricing.ai.delay': '6-10 semaines selon projet',
+      'servicePage.pricing.ai.desc': 'Solutions IA personnalisées pour automatiser vos tâches, optimiser vos processus et améliorer vos performances.',
 
 
-    'servicePage.pricing.business.name': 'Business',
-    'servicePage.pricing.business.price': '3 490€',
-    'servicePage.pricing.business.features.1': '8-12 pages',
-    'servicePage.pricing.business.features.2': 'Design sur-mesure',
-    'servicePage.pricing.business.features.3': 'SEO avancé',
-    'servicePage.pricing.business.features.4': 'Espace admin',
-    'servicePage.pricing.business.features.5': 'Blog intégré',
-    'servicePage.pricing.business.features.6': '3 mois de support',
-    'servicePage.pricing.business.delay': '4-8 semaines selon complexité',
-    'servicePage.pricing.business.popular': 'POPULAIRE',
-    'servicePage.pricing.business.desc': 'Conçu pour les entreprises souhaitant un site performant, évolutif et bien référencé.',
+      'servicePage.pricing.cta': 'Demander un devis personnalisé',
 
-
-    'servicePage.pricing.premium.name': 'Premium',
-    'servicePage.pricing.premium.price': '6 900€',
-    'servicePage.pricing.premium.features.1': 'Pages illimitées',
-    'servicePage.pricing.premium.features.2': 'Design premium',
-    'servicePage.pricing.premium.features.3': 'SEO expert',
-    'servicePage.pricing.premium.features.4': 'Dashboard avancé',
-    'servicePage.pricing.premium.features.5': 'E-commerce',
-    'servicePage.pricing.premium.features.6': 'Animations spécifiques',
-    'servicePage.pricing.premium.features.7': '6 mois de support',
-    'servicePage.pricing.premium.delay': '8-12 semaines selon complexité',
-    'servicePage.pricing.premium.desc': 'Une solution haut de gamme pour les marques ambitieuses : design, performance et e-commerce complet.',
-
-    'servicePage.pricing.cta': 'Demander un devis personnalisé',
 
 
 
@@ -964,7 +997,8 @@ const translations = {
     'servicePage.process.delivery.title': 'Livraison',
     'servicePage.process.delivery.description': 'Mise en ligne et accompagnement pour un lancement réussi de votre projet.',
 
-    // Contact
+///////////////////////////////////////////////////
+    // Login
     "login.signin.title": "Connectez-vous à votre compte",
     "login.signin.description": "Connectez-vous avec vos identifiants",
     "login.create.title": "Créez votre compte",
@@ -993,6 +1027,7 @@ const translations = {
     "login.password.minlength": "Le mot de passe doit contenir au moins 6 caractères",
     "login.confirm.password.required": "Veuillez confirmer votre mot de passe",
     
+///////////////////////////////////////////////////
     // Contact
     'contact.title': 'Nous Contacter',
     'contact.subtitle': 'Contactez-nous pour discuter de votre projet et voir comment nous pouvons vous aider à concrétiser votre vision.',
@@ -1012,6 +1047,7 @@ const translations = {
     'contact.why.support': '• Support dédié tout au long du projet',
     'contact.why.pricing': '• Tarification et délais transparents',
     
+///////////////////////////////////////////////////
     // Quote
     'quote.title': 'Demander un Devis',
     'quote.subtitle': 'Parlez-nous de votre projet et obtenez une estimation instantanée. Nous fournirons un devis détaillé sous 24 heures.',

@@ -1,3 +1,4 @@
+// frontend/src/context/v3.tsx
 import React, { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { useNavigate, useLocation } from 'react-router-dom';
@@ -12,9 +13,11 @@ import {
   Briefcase, 
   Settings, 
   MessageSquare,
-  CheckCircle
+  CheckCircle,
+  Sparkles
 } from 'lucide-react';
 import { useLanguage } from '../context/LanguageContext';
+import { useTheme } from '../context/ThemeContext';
 import api from '../utils/api';
 
 interface QuoteFormData {
@@ -27,6 +30,7 @@ interface QuoteFormData {
 
 const QuotePage: React.FC = () => {
   const { t } = useLanguage();
+  const { isDark } = useTheme();
   const navigate = useNavigate();
   const location = useLocation();
   const [currentStep, setCurrentStep] = useState(1);
@@ -49,11 +53,12 @@ const QuotePage: React.FC = () => {
   const watchedServiceType = watch('serviceType');
   const watchedOptions = watch('options', []);
 
-  const servicePrices = {
+  const servicePrices: Record<string, number> = {
     starter: 1490,
     business: 3490,
     premium: 6900,
     ai: 4500,
+    custom: 0,
   };
 
   const optionPrices = {
@@ -62,49 +67,45 @@ const QuotePage: React.FC = () => {
     support: 1200,
   };
 
-  // Ordre inversé : Pack -> Options -> Message -> Coordonnées
   const stepConfig = [
     {
       id: 1,
-      title: t('quote.step2.title'), // Choix du pack
-      subtitle: t('quote.step2.subtitle'),
+      title: 'Choisissez votre pack',
+      subtitle: 'Sélectionnez le pack qui correspond à vos besoins',
       icon: Briefcase,
       fields: ['serviceType']
     },
     {
       id: 2,
-      title: t('quote.step3.title'), // Options
-      subtitle: t('quote.step3.subtitle'),
+      title: 'Options supplémentaires',
+      subtitle: 'Personnalisez votre projet',
       icon: Settings,
       fields: ['options']
     },
     {
       id: 3,
-      title: t('quote.step4.title'), // Message
-      subtitle: t('quote.step4.subtitle'),
+      title: 'Détails du projet',
+      subtitle: 'Parlez-nous de vos besoins',
       icon: MessageSquare,
       fields: ['message']
     },
     {
       id: 4,
-      title: t('quote.step1.title'), // Coordonnées
-      subtitle: t('quote.step1.subtitle'),
+      title: 'Vos coordonnées',
+      subtitle: 'Pour vous contacter rapidement',
       icon: User,
       fields: ['name', 'email']
     }
   ];
 
-  // Pré-sélection du pack si venant de la page pricing
   useEffect(() => {
     if (selectedPackFromNav) {
       setValue('serviceType', selectedPackFromNav);
-      // Optionnel : démarrer à l'étape 2 (options)
-      // setCurrentStep(2);
     }
   }, [selectedPackFromNav, setValue]);
 
   useEffect(() => {
-    let basePrice = servicePrices[watchedServiceType as keyof typeof servicePrices] || 0;
+    let basePrice = servicePrices[watchedServiceType] || 0;
     let optionsTotal = 0;
 
     if (Array.isArray(watchedOptions)) {
@@ -134,8 +135,6 @@ const QuotePage: React.FC = () => {
   };
 
   const onSubmit = async (data: QuoteFormData) => {
-    console.log('Submitting quote data:', data);
-    
     setIsSubmitting(true);
     try {
       const submitData = {
@@ -145,12 +144,9 @@ const QuotePage: React.FC = () => {
         message: data.message || ''
       };
 
-      console.log('Final submit data:', submitData);
-
-      const response = await api.post('/quotes', submitData);
-      console.log('Quote submission response:', response.data);
+      await api.post('/quotes', submitData);
       
-      toast.success('🎉 Votre demande de devis a été envoyée avec succès ! Vous recevrez une réponse dans les 24h.');
+      toast.success('🎉 Votre demande de devis a été envoyée avec succès !');
       reset();
       setEstimatedPrice(0);
       setCurrentStep(1);
@@ -160,21 +156,8 @@ const QuotePage: React.FC = () => {
       }, 500);
       
     } catch (error: any) {
-      console.error('Quote form error:', error);
-      
-      if (error.response?.data?.error) {
-        toast.error(`Erreur: ${error.response.data.error}`);
-        
-        if (error.response.data.details) {
-          console.log('Validation details:', error.response.data.details);
-        }
-      } else if (error.response?.status === 400) {
-        toast.error('Erreur: Données invalides. Vérifiez vos informations.');
-      } else if (error.response?.status === 500) {
-        toast.error('Erreur serveur. Veuillez réessayer plus tard.');
-      } else {
-        toast.error('Erreur: Impossible d\'envoyer votre demande. Vérifiez votre connexion.');
-      }
+      console.error('Error:', error);
+      toast.error('Erreur lors de l\'envoi de la demande');
     } finally {
       setIsSubmitting(false);
     }
@@ -185,21 +168,21 @@ const QuotePage: React.FC = () => {
       {stepConfig.map((step, index) => (
         <div key={step.id} className="flex items-center">
           <div className={`
-            relative flex items-center justify-center w-10 h-10 rounded-full border-2 transition-all duration-300
+            relative flex items-center justify-center w-12 h-12 rounded-full border-2 transition-all duration-300
             ${currentStep >= step.id 
               ? 'bg-primary-600 border-primary-600 text-white' 
               : 'bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600 text-gray-400'
             }
           `}>
             {currentStep > step.id ? (
-              <CheckCircle size={20} />
+              <CheckCircle size={22} />
             ) : (
-              <step.icon size={20} />
+              <step.icon size={22} />
             )}
           </div>
           {index < stepConfig.length - 1 && (
             <div className={`
-              w-16 h-0.5 mx-2 transition-all duration-300
+              w-12 sm:w-16 h-1 mx-2 rounded-full transition-all duration-300
               ${currentStep > step.id ? 'bg-primary-600' : 'bg-gray-300 dark:bg-gray-600'}
             `} />
           )}
@@ -210,24 +193,25 @@ const QuotePage: React.FC = () => {
 
   const renderStepContent = () => {
     switch (currentStep) {
-      case 1: // Choix du pack
+      case 1:
         return (
           <div className="space-y-6">
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-4">
-                {t('quote.service')}
+                Type de service
               </label>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {[
-                  { value: 'starter', label: t('servicePage.pricing.starter.name'), price: 1490, desc: 'Site vitrine professionnel' },
-                  { value: 'business', label: t('servicePage.pricing.business.name'), price: 3490, desc: 'Boutique en ligne complète' },
-                  { value: 'premium', label: t('servicePage.pricing.premium.name'), price: 6900, desc: 'Solution haut de gamme' },
-                  { value: 'ai', label: t('servicePage.pricing.ai.name'), price: 4500, desc: 'Solutions IA personnalisées' }
+                  { value: 'starter', label: 'Starter', price: 1490, desc: 'Site vitrine professionnel' },
+                  { value: 'business', label: 'Business', price: 3490, desc: 'Boutique en ligne complète', popular: true },
+                  { value: 'premium', label: 'Premium', price: 6900, desc: 'Solution haut de gamme' },
+                  { value: 'ai', label: 'IA', price: 4500, desc: 'Solutions IA personnalisées' },
+                  { value: 'custom', label: 'Personnalisé', price: 0, desc: 'Solution sur mesure' }
                 ].map((service) => (
                   <label
                     key={service.value}
                     className={`
-                      relative cursor-pointer p-4 rounded-lg border-2 transition-all duration-200 hover:shadow-md
+                      relative cursor-pointer p-4 rounded-lg border-2 transition-all
                       ${watchedServiceType === service.value 
                         ? 'border-primary-500 bg-primary-50 dark:bg-primary-900/20' 
                         : 'border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700'
@@ -237,183 +221,151 @@ const QuotePage: React.FC = () => {
                     <input
                       type="radio"
                       value={service.value}
-                      {...register('serviceType', { required: t('common.service.required') })}
+                      {...register('serviceType', { required: 'Veuillez sélectionner un service' })}
                       className="sr-only"
                     />
-                    <div className="flex items-center justify-between mb-2">
-                      <h3 className="font-medium text-gray-900 dark:text-white">
-                        {service.label}
-                      </h3>
-                      <span className="text-lg font-bold text-primary-600">
-                        {service.price.toLocaleString()}€
+                    {service.popular && (
+                      <div className="absolute -top-2 left-1/2 -translate-x-1/2 bg-yellow-400 text-xs px-2 py-1 rounded-full font-bold">
+                        POPULAIRE
+                      </div>
+                    )}
+                    <div className="flex justify-between items-center mb-2">
+                      <h3 className="font-bold text-gray-900 dark:text-white">{service.label}</h3>
+                      <span className="font-bold text-primary-600">
+                        {service.price > 0 ? `${service.price}€` : 'Sur devis'}
                       </span>
                     </div>
-                    <p className="text-sm text-gray-600 dark:text-gray-300">
-                      {service.desc}
-                    </p>
+                    <p className="text-sm text-gray-600 dark:text-gray-300">{service.desc}</p>
                     {watchedServiceType === service.value && (
-                      <div className="absolute top-2 right-2">
-                        <CheckCircle className="text-primary-600" size={20} />
-                      </div>
+                      <CheckCircle className="absolute top-2 right-2 text-primary-600" size={20} />
                     )}
                   </label>
                 ))}
               </div>
               {errors.serviceType && (
-                <p className="mt-2 text-sm text-red-600 dark:text-red-400">{errors.serviceType.message}</p>
+                <p className="mt-2 text-sm text-red-600">{errors.serviceType.message}</p>
               )}
             </div>
           </div>
         );
 
-      case 2: // Options
+      case 2:
         return (
-          <div className="space-y-6">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-4">
-                {t('quote.options')}
+          <div className="space-y-4">
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-4">
+              Options supplémentaires (Optionnel)
+            </label>
+            {[
+              { value: 'design', label: 'Design personnalisé', price: 1500 },
+              { value: 'maintenance', label: 'Maintenance', price: 800 },
+              { value: 'support', label: 'Support prioritaire', price: 1200 }
+            ].map((option) => (
+              <label
+                key={option.value}
+                className={`
+                  flex items-center p-4 rounded-lg border-2 cursor-pointer
+                  ${watchedOptions.includes(option.value)
+                    ? 'border-primary-500 bg-primary-50 dark:bg-primary-900/20'
+                    : 'border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700'
+                  }
+                `}
+              >
+                <input
+                  type="checkbox"
+                  value={option.value}
+                  {...register('options')}
+                  className="h-5 w-5 text-primary-600 rounded"
+                />
+                <div className="ml-3 flex-1">
+                  <div className="flex justify-between">
+                    <span className="font-medium text-gray-900 dark:text-white">{option.label}</span>
+                    <span className="font-bold text-primary-600">+{option.price}€</span>
+                  </div>
+                </div>
               </label>
-              <div className="space-y-3">
-                {[
-                  { value: 'design', label: t('quote.option.design'), price: 1500, desc: 'Design personnalisé et branding' },
-                  { value: 'maintenance', label: t('quote.option.maintenance'), price: 800, desc: 'Maintenance mensuelle incluse' },
-                  { value: 'support', label: t('quote.option.support'), price: 1200, desc: 'Support technique prioritaire' }
-                ].map((option) => {
-                  const isSelected = Array.isArray(watchedOptions) && watchedOptions.includes(option.value);
-                  return (
-                    <label
-                      key={option.value}
-                      className={`
-                        relative cursor-pointer p-4 rounded-lg border-2 transition-all duration-200 hover:shadow-md flex items-start space-x-3
-                        ${isSelected
-                          ? 'border-primary-500 bg-primary-50 dark:bg-primary-900/20' 
-                          : 'border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700'
-                        }
-                      `}
-                    >
-                      <input
-                        type="checkbox"
-                        value={option.value}
-                        {...register('options')}
-                        className="h-5 w-5 text-primary-600 bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 rounded focus:ring-primary-500 focus:ring-2 mt-1"
-                      />
-                      <div className="flex-1">
-                        <div className="flex items-center justify-between mb-2">
-                          <h3 className="font-medium text-gray-900 dark:text-white">
-                            {option.label}
-                          </h3>
-                          <span className="text-lg font-bold text-primary-600">
-                            +{option.price.toLocaleString()}€
-                          </span>
-                        </div>
-                        <p className="text-sm text-gray-600 dark:text-gray-300">
-                          {option.desc}
-                        </p>
-                      </div>
-                    </label>
-                  );
-                })}
-              </div>
-            </div>
+            ))}
           </div>
         );
 
-      case 3: // Message
+      case 3:
         return (
           <div className="space-y-6">
             <div>
               <label htmlFor="message" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                {t('quote.details')}
+                Détails du projet (Optionnel)
               </label>
               <textarea
                 id="message"
                 rows={6}
                 {...register('message')}
-                className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white transition-all resize-vertical"
-                placeholder={t('quote.details.placeholder')}
+                className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                placeholder="Décrivez votre projet..."
               />
             </div>
 
-            {/* Résumé de la commande */}
-            <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-4">
-              <h3 className="font-semibold text-gray-900 dark:text-white mb-3">
-                Résumé de votre projet
-              </h3>
-              <div className="space-y-2">
-                {watchedServiceType && (
+            {watchedServiceType && (
+              <div className="bg-primary-50 dark:bg-primary-900/20 rounded-lg p-4 border border-primary-200 dark:border-primary-800">
+                <h3 className="font-bold mb-3">Résumé</h3>
+                <div className="space-y-2">
                   <div className="flex justify-between">
-                    <span className="text-gray-600 dark:text-gray-300">
-                      {t(`servicePage.pricing.${watchedServiceType}.name`)}
-                    </span>
-                    <span className="font-medium">
-                      {servicePrices[watchedServiceType as keyof typeof servicePrices]?.toLocaleString()}€
+                    <span>Service</span>
+                    <span className="font-bold">
+                      {watchedServiceType === 'custom' ? 'Sur devis' : `${servicePrices[watchedServiceType]}€`}
                     </span>
                   </div>
-                )}
-                {Array.isArray(watchedOptions) && watchedOptions.map((option) => (
-                  <div key={option} className="flex justify-between">
-                    <span className="text-gray-600 dark:text-gray-300">
-                      {t(`quote.option.${option}`)}
-                    </span>
-                    <span className="font-medium text-primary-600">
-                      +{optionPrices[option as keyof typeof optionPrices]?.toLocaleString()}€
-                    </span>
-                  </div>
-                ))}
-                <div className="pt-2 border-t border-gray-200 dark:border-gray-600">
-                  <div className="flex justify-between">
-                    <span className="font-semibold text-gray-900 dark:text-white">
-                      Total estimé
-                    </span>
-                    <span className="text-xl font-bold text-primary-600">
-                      {estimatedPrice.toLocaleString()}€
-                    </span>
-                  </div>
+                  {watchedOptions.map((opt) => (
+                    <div key={opt} className="flex justify-between">
+                      <span>{opt}</span>
+                      <span className="text-primary-600">+{optionPrices[opt as keyof typeof optionPrices]}€</span>
+                    </div>
+                  ))}
+                  {watchedServiceType !== 'custom' && estimatedPrice > 0 && (
+                    <div className="pt-2 border-t flex justify-between font-bold">
+                      <span>Total</span>
+                      <span className="text-primary-600">{estimatedPrice}€</span>
+                    </div>
+                  )}
                 </div>
               </div>
-            </div>
+            )}
           </div>
         );
 
-      case 4: // Coordonnées
+      case 4:
         return (
           <div className="space-y-6">
             <div>
               <label htmlFor="name" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                {t('contact.name')}
+                Nom complet *
               </label>
               <input
                 type="text"
                 id="name"
-                {...register('name', { required: t('common.name.required') })}
-                className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white transition-all"
+                {...register('name', { required: 'Le nom est requis' })}
+                className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                 placeholder="John Doe"
               />
-              {errors.name && (
-                <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.name.message}</p>
-              )}
+              {errors.name && <p className="mt-1 text-sm text-red-600">{errors.name.message}</p>}
             </div>
 
             <div>
               <label htmlFor="email" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                {t('contact.email')}
+                Email *
               </label>
               <input
                 type="email"
                 id="email"
                 {...register('email', { 
-                  required: t('common.email.required'),
+                  required: 'L\'email est requis',
                   pattern: {
                     value: /^\S+@\S+$/i,
-                    message: t('common.email.invalid')
+                    message: 'Email invalide'
                   }
                 })}
-                className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white transition-all"
+                className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                 placeholder="john@example.com"
               />
-              {errors.email && (
-                <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.email.message}</p>
-              )}
+              {errors.email && <p className="mt-1 text-sm text-red-600">{errors.email.message}</p>}
             </div>
           </div>
         );
@@ -426,161 +378,136 @@ const QuotePage: React.FC = () => {
   const currentStepConfig = stepConfig[currentStep - 1];
 
   return (
-  <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
-    <section className="min-h-screen flex flex-col justify-center px-4 sm:px-6 lg:px-8 pt-20 pb-8">
-      <div className="max-w-4xl mx-auto w-full flex-1 flex flex-col justify-center">
+    <div className={`min-h-screen ${isDark ? 'bg-gray-900' : 'bg-gray-50'} py-12`}>
+      <div className="max-w-6xl mx-auto px-4">
         
-        {/* Titre */}
         <div className="text-center mb-8">
-          <h1 className="text-3xl lg:text-4xl font-bold text-gray-900 dark:text-white mb-3">
-            {t('quote.title')}
+          <h1 className={`text-4xl font-bold ${isDark ? 'text-white' : 'text-gray-900'} mb-4`}>
+            Demande de devis
           </h1>
-          <p className="text-lg text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
-            {t('quote.subtitle')}
+          <p className={`text-lg ${isDark ? 'text-gray-300' : 'text-gray-600'}`}>
+            Obtenez une estimation instantanée
           </p>
         </div>
 
-        {/* Badge du pack pré-sélectionné */}
         {selectedPackFromNav && (
-          <div className="mb-6 p-4 bg-primary-50 dark:bg-primary-900/20 border border-primary-200 dark:border-primary-800 rounded-lg max-w-md mx-auto">
-            <p className="text-primary-700 dark:text-primary-300 text-center flex items-center justify-center gap-2">
-              <Check size={16} />
-              <span>Pack <strong>{location.state?.packName}</strong> pré-sélectionné</span>
-            </p>
+          <div className="mb-6 p-4 bg-primary-100 dark:bg-primary-900/20 rounded-lg max-w-md mx-auto text-center">
+            <Check className="inline mr-2" size={16} />
+            <span>Pack <strong>{location.state?.packName}</strong> pré-sélectionné</span>
           </div>
         )}
 
-        {/* Indicateur d'étapes */}
         <StepIndicator />
+      <form onSubmit={handleSubmit(onSubmit)}>
 
-        {/* Contenu principal */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 flex-1">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           
-          {/* Formulaire wizard */}
           <div className="lg:col-span-2">
-            <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 p-6">
+            <div className={`${isDark ? 'bg-gray-800' : 'bg-white'} rounded-xl shadow-lg p-6`}>
               
-              {/* En-tête de l'étape */}
-              <div className="mb-6 pb-4 border-b border-gray-200 dark:border-gray-600">
-                <div className="flex items-center space-x-3 mb-2">
+              <div className="mb-6 pb-4 border-b border-gray-200 dark:border-gray-700">
+                <div className="flex items-center gap-3 mb-2">
                   <currentStepConfig.icon className="text-primary-600" size={24} />
-                  <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
+                  <h2 className={`text-xl font-bold ${isDark ? 'text-white' : 'text-gray-900'}`}>
                     {currentStepConfig.title}
                   </h2>
                 </div>
-                <p className="text-gray-600 dark:text-gray-300">
+                <p className={isDark ? 'text-gray-300' : 'text-gray-600'}>
                   {currentStepConfig.subtitle}
                 </p>
-                <div className="mt-2 text-sm text-gray-500 dark:text-gray-400">
+                <div className="mt-2 text-sm text-gray-500">
                   Étape {currentStep} sur {totalSteps}
                 </div>
               </div>
 
-              {/* Contenu de l'étape */}
               {renderStepContent()}
 
-              {/* Navigation */}
-              <div className="flex justify-between mt-8 pt-6 border-t border-gray-200 dark:border-gray-600">
+              <div className="flex justify-between mt-8 pt-6 border-t border-gray-200 dark:border-gray-700">
                 <button
                   type="button"
                   onClick={prevStep}
                   disabled={currentStep === 1}
-                  className="flex items-center space-x-2 px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+                  className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50"
                 >
-                  <ChevronLeft size={16} />
-                  <span>Précédent</span>
+                  <ChevronLeft className="inline mr-1" size={16} />
+                  Précédent
                 </button>
 
                 {currentStep < totalSteps ? (
                   <button
                     type="button"
                     onClick={nextStep}
-                    className="flex items-center space-x-2 px-6 py-2 bg-primary-600 hover:bg-primary-700 text-white rounded-lg transition-all"
+                    className="px-6 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700"
                   >
-                    <span>Suivant</span>
-                    <ChevronRight size={16} />
+                    Suivant
+                    <ChevronRight className="inline ml-1" size={16} />
                   </button>
                 ) : (
-                  <form onSubmit={handleSubmit(onSubmit)}>
                     <button
                       type="submit"
                       disabled={isSubmitting}
-                      className="flex items-center space-x-2 px-6 py-2 bg-primary-600 hover:bg-primary-700 disabled:bg-gray-400 disabled:cursor-not-allowed text-white rounded-lg transition-all"
+                      className="px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:bg-gray-400"
                     >
-                      {isSubmitting ? (
-                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
-                      ) : (
+                      {isSubmitting ? 'Envoi...' : (
                         <>
-                          <Send size={16} />
-                          <span>{t('quote.submit')}</span>
+                          <Send className="inline mr-1" size={16} />
+                          Envoyer
                         </>
                       )}
                     </button>
-                  </form>
                 )}
               </div>
             </div>
           </div>
 
-          {/* Estimation des prix */}
           <div className="lg:col-span-1">
-            <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 p-6 sticky top-24">
-              <div className="flex items-center space-x-2 mb-4">
+            <div className={`${isDark ? 'bg-gray-800' : 'bg-white'} rounded-xl shadow-lg p-6 sticky top-24`}>
+              <div className="flex items-center gap-2 mb-4 pb-3 border-b">
                 <Calculator className="text-primary-600" size={20} />
-                <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-                  {t('quote.estimate')}
+                <h3 className={`font-bold ${isDark ? 'text-white' : 'text-gray-900'}`}>
+                  Estimation
                 </h3>
               </div>
 
-              <div className="space-y-3">
-                {watchedServiceType && (
-                  <div className="flex justify-between items-center py-2 border-b border-gray-200 dark:border-gray-600">
-                    <span className="text-sm text-gray-600 dark:text-gray-300">
-                      {t(`servicePage.pricing.${watchedServiceType}.name`)}
-                    </span>
-                    <span className="font-medium">
-                      {servicePrices[watchedServiceType as keyof typeof servicePrices]?.toLocaleString()}€
+              {watchedServiceType ? (
+                <div className="space-y-3">
+                  <div className="flex justify-between py-2">
+                    <span className="text-sm">Service</span>
+                    <span className="font-bold">
+                      {watchedServiceType === 'custom' ? 'Sur devis' : `${servicePrices[watchedServiceType]}€`}
                     </span>
                   </div>
-                )}
 
-                {Array.isArray(watchedOptions) && watchedOptions.map((option) => (
-                  <div key={option} className="flex justify-between items-center py-2 border-b border-gray-200 dark:border-gray-600">
-                    <span className="text-sm text-gray-600 dark:text-gray-300">
-                      {t(`quote.option.${option}`)}
-                    </span>
-                    <span className="font-medium text-primary-600">
-                      +{optionPrices[option as keyof typeof optionPrices]?.toLocaleString()}€
-                    </span>
-                  </div>
-                ))}
-
-                {estimatedPrice > 0 && (
-                  <div className="pt-3 border-t-2 border-primary-200 dark:border-primary-800">
-                    <div className="flex justify-between items-center mb-2">
-                      <span className="font-semibold text-gray-900 dark:text-white">
-                        {t('quote.estimate.total')}
-                      </span>
-                      <span className="text-xl font-bold text-primary-600">
-                        {estimatedPrice.toLocaleString()}€
-                      </span>
+                  {watchedOptions.map((opt) => (
+                    <div key={opt} className="flex justify-between py-2">
+                      <span className="text-sm">{opt}</span>
+                      <span className="text-primary-600">+{optionPrices[opt as keyof typeof optionPrices]}€</span>
                     </div>
-                    <p className="text-xs text-gray-500 dark:text-gray-400">
-                      {t('quote.estimate.disclaimer')}
-                    </p>
-                  </div>
-                )}
-              </div>
+                  ))}
 
-              {/* Barre de progression */}
-              <div className="mt-6 pt-4 border-t border-gray-200 dark:border-gray-600">
-                <div className="flex justify-between text-sm text-gray-600 dark:text-gray-300 mb-2">
+                  {watchedServiceType !== 'custom' && estimatedPrice > 0 && (
+                    <div className="pt-3 border-t">
+                      <div className="flex justify-between font-bold">
+                        <span>Total</span>
+                        <span className="text-2xl text-primary-600">{estimatedPrice}€</span>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              ) : (
+                <p className="text-sm text-gray-500 text-center py-4">
+                  Sélectionnez un pack
+                </p>
+              )}
+
+              <div className="mt-6 pt-4 border-t">
+                <div className="flex justify-between text-sm mb-2">
                   <span>Progression</span>
                   <span>{Math.round((currentStep / totalSteps) * 100)}%</span>
                 </div>
-                <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
+                <div className="w-full bg-gray-200 rounded-full h-2">
                   <div 
-                    className="bg-primary-600 h-2 rounded-full transition-all duration-300"
+                    className="bg-primary-600 h-2 rounded-full transition-all"
                     style={{ width: `${(currentStep / totalSteps) * 100}%` }}
                   />
                 </div>
@@ -588,10 +515,11 @@ const QuotePage: React.FC = () => {
             </div>
           </div>
         </div>
+        </form>
+
       </div>
-    </section>
-  </div>
-);
+    </div>
+  );
 };
 
 export default QuotePage;

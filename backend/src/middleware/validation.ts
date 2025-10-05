@@ -21,15 +21,22 @@ export const validateQuoteForm = (req: Request, res: Response, next: NextFunctio
   const schema = Joi.object({
     name: Joi.string().min(2).max(100).required(),
     email: Joi.string().email().required(),
-    serviceType: Joi.string().valid('showcase', 'ecommerce', 'automation', 'ai').required(),
-    options: Joi.array().items(Joi.string().valid('design', 'maintenance', 'support')),
-    message: Joi.string().max(1000).allow(''),
+    serviceType: Joi.string().valid('starter', 'business', 'premium', 'ai', 'custom').required(),
+    options: Joi.array().items(Joi.string().valid('design', 'maintenance', 'support')).default([]),
+    message: Joi.string().max(1000).allow('').default(''),
     estimatedPrice: Joi.number().min(0).required(),
   });
 
-  const { error } = schema.validate(req.body);
+  const { error } = schema.validate(req.body, {
+    abortEarly: false, // Affiche toutes les erreurs, pas juste la première
+    stripUnknown: true // Ignore les champs inconnus
+  });
+
   if (error) {
-    return res.status(400).json({ error: error.details[0].message });
+    return res.status(400).json({ 
+      error: error.details[0].message,
+      details: error.details 
+    });
   }
 
   next();

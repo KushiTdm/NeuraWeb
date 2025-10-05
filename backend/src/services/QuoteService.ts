@@ -51,7 +51,7 @@ export class QuoteService {
     }
 
     // Validation du type de service
-    const validServiceTypes = ['showcase', 'ecommerce', 'automation', 'ai'];
+    const validServiceTypes = ['starter', 'business', 'premium', 'ai', 'custom'];
     if (!data.serviceType || !validServiceTypes.includes(data.serviceType)) {
       throw new Error('Invalid service type');
     }
@@ -75,10 +75,11 @@ export class QuoteService {
 
   private getQuoteEmailTemplate(type: 'user' | 'admin', data: QuoteFormData): string {
     const serviceTypeLabels = {
-      showcase: 'Site Vitrine',
-      ecommerce: 'Plateforme E-commerce',
-      automation: 'Bot d\'Automatisation',
-      ai: 'Intégration IA',
+      starter: 'Pack Starter',
+      business: 'Pack Business',
+      premium: 'Pack Premium',
+      ai: 'Solutions IA',
+      custom: 'Solution personnalisée'
     };
 
     const optionLabels = {

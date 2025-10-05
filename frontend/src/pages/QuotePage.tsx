@@ -1,5 +1,4 @@
-// frontend/src/pages/QuotePage.tsx
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useForm } from 'react-hook-form';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { toast } from 'react-hot-toast';
@@ -14,6 +13,8 @@ import {
   Settings, 
   MessageSquare,
   CheckCircle,
+  Sparkles,
+  Circle
 } from 'lucide-react';
 import { useLanguage } from '../context/LanguageContext';
 import { useTheme } from '../context/ThemeContext';
@@ -38,6 +39,10 @@ const QuotePage: React.FC = () => {
   const totalSteps = 4;
   
   const selectedPackFromNav = location.state?.selectedPack;
+  const containerRef = useRef<HTMLDivElement>(null);
+  const stepContentRef = useRef<HTMLDivElement>(null);
+  const progressRef = useRef<HTMLDivElement>(null);
+  const [scrollY, setScrollY] = useState(0);
 
   const { register, handleSubmit, watch, reset, formState: { errors }, trigger, setValue } = useForm<QuoteFormData>({
     defaultValues: {
@@ -96,6 +101,14 @@ const QuotePage: React.FC = () => {
       fields: ['name', 'email']
     }
   ];
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setScrollY(window.scrollY);
+    };
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
   useEffect(() => {
     if (selectedPackFromNav) {
@@ -163,31 +176,45 @@ const QuotePage: React.FC = () => {
   };
 
   const StepIndicator = () => (
-    <div className="flex items-center justify-center mb-6 sm:mb-8 overflow-x-auto pb-2">
-      <div className="flex items-center min-w-max px-4">
+    <div className="mb-8">
+      <div className="flex items-center justify-between mb-4">
         {stepConfig.map((step, index) => (
-          <div key={step.id} className="flex items-center">
-            <div className={`
-              relative flex items-center justify-center w-10 h-10 sm:w-12 sm:h-12 rounded-full border-2 transition-all duration-300 flex-shrink-0
-              ${currentStep >= step.id 
-                ? 'bg-primary-600 border-primary-600 text-white' 
-                : 'bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600 text-gray-400'
-              }
-            `}>
-              {currentStep > step.id ? (
-                <CheckCircle size={20} className="sm:w-[22px] sm:h-[22px]" />
-              ) : (
-                <step.icon size={20} className="sm:w-[22px] sm:h-[22px]" />
+          <div key={step.id} className="flex items-center flex-1">
+            <div className="flex items-center">
+              <div
+                className={`w-10 h-10 sm:w-12 sm:h-12 rounded-full flex items-center justify-center transition-all duration-300 ${
+                  index < currentStep
+                    ? 'bg-gradient-to-r from-blue-500 to-purple-600 shadow-lg shadow-purple-500/50'
+                    : index === currentStep - 1
+                    ? 'bg-gradient-to-r from-blue-500 to-purple-600 shadow-lg shadow-purple-500/50'
+                    : 'bg-white/10 border-2 border-white/20'
+                }`}
+              >
+                {index < currentStep - 1 ? (
+                  <CheckCircle className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
+                ) : (
+                  <step.icon className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
+                )}
+              </div>
+              {index < stepConfig.length - 1 && (
+                <div className="h-1 w-full mx-2 bg-white/10 relative overflow-hidden flex-1">
+                  <div
+                    className={`h-full bg-gradient-to-r from-blue-500 to-purple-600 transition-all duration-500 ${
+                      index < currentStep - 1 ? 'w-full' : 'w-0'
+                    }`}
+                  />
+                </div>
               )}
             </div>
-            {index < stepConfig.length - 1 && (
-              <div className={`
-                w-8 sm:w-12 md:w-16 h-1 mx-1 sm:mx-2 rounded-full transition-all duration-300 flex-shrink-0
-                ${currentStep > step.id ? 'bg-primary-600' : 'bg-gray-300 dark:bg-gray-600'}
-              `} />
-            )}
           </div>
         ))}
+      </div>
+      <div className="h-2 bg-white/10 rounded-full overflow-hidden">
+        <div
+          ref={progressRef}
+          className="h-full bg-gradient-to-r from-blue-500 via-purple-600 to-pink-500 transition-all duration-600"
+          style={{ width: `${(currentStep / totalSteps) * 100}%` }}
+        />
       </div>
     </div>
   );
@@ -198,10 +225,10 @@ const QuotePage: React.FC = () => {
         return (
           <div className="space-y-6">
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-4">
+              <label className="block text-white/80 font-medium mb-4 text-base sm:text-lg">
                 {t('quote.service.label')}
               </label>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 {[
                   { value: 'starter', label: t('quote.service.starter'), price: 1490, desc: t('quote.service.starter.desc') },
                   { value: 'business', label: t('quote.service.business'), price: 3490, desc: t('quote.service.business.desc'), popular: true },
@@ -212,10 +239,10 @@ const QuotePage: React.FC = () => {
                   <label
                     key={service.value}
                     className={`
-                      relative cursor-pointer p-3 sm:p-4 rounded-lg border-2 transition-all
+                      relative cursor-pointer p-4 rounded-xl border-2 transition-all duration-300 hover:scale-105
                       ${watchedServiceType === service.value 
-                        ? 'border-primary-500 bg-primary-50 dark:bg-primary-900/20' 
-                        : 'border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700'
+                        ? 'border-blue-500 bg-blue-500/10 shadow-lg shadow-blue-500/20' 
+                        : 'border-white/10 bg-white/5 hover:bg-white/10'
                       }
                     `}
                   >
@@ -226,25 +253,25 @@ const QuotePage: React.FC = () => {
                       className="sr-only"
                     />
                     {service.popular && (
-                      <div className="absolute -top-2 left-1/2 -translate-x-1/2 bg-yellow-400 text-xs px-2 py-0.5 sm:py-1 rounded-full font-bold">
+                      <div className="absolute -top-2 left-1/2 -translate-x-1/2 bg-gradient-to-r from-yellow-400 to-orange-500 text-xs px-3 py-1 rounded-full font-bold text-white">
                         {t('quote.service.business.popular')}
                       </div>
                     )}
-                    <div className="flex justify-between items-center mb-1 sm:mb-2">
-                      <h3 className="font-bold text-sm sm:text-base text-gray-900 dark:text-white">{service.label}</h3>
-                      <span className="font-bold text-sm sm:text-base text-primary-600">
+                    <div className="flex justify-between items-center mb-2">
+                      <h3 className="font-bold text-base sm:text-lg text-white">{service.label}</h3>
+                      <span className="font-bold text-base sm:text-lg text-blue-400">
                         {service.price > 0 ? `${service.price}€` : t('quote.service.custom.price')}
                       </span>
                     </div>
-                    <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-300">{service.desc}</p>
+                    <p className="text-sm text-white/60">{service.desc}</p>
                     {watchedServiceType === service.value && (
-                      <CheckCircle className="absolute top-2 right-2 text-primary-600" size={18} />
+                      <CheckCircle className="absolute top-4 right-4 text-blue-400" size={20} />
                     )}
                   </label>
                 ))}
               </div>
               {errors.serviceType && (
-                <p className="mt-2 text-sm text-red-600">{errors.serviceType.message}</p>
+                <p className="mt-2 text-sm text-red-400">{errors.serviceType.message}</p>
               )}
             </div>
           </div>
@@ -252,8 +279,8 @@ const QuotePage: React.FC = () => {
 
       case 2:
         return (
-          <div className="space-y-3 sm:space-y-4">
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-4">
+          <div className="space-y-4">
+            <label className="block text-white/80 font-medium mb-4 text-base sm:text-lg">
               {t('quote.options.label')}
             </label>
             {[
@@ -264,10 +291,10 @@ const QuotePage: React.FC = () => {
               <label
                 key={option.value}
                 className={`
-                  flex items-start p-3 sm:p-4 rounded-lg border-2 cursor-pointer transition-all
+                  flex items-start p-4 rounded-xl border-2 cursor-pointer transition-all duration-300 hover:scale-[1.02]
                   ${watchedOptions.includes(option.value)
-                    ? 'border-primary-500 bg-primary-50 dark:bg-primary-900/20'
-                    : 'border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700'
+                    ? 'border-purple-500 bg-purple-500/10 shadow-lg shadow-purple-500/20'
+                    : 'border-white/10 bg-white/5 hover:bg-white/10'
                   }
                 `}
               >
@@ -275,14 +302,14 @@ const QuotePage: React.FC = () => {
                   type="checkbox"
                   value={option.value}
                   {...register('options')}
-                  className="h-5 w-5 text-primary-600 rounded mt-0.5 flex-shrink-0"
+                  className="h-5 w-5 text-purple-600 rounded mt-0.5 flex-shrink-0 accent-purple-500"
                 />
                 <div className="ml-3 flex-1 min-w-0">
                   <div className="flex justify-between items-start mb-1 gap-2">
-                    <span className="font-medium text-sm sm:text-base text-gray-900 dark:text-white">{option.label}</span>
-                    <span className="font-bold text-sm sm:text-base text-primary-600 whitespace-nowrap">+{option.price}€</span>
+                    <span className="font-medium text-base text-white">{option.label}</span>
+                    <span className="font-bold text-base text-purple-400 whitespace-nowrap">+{option.price}€</span>
                   </div>
-                  <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-300">{option.desc}</p>
+                  <p className="text-sm text-white/60">{option.desc}</p>
                 </div>
               </label>
             ))}
@@ -293,38 +320,41 @@ const QuotePage: React.FC = () => {
         return (
           <div className="space-y-6">
             <div>
-              <label htmlFor="message" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              <label htmlFor="message" className="block text-white/80 font-medium mb-2 text-base sm:text-lg">
                 {t('quote.details.label')}
               </label>
               <textarea
                 id="message"
                 rows={6}
                 {...register('message')}
-                className="w-full px-3 sm:px-4 py-2 sm:py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white text-sm sm:text-base"
+                className="w-full px-6 py-4 bg-white/5 border border-white/10 rounded-xl text-white placeholder-white/40 focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 transition-all duration-300 resize-none"
                 placeholder={t('quote.details.placeholder')}
               />
             </div>
 
             {watchedServiceType && (
-              <div className="bg-primary-50 dark:bg-primary-900/20 rounded-lg p-3 sm:p-4 border border-primary-200 dark:border-primary-800">
-                <h3 className="font-bold text-sm sm:text-base mb-3">{t('quote.summary.title')}</h3>
-                <div className="space-y-2">
-                  <div className="flex justify-between text-sm sm:text-base">
-                    <span>{t('quote.summary.service')}</span>
-                    <span className="font-bold">
+              <div className="bg-gradient-to-br from-blue-500/10 to-purple-500/10 rounded-xl p-6 border border-white/10">
+                <h3 className="font-bold text-lg mb-4 text-white flex items-center gap-2">
+                  <Sparkles className="w-5 h-5 text-purple-400" />
+                  {t('quote.summary.title')}
+                </h3>
+                <div className="space-y-3">
+                  <div className="flex justify-between text-base">
+                    <span className="text-white/70">{t('quote.summary.service')}</span>
+                    <span className="font-bold text-white">
                       {watchedServiceType === 'custom' ? t('quote.service.custom.price') : `${servicePrices[watchedServiceType]}€`}
                     </span>
                   </div>
                   {watchedOptions.map((opt) => (
-                    <div key={opt} className="flex justify-between text-sm sm:text-base">
-                      <span>{t(`quote.option.${opt}`)}</span>
-                      <span className="text-primary-600">+{optionPrices[opt as keyof typeof optionPrices]}€</span>
+                    <div key={opt} className="flex justify-between text-base">
+                      <span className="text-white/70">{t(`quote.option.${opt}`)}</span>
+                      <span className="text-purple-400">+{optionPrices[opt as keyof typeof optionPrices]}€</span>
                     </div>
                   ))}
                   {watchedServiceType !== 'custom' && estimatedPrice > 0 && (
-                    <div className="pt-2 border-t flex justify-between font-bold text-sm sm:text-base">
-                      <span>{t('quote.summary.total')}</span>
-                      <span className="text-primary-600">{estimatedPrice}€</span>
+                    <div className="pt-3 border-t border-white/20 flex justify-between font-bold text-lg">
+                      <span className="text-white">{t('quote.summary.total')}</span>
+                      <span className="text-blue-400">{estimatedPrice}€</span>
                     </div>
                   )}
                 </div>
@@ -337,21 +367,21 @@ const QuotePage: React.FC = () => {
         return (
           <div className="space-y-6">
             <div>
-              <label htmlFor="name" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              <label htmlFor="name" className="block text-white/80 font-medium mb-2 text-base">
                 {t('quote.name.label')}
               </label>
               <input
                 type="text"
                 id="name"
                 {...register('name', { required: t('quote.name.required') })}
-                className="w-full px-3 sm:px-4 py-2 sm:py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white text-sm sm:text-base"
+                className="w-full px-6 py-4 bg-white/5 border border-white/10 rounded-xl text-white placeholder-white/40 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all duration-300"
                 placeholder={t('quote.name.placeholder')}
               />
-              {errors.name && <p className="mt-1 text-sm text-red-600">{errors.name.message}</p>}
+              {errors.name && <p className="mt-2 text-sm text-red-400">{errors.name.message}</p>}
             </div>
 
             <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              <label htmlFor="email" className="block text-white/80 font-medium mb-2 text-base">
                 {t('quote.email.label')}
               </label>
               <input
@@ -364,10 +394,10 @@ const QuotePage: React.FC = () => {
                     message: t('quote.email.invalid')
                   }
                 })}
-                className="w-full px-3 sm:px-4 py-2 sm:py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white text-sm sm:text-base"
+                className="w-full px-6 py-4 bg-white/5 border border-white/10 rounded-xl text-white placeholder-white/40 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all duration-300"
                 placeholder={t('quote.email.placeholder')}
               />
-              {errors.email && <p className="mt-1 text-sm text-red-600">{errors.email.message}</p>}
+              {errors.email && <p className="mt-2 text-sm text-red-400">{errors.email.message}</p>}
             </div>
           </div>
         );
@@ -380,150 +410,190 @@ const QuotePage: React.FC = () => {
   const currentStepConfig = stepConfig[currentStep - 1];
 
   return (
-    <div className={`min-h-screen ${isDark ? 'bg-gray-900' : 'bg-gray-50'} pt-20 sm:pt-24 pb-8 sm:pb-12`}>
-      <div className="max-w-6xl mx-auto px-4 sm:px-6">
-        
-        <div className="text-center mb-6 sm:mb-8">
-          <h1 className={`text-2xl sm:text-3xl lg:text-4xl font-bold ${isDark ? 'text-white' : 'text-gray-900'} mb-2 sm:mb-4`}>
-            {t('quote.title')}
-          </h1>
-          <p className={`text-base sm:text-lg ${isDark ? 'text-gray-300' : 'text-gray-600'} px-4`}>
-            {t('quote.subtitle')}
-          </p>
-        </div>
+    <div className="min-h-screen bg-slate-950 overflow-hidden relative">
+      {/* Animated Background Blobs */}
+      <div
+        className="absolute top-0 left-0 w-full h-full opacity-30 pointer-events-none"
+        style={{ transform: `translateY(${scrollY * 0.5}px)` }}
+      >
+        <div className="absolute top-20 left-10 w-96 h-96 bg-blue-500 rounded-full blur-3xl"></div>
+      </div>
+      <div
+        className="absolute top-0 left-0 w-full h-full opacity-20 pointer-events-none"
+        style={{ transform: `translateY(${scrollY * 0.3}px)` }}
+      >
+        <div className="absolute bottom-20 right-10 w-96 h-96 bg-purple-500 rounded-full blur-3xl"></div>
+      </div>
+      <div
+        className="absolute top-0 left-0 w-full h-full opacity-10 pointer-events-none"
+        style={{ transform: `translateY(${scrollY * 0.2}px)` }}
+      >
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-pink-500 rounded-full blur-3xl"></div>
+      </div>
 
-        {selectedPackFromNav && (
-          <div className="mb-4 sm:mb-6 p-3 sm:p-4 bg-primary-100 dark:bg-primary-900/20 rounded-lg max-w-md mx-auto text-center text-sm sm:text-base">
-            <Check className="inline mr-2" size={16} />
-            <span dangerouslySetInnerHTML={{ 
-              __html: t('quote.pack.preselected').replace('{packName}', location.state?.packName || selectedPackFromNav) 
-            }} />
+      <div className="relative z-10 min-h-screen pt-20 sm:pt-24 pb-12 px-4 sm:px-6">
+        <div className="max-w-6xl mx-auto">
+          
+          <div className="text-center mb-8 sm:mb-12">
+            <h1 className="text-3xl sm:text-4xl lg:text-5xl xl:text-6xl font-bold text-white mb-4">
+              {t('quote.title')}
+            </h1>
+            <p className="text-lg sm:text-xl text-white/70 max-w-3xl mx-auto">
+              {t('quote.subtitle')}
+            </p>
           </div>
-        )}
 
-        <StepIndicator />
-        
-        <form onSubmit={handleSubmit(onSubmit)}>
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
-            
-            <div className="lg:col-span-2">
-              <div className={`${isDark ? 'bg-gray-800' : 'bg-white'} rounded-xl shadow-lg p-4 sm:p-6`}>
-                
-                <div className="mb-4 sm:mb-6 pb-3 sm:pb-4 border-b border-gray-200 dark:border-gray-700">
-                  <div className="flex items-center gap-2 sm:gap-3 mb-2">
-                    <currentStepConfig.icon className="text-primary-600 flex-shrink-0" size={20} />
-                    <h2 className={`text-lg sm:text-xl font-bold ${isDark ? 'text-white' : 'text-gray-900'}`}>
-                      {currentStepConfig.title}
-                    </h2>
-                  </div>
-                  <p className={`text-sm sm:text-base ${isDark ? 'text-gray-300' : 'text-gray-600'}`}>
-                    {currentStepConfig.subtitle}
-                  </p>
-                  <div className="mt-2 text-xs sm:text-sm text-gray-500">
-                    {t('quote.step.progress').replace('{current}', currentStep.toString()).replace('{total}', totalSteps.toString())}
-                  </div>
-                </div>
-
-                {renderStepContent()}
-
-                <div className="flex justify-between mt-6 sm:mt-8 pt-4 sm:pt-6 border-t border-gray-200 dark:border-gray-700 gap-3">
-                  <button
-                    type="button"
-                    onClick={prevStep}
-                    disabled={currentStep === 1}
-                    className="flex items-center justify-center gap-1 px-3 sm:px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed text-sm sm:text-base transition-colors"
-                  >
-                    <ChevronLeft size={16} />
-                    <span className="hidden xs:inline">{t('quote.button.previous')}</span>
-                  </button>
-
-                  {currentStep < totalSteps ? (
-                    <button
-                      type="button"
-                      onClick={nextStep}
-                      className="flex items-center justify-center gap-1 px-4 sm:px-6 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 text-sm sm:text-base transition-colors"
-                    >
-                      <span>{t('quote.button.next')}</span>
-                      <ChevronRight size={16} />
-                    </button>
-                  ) : (
-                    <button
-                      type="submit"
-                      disabled={isSubmitting}
-                      className="flex items-center justify-center gap-1 px-4 sm:px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:bg-gray-400 disabled:cursor-not-allowed text-sm sm:text-base transition-colors"
-                    >
-                      {isSubmitting ? (
-                        <span>{t('quote.button.submitting')}</span>
-                      ) : (
-                        <>
-                          <Send size={16} />
-                          <span>{t('quote.button.submit')}</span>
-                        </>
-                      )}
-                    </button>
-                  )}
-                </div>
-              </div>
+          {selectedPackFromNav && (
+            <div className="mb-6 p-4 bg-gradient-to-r from-blue-500/20 to-purple-500/20 backdrop-blur-xl rounded-xl border border-white/10 max-w-md mx-auto text-center">
+              <Check className="inline mr-2 text-green-400" size={18} />
+              <span className="text-white" dangerouslySetInnerHTML={{ 
+                __html: t('quote.pack.preselected').replace('{packName}', location.state?.packName || selectedPackFromNav) 
+              }} />
             </div>
+          )}
 
-            <div className="lg:col-span-1 order-first lg:order-last">
-              <div className={`${isDark ? 'bg-gray-800' : 'bg-white'} rounded-xl shadow-lg p-4 sm:p-6 lg:sticky lg:top-24`}>
-                <div className="flex items-center gap-2 mb-3 sm:mb-4 pb-2 sm:pb-3 border-b">
-                  <Calculator className="text-primary-600 flex-shrink-0" size={18} />
-                  <h3 className={`font-bold text-sm sm:text-base ${isDark ? 'text-white' : 'text-gray-900'}`}>
-                    {t('quote.estimate')}
-                  </h3>
-                </div>
-
-                {watchedServiceType ? (
-                  <div className="space-y-2 sm:space-y-3">
-                    <div className="flex justify-between py-2 text-sm sm:text-base">
-                      <span className="text-sm">{t('quote.estimate.service')}</span>
-                      <span className="font-bold">
-                        {watchedServiceType === 'custom' ? t('quote.service.custom.price') : `${servicePrices[watchedServiceType]}€`}
-                      </span>
-                    </div>
-
-                    {watchedOptions.map((opt) => (
-                      <div key={opt} className="flex justify-between py-2 text-sm sm:text-base">
-                        <span className="text-sm">{t(`quote.option.${opt}`)}</span>
-                        <span className="text-primary-600">+{optionPrices[opt as keyof typeof optionPrices]}€</span>
-                      </div>
-                    ))}
-
-                    {watchedServiceType !== 'custom' && estimatedPrice > 0 && (
-                      <div className="pt-2 sm:pt-3 border-t">
-                        <div className="flex justify-between font-bold">
-                          <span className="text-sm sm:text-base">{t('quote.estimate.total')}</span>
-                          <span className="text-xl sm:text-2xl text-primary-600">{estimatedPrice}€</span>
+          <div ref={containerRef} className="max-w-5xl mx-auto">
+            <StepIndicator />
+            
+            <form onSubmit={handleSubmit(onSubmit)}>
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8">
+                
+                <div className="lg:col-span-2">
+                  <div className="bg-white/5 backdrop-blur-xl rounded-2xl p-6 sm:p-8 border border-white/10 shadow-2xl">
+                    
+                    <div ref={stepContentRef} className="animate-slide-in">
+                      <div className="flex items-center gap-3 mb-6 pb-4 border-b border-white/10">
+                        <currentStepConfig.icon className="text-purple-400 flex-shrink-0" size={24} />
+                        <div>
+                          <h2 className="text-xl sm:text-2xl font-bold text-white">
+                            {currentStepConfig.title}
+                          </h2>
+                          <p className="text-sm text-white/60 mt-1">
+                            {currentStepConfig.subtitle}
+                          </p>
                         </div>
                       </div>
-                    )}
-                  </div>
-                ) : (
-                  <p className="text-xs sm:text-sm text-gray-500 text-center py-4">
-                    {t('quote.estimate.select')}
-                  </p>
-                )}
 
-                <div className="mt-4 sm:mt-6 pt-3 sm:pt-4 border-t">
-                  <div className="flex justify-between text-xs sm:text-sm mb-2">
-                    <span>{t('quote.progress')}</span>
-                    <span>{Math.round((currentStep / totalSteps) * 100)}%</span>
+                      {renderStepContent()}
+
+                      <div className="flex gap-4 mt-8 pt-6 border-t border-white/10">
+                        {currentStep > 1 && (
+                          <button
+                            type="button"
+                            onClick={prevStep}
+                            className="flex-1 px-6 py-4 bg-white/5 border border-white/10 text-white rounded-xl font-semibold hover:bg-white/10 transition-all duration-300 flex items-center justify-center gap-2 group"
+                          >
+                            <ChevronLeft className="w-5 h-5 group-hover:-translate-x-1 transition-transform" />
+                            <span className="hidden sm:inline">{t('quote.button.previous')}</span>
+                          </button>
+                        )}
+
+                        {currentStep < totalSteps ? (
+                          <button
+                            type="button"
+                            onClick={nextStep}
+                            className="flex-1 px-6 py-4 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-xl font-semibold hover:shadow-lg hover:shadow-purple-500/50 transition-all duration-300 flex items-center justify-center gap-2 group"
+                          >
+                            <span>{t('quote.button.next')}</span>
+                            <ChevronRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                          </button>
+                        ) : (
+                          <button
+                            type="submit"
+                            disabled={isSubmitting}
+                            className="flex-1 px-6 py-4 bg-gradient-to-r from-green-500 to-emerald-600 text-white rounded-xl font-semibold hover:shadow-lg hover:shadow-green-500/50 transition-all duration-300 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed group"
+                          >
+                            {isSubmitting ? (
+                              <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
+                            ) : (
+                              <>
+                                <Send className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                                <span>{t('quote.button.submit')}</span>
+                              </>
+                            )}
+                          </button>
+                        )}
+                      </div>
+                    </div>
                   </div>
-                  <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
-                    <div 
-                      className="bg-primary-600 h-2 rounded-full transition-all duration-300"
-                      style={{ width: `${(currentStep / totalSteps) * 100}%` }}
-                    />
+                </div>
+
+                <div className="lg:col-span-1 order-first lg:order-last">
+                  <div className="bg-white/5 backdrop-blur-xl rounded-2xl p-6 border border-white/10 shadow-2xl lg:sticky lg:top-24">
+                    <div className="flex items-center gap-2 mb-4 pb-3 border-b border-white/10">
+                      <Calculator className="text-blue-400 flex-shrink-0" size={20} />
+                      <h3 className="font-bold text-lg text-white">
+                        {t('quote.estimate')}
+                      </h3>
+                    </div>
+
+                    {watchedServiceType ? (
+                      <div className="space-y-3">
+                        <div className="flex justify-between py-2 text-base">
+                          <span className="text-white/70 text-sm">{t('quote.estimate.service')}</span>
+                          <span className="font-bold text-white">
+                            {watchedServiceType === 'custom' ? t('quote.service.custom.price') : `${servicePrices[watchedServiceType]}€`}
+                          </span>
+                        </div>
+
+                        {watchedOptions.map((opt) => (
+                          <div key={opt} className="flex justify-between py-2">
+                            <span className="text-white/70 text-sm">{t(`quote.option.${opt}`)}</span>
+                            <span className="text-purple-400 text-sm">+{optionPrices[opt as keyof typeof optionPrices]}€</span>
+                          </div>
+                        ))}
+
+                        {watchedServiceType !== 'custom' && estimatedPrice > 0 && (
+                          <div className="pt-3 border-t border-white/10">
+                            <div className="flex justify-between font-bold">
+                              <span className="text-white">{t('quote.estimate.total')}</span>
+                              <span className="text-2xl text-blue-400">{estimatedPrice}€</span>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    ) : (
+                      <p className="text-sm text-white/50 text-center py-6">
+                        {t('quote.estimate.select')}
+                      </p>
+                    )}
+
+                    <div className="mt-6 pt-4 border-t border-white/10">
+                      <div className="flex justify-between text-sm text-white/70 mb-2">
+                        <span>{t('quote.progress')}</span>
+                        <span>{Math.round((currentStep / totalSteps) * 100)}%</span>
+                      </div>
+                      <div className="w-full bg-white/10 rounded-full h-2">
+                        <div 
+                          className="bg-gradient-to-r from-blue-500 to-purple-600 h-2 rounded-full transition-all duration-300"
+                          style={{ width: `${(currentStep / totalSteps) * 100}%` }}
+                        />
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
+            </form>
           </div>
-        </form>
-
+        </div>
       </div>
+
+      <style>{`
+        @keyframes slide-in {
+          from {
+            opacity: 0;
+            transform: translateX(30px);
+          }
+          to {
+            opacity: 1;
+            transform: translateX(0);
+          }
+        }
+
+        .animate-slide-in {
+          animation: slide-in 0.5s ease-out;
+        }
+      `}</style>
     </div>
   );
 };

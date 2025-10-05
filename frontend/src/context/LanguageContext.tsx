@@ -226,8 +226,9 @@ const translations = {
       "login.name.required": "Name is required",
       "login.password.minlength": "Password must be at least 6 characters",
       "login.confirm.password.required": "Please confirm your password",
-    
-    // Contact
+
+//////////////////////////////////////////////////////////////////////////////////////////////:
+    // Contact Page
     'contact.title': 'Contact Us',
     'contact.subtitle': 'Get in touch with us to discuss your project and see how we can help bring your vision to life.',
     'contact.name': 'Full Name',
@@ -245,6 +246,8 @@ const translations = {
     'contact.why.tech': '• Cutting-edge technologies and best practices',
     'contact.why.support': '• Dedicated support throughout the project',
     'contact.why.pricing': '• Transparent pricing and timelines',
+    'ontact.form.title': 'Contact Form',
+    'contact.message.placeholder': 'Write your message here...',
     
 ///////////////////////////////////////////////////////////////////////
     // Quote Page
@@ -1059,8 +1062,8 @@ const translations = {
     "login.password.minlength": "Le mot de passe doit contenir au moins 6 caractères",
     "login.confirm.password.required": "Veuillez confirmer votre mot de passe",
     
-///////////////////////////////////////////////////
-    // Contact
+//////////////////////////////////////////////////////////////////////////////////////////////////////
+    // Contact Page
     'contact.title': 'Nous Contacter',
     'contact.subtitle': 'Contactez-nous pour discuter de votre projet et voir comment nous pouvons vous aider à concrétiser votre vision.',
     'contact.name': 'Nom Complet',
@@ -1078,6 +1081,9 @@ const translations = {
     'contact.why.tech': '• Technologies de pointe et meilleures pratiques',
     'contact.why.support': '• Support dédié tout au long du projet',
     'contact.why.pricing': '• Tarification et délais transparents',
+    'contact.form.title': 'Formulaire de contact',
+    'contact.message.placeholder': 'Écrivez votre message ici...',
+
     
 //////////////////////////////////////////////////////////////////////////////////////////////////////
     // Quote Page

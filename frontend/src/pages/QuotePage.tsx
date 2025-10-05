@@ -1,4 +1,4 @@
-// frontend/src/context/v3.tsx
+// frontend/src/pages/QuotePage.tsx
 import React, { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { useNavigate, useLocation } from 'react-router-dom';
@@ -14,7 +14,6 @@ import {
   Settings, 
   MessageSquare,
   CheckCircle,
-  Sparkles
 } from 'lucide-react';
 import { useLanguage } from '../context/LanguageContext';
 import { useTheme } from '../context/ThemeContext';
@@ -70,29 +69,29 @@ const QuotePage: React.FC = () => {
   const stepConfig = [
     {
       id: 1,
-      title: 'Choisissez votre pack',
-      subtitle: 'Sélectionnez le pack qui correspond à vos besoins',
+      title: t('quote.step1.title'),
+      subtitle: t('quote.step1.subtitle'),
       icon: Briefcase,
       fields: ['serviceType']
     },
     {
       id: 2,
-      title: 'Options supplémentaires',
-      subtitle: 'Personnalisez votre projet',
+      title: t('quote.step2.title'),
+      subtitle: t('quote.step2.subtitle'),
       icon: Settings,
       fields: ['options']
     },
     {
       id: 3,
-      title: 'Détails du projet',
-      subtitle: 'Parlez-nous de vos besoins',
+      title: t('quote.step3.title'),
+      subtitle: t('quote.step3.subtitle'),
       icon: MessageSquare,
       fields: ['message']
     },
     {
       id: 4,
-      title: 'Vos coordonnées',
-      subtitle: 'Pour vous contacter rapidement',
+      title: t('quote.step4.title'),
+      subtitle: t('quote.step4.subtitle'),
       icon: User,
       fields: ['name', 'email']
     }
@@ -146,7 +145,7 @@ const QuotePage: React.FC = () => {
 
       await api.post('/quotes', submitData);
       
-      toast.success('🎉 Votre demande de devis a été envoyée avec succès !');
+      toast.success(t('quote.success'));
       reset();
       setEstimatedPrice(0);
       setCurrentStep(1);
@@ -157,37 +156,39 @@ const QuotePage: React.FC = () => {
       
     } catch (error: any) {
       console.error('Error:', error);
-      toast.error('Erreur lors de l\'envoi de la demande');
+      toast.error(t('quote.error'));
     } finally {
       setIsSubmitting(false);
     }
   };
 
   const StepIndicator = () => (
-    <div className="flex items-center justify-center mb-8">
-      {stepConfig.map((step, index) => (
-        <div key={step.id} className="flex items-center">
-          <div className={`
-            relative flex items-center justify-center w-12 h-12 rounded-full border-2 transition-all duration-300
-            ${currentStep >= step.id 
-              ? 'bg-primary-600 border-primary-600 text-white' 
-              : 'bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600 text-gray-400'
-            }
-          `}>
-            {currentStep > step.id ? (
-              <CheckCircle size={22} />
-            ) : (
-              <step.icon size={22} />
+    <div className="flex items-center justify-center mb-6 sm:mb-8 overflow-x-auto pb-2">
+      <div className="flex items-center min-w-max px-4">
+        {stepConfig.map((step, index) => (
+          <div key={step.id} className="flex items-center">
+            <div className={`
+              relative flex items-center justify-center w-10 h-10 sm:w-12 sm:h-12 rounded-full border-2 transition-all duration-300 flex-shrink-0
+              ${currentStep >= step.id 
+                ? 'bg-primary-600 border-primary-600 text-white' 
+                : 'bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600 text-gray-400'
+              }
+            `}>
+              {currentStep > step.id ? (
+                <CheckCircle size={20} className="sm:w-[22px] sm:h-[22px]" />
+              ) : (
+                <step.icon size={20} className="sm:w-[22px] sm:h-[22px]" />
+              )}
+            </div>
+            {index < stepConfig.length - 1 && (
+              <div className={`
+                w-8 sm:w-12 md:w-16 h-1 mx-1 sm:mx-2 rounded-full transition-all duration-300 flex-shrink-0
+                ${currentStep > step.id ? 'bg-primary-600' : 'bg-gray-300 dark:bg-gray-600'}
+              `} />
             )}
           </div>
-          {index < stepConfig.length - 1 && (
-            <div className={`
-              w-12 sm:w-16 h-1 mx-2 rounded-full transition-all duration-300
-              ${currentStep > step.id ? 'bg-primary-600' : 'bg-gray-300 dark:bg-gray-600'}
-            `} />
-          )}
-        </div>
-      ))}
+        ))}
+      </div>
     </div>
   );
 
@@ -198,20 +199,20 @@ const QuotePage: React.FC = () => {
           <div className="space-y-6">
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-4">
-                Type de service
+                {t('quote.service.label')}
               </label>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                 {[
-                  { value: 'starter', label: 'Starter', price: 1490, desc: 'Site vitrine professionnel' },
-                  { value: 'business', label: 'Business', price: 3490, desc: 'Boutique en ligne complète', popular: true },
-                  { value: 'premium', label: 'Premium', price: 6900, desc: 'Solution haut de gamme' },
-                  { value: 'ai', label: 'IA', price: 4500, desc: 'Solutions IA personnalisées' },
-                  { value: 'custom', label: 'Personnalisé', price: 0, desc: 'Solution sur mesure' }
+                  { value: 'starter', label: t('quote.service.starter'), price: 1490, desc: t('quote.service.starter.desc') },
+                  { value: 'business', label: t('quote.service.business'), price: 3490, desc: t('quote.service.business.desc'), popular: true },
+                  { value: 'premium', label: t('quote.service.premium'), price: 6900, desc: t('quote.service.premium.desc') },
+                  { value: 'ai', label: t('quote.service.ai'), price: 4500, desc: t('quote.service.ai.desc') },
+                  { value: 'custom', label: t('quote.service.custom'), price: 0, desc: t('quote.service.custom.desc') }
                 ].map((service) => (
                   <label
                     key={service.value}
                     className={`
-                      relative cursor-pointer p-4 rounded-lg border-2 transition-all
+                      relative cursor-pointer p-3 sm:p-4 rounded-lg border-2 transition-all
                       ${watchedServiceType === service.value 
                         ? 'border-primary-500 bg-primary-50 dark:bg-primary-900/20' 
                         : 'border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700'
@@ -221,23 +222,23 @@ const QuotePage: React.FC = () => {
                     <input
                       type="radio"
                       value={service.value}
-                      {...register('serviceType', { required: 'Veuillez sélectionner un service' })}
+                      {...register('serviceType', { required: t('quote.service.required') })}
                       className="sr-only"
                     />
                     {service.popular && (
-                      <div className="absolute -top-2 left-1/2 -translate-x-1/2 bg-yellow-400 text-xs px-2 py-1 rounded-full font-bold">
-                        POPULAIRE
+                      <div className="absolute -top-2 left-1/2 -translate-x-1/2 bg-yellow-400 text-xs px-2 py-0.5 sm:py-1 rounded-full font-bold">
+                        {t('quote.service.business.popular')}
                       </div>
                     )}
-                    <div className="flex justify-between items-center mb-2">
-                      <h3 className="font-bold text-gray-900 dark:text-white">{service.label}</h3>
-                      <span className="font-bold text-primary-600">
-                        {service.price > 0 ? `${service.price}€` : 'Sur devis'}
+                    <div className="flex justify-between items-center mb-1 sm:mb-2">
+                      <h3 className="font-bold text-sm sm:text-base text-gray-900 dark:text-white">{service.label}</h3>
+                      <span className="font-bold text-sm sm:text-base text-primary-600">
+                        {service.price > 0 ? `${service.price}€` : t('quote.service.custom.price')}
                       </span>
                     </div>
-                    <p className="text-sm text-gray-600 dark:text-gray-300">{service.desc}</p>
+                    <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-300">{service.desc}</p>
                     {watchedServiceType === service.value && (
-                      <CheckCircle className="absolute top-2 right-2 text-primary-600" size={20} />
+                      <CheckCircle className="absolute top-2 right-2 text-primary-600" size={18} />
                     )}
                   </label>
                 ))}
@@ -251,19 +252,19 @@ const QuotePage: React.FC = () => {
 
       case 2:
         return (
-          <div className="space-y-4">
+          <div className="space-y-3 sm:space-y-4">
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-4">
-              Options supplémentaires (Optionnel)
+              {t('quote.options.label')}
             </label>
             {[
-              { value: 'design', label: 'Design personnalisé', price: 1500 },
-              { value: 'maintenance', label: 'Maintenance', price: 800 },
-              { value: 'support', label: 'Support prioritaire', price: 1200 }
+              { value: 'design', label: t('quote.option.design'), price: 1500, desc: t('quote.option.design.desc') },
+              { value: 'maintenance', label: t('quote.option.maintenance'), price: 800, desc: t('quote.option.maintenance.desc') },
+              { value: 'support', label: t('quote.option.support'), price: 1200, desc: t('quote.option.support.desc') }
             ].map((option) => (
               <label
                 key={option.value}
                 className={`
-                  flex items-center p-4 rounded-lg border-2 cursor-pointer
+                  flex items-start p-3 sm:p-4 rounded-lg border-2 cursor-pointer transition-all
                   ${watchedOptions.includes(option.value)
                     ? 'border-primary-500 bg-primary-50 dark:bg-primary-900/20'
                     : 'border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700'
@@ -274,13 +275,14 @@ const QuotePage: React.FC = () => {
                   type="checkbox"
                   value={option.value}
                   {...register('options')}
-                  className="h-5 w-5 text-primary-600 rounded"
+                  className="h-5 w-5 text-primary-600 rounded mt-0.5 flex-shrink-0"
                 />
-                <div className="ml-3 flex-1">
-                  <div className="flex justify-between">
-                    <span className="font-medium text-gray-900 dark:text-white">{option.label}</span>
-                    <span className="font-bold text-primary-600">+{option.price}€</span>
+                <div className="ml-3 flex-1 min-w-0">
+                  <div className="flex justify-between items-start mb-1 gap-2">
+                    <span className="font-medium text-sm sm:text-base text-gray-900 dark:text-white">{option.label}</span>
+                    <span className="font-bold text-sm sm:text-base text-primary-600 whitespace-nowrap">+{option.price}€</span>
                   </div>
+                  <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-300">{option.desc}</p>
                 </div>
               </label>
             ))}
@@ -292,36 +294,36 @@ const QuotePage: React.FC = () => {
           <div className="space-y-6">
             <div>
               <label htmlFor="message" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                Détails du projet (Optionnel)
+                {t('quote.details.label')}
               </label>
               <textarea
                 id="message"
                 rows={6}
                 {...register('message')}
-                className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-                placeholder="Décrivez votre projet..."
+                className="w-full px-3 sm:px-4 py-2 sm:py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white text-sm sm:text-base"
+                placeholder={t('quote.details.placeholder')}
               />
             </div>
 
             {watchedServiceType && (
-              <div className="bg-primary-50 dark:bg-primary-900/20 rounded-lg p-4 border border-primary-200 dark:border-primary-800">
-                <h3 className="font-bold mb-3">Résumé</h3>
+              <div className="bg-primary-50 dark:bg-primary-900/20 rounded-lg p-3 sm:p-4 border border-primary-200 dark:border-primary-800">
+                <h3 className="font-bold text-sm sm:text-base mb-3">{t('quote.summary.title')}</h3>
                 <div className="space-y-2">
-                  <div className="flex justify-between">
-                    <span>Service</span>
+                  <div className="flex justify-between text-sm sm:text-base">
+                    <span>{t('quote.summary.service')}</span>
                     <span className="font-bold">
-                      {watchedServiceType === 'custom' ? 'Sur devis' : `${servicePrices[watchedServiceType]}€`}
+                      {watchedServiceType === 'custom' ? t('quote.service.custom.price') : `${servicePrices[watchedServiceType]}€`}
                     </span>
                   </div>
                   {watchedOptions.map((opt) => (
-                    <div key={opt} className="flex justify-between">
-                      <span>{opt}</span>
+                    <div key={opt} className="flex justify-between text-sm sm:text-base">
+                      <span>{t(`quote.option.${opt}`)}</span>
                       <span className="text-primary-600">+{optionPrices[opt as keyof typeof optionPrices]}€</span>
                     </div>
                   ))}
                   {watchedServiceType !== 'custom' && estimatedPrice > 0 && (
-                    <div className="pt-2 border-t flex justify-between font-bold">
-                      <span>Total</span>
+                    <div className="pt-2 border-t flex justify-between font-bold text-sm sm:text-base">
+                      <span>{t('quote.summary.total')}</span>
                       <span className="text-primary-600">{estimatedPrice}€</span>
                     </div>
                   )}
@@ -336,34 +338,34 @@ const QuotePage: React.FC = () => {
           <div className="space-y-6">
             <div>
               <label htmlFor="name" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                Nom complet *
+                {t('quote.name.label')}
               </label>
               <input
                 type="text"
                 id="name"
-                {...register('name', { required: 'Le nom est requis' })}
-                className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-                placeholder="John Doe"
+                {...register('name', { required: t('quote.name.required') })}
+                className="w-full px-3 sm:px-4 py-2 sm:py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white text-sm sm:text-base"
+                placeholder={t('quote.name.placeholder')}
               />
               {errors.name && <p className="mt-1 text-sm text-red-600">{errors.name.message}</p>}
             </div>
 
             <div>
               <label htmlFor="email" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                Email *
+                {t('quote.email.label')}
               </label>
               <input
                 type="email"
                 id="email"
                 {...register('email', { 
-                  required: 'L\'email est requis',
+                  required: t('quote.email.required'),
                   pattern: {
                     value: /^\S+@\S+$/i,
-                    message: 'Email invalide'
+                    message: t('quote.email.invalid')
                   }
                 })}
-                className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-                placeholder="john@example.com"
+                className="w-full px-3 sm:px-4 py-2 sm:py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white text-sm sm:text-base"
+                placeholder={t('quote.email.placeholder')}
               />
               {errors.email && <p className="mt-1 text-sm text-red-600">{errors.email.message}</p>}
             </div>
@@ -378,143 +380,147 @@ const QuotePage: React.FC = () => {
   const currentStepConfig = stepConfig[currentStep - 1];
 
   return (
-    <div className={`min-h-screen ${isDark ? 'bg-gray-900' : 'bg-gray-50'} py-12`}>
-      <div className="max-w-6xl mx-auto px-4">
+    <div className={`min-h-screen ${isDark ? 'bg-gray-900' : 'bg-gray-50'} pt-20 sm:pt-24 pb-8 sm:pb-12`}>
+      <div className="max-w-6xl mx-auto px-4 sm:px-6">
         
-        <div className="text-center mb-8">
-          <h1 className={`text-4xl font-bold ${isDark ? 'text-white' : 'text-gray-900'} mb-4`}>
-            Demande de devis
+        <div className="text-center mb-6 sm:mb-8">
+          <h1 className={`text-2xl sm:text-3xl lg:text-4xl font-bold ${isDark ? 'text-white' : 'text-gray-900'} mb-2 sm:mb-4`}>
+            {t('quote.title')}
           </h1>
-          <p className={`text-lg ${isDark ? 'text-gray-300' : 'text-gray-600'}`}>
-            Obtenez une estimation instantanée
+          <p className={`text-base sm:text-lg ${isDark ? 'text-gray-300' : 'text-gray-600'} px-4`}>
+            {t('quote.subtitle')}
           </p>
         </div>
 
         {selectedPackFromNav && (
-          <div className="mb-6 p-4 bg-primary-100 dark:bg-primary-900/20 rounded-lg max-w-md mx-auto text-center">
+          <div className="mb-4 sm:mb-6 p-3 sm:p-4 bg-primary-100 dark:bg-primary-900/20 rounded-lg max-w-md mx-auto text-center text-sm sm:text-base">
             <Check className="inline mr-2" size={16} />
-            <span>Pack <strong>{location.state?.packName}</strong> pré-sélectionné</span>
+            <span dangerouslySetInnerHTML={{ 
+              __html: t('quote.pack.preselected').replace('{packName}', location.state?.packName || selectedPackFromNav) 
+            }} />
           </div>
         )}
 
         <StepIndicator />
-      <form onSubmit={handleSubmit(onSubmit)}>
-
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          
-          <div className="lg:col-span-2">
-            <div className={`${isDark ? 'bg-gray-800' : 'bg-white'} rounded-xl shadow-lg p-6`}>
-              
-              <div className="mb-6 pb-4 border-b border-gray-200 dark:border-gray-700">
-                <div className="flex items-center gap-3 mb-2">
-                  <currentStepConfig.icon className="text-primary-600" size={24} />
-                  <h2 className={`text-xl font-bold ${isDark ? 'text-white' : 'text-gray-900'}`}>
-                    {currentStepConfig.title}
-                  </h2>
+        
+        <form onSubmit={handleSubmit(onSubmit)}>
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
+            
+            <div className="lg:col-span-2">
+              <div className={`${isDark ? 'bg-gray-800' : 'bg-white'} rounded-xl shadow-lg p-4 sm:p-6`}>
+                
+                <div className="mb-4 sm:mb-6 pb-3 sm:pb-4 border-b border-gray-200 dark:border-gray-700">
+                  <div className="flex items-center gap-2 sm:gap-3 mb-2">
+                    <currentStepConfig.icon className="text-primary-600 flex-shrink-0" size={20} />
+                    <h2 className={`text-lg sm:text-xl font-bold ${isDark ? 'text-white' : 'text-gray-900'}`}>
+                      {currentStepConfig.title}
+                    </h2>
+                  </div>
+                  <p className={`text-sm sm:text-base ${isDark ? 'text-gray-300' : 'text-gray-600'}`}>
+                    {currentStepConfig.subtitle}
+                  </p>
+                  <div className="mt-2 text-xs sm:text-sm text-gray-500">
+                    {t('quote.step.progress').replace('{current}', currentStep.toString()).replace('{total}', totalSteps.toString())}
+                  </div>
                 </div>
-                <p className={isDark ? 'text-gray-300' : 'text-gray-600'}>
-                  {currentStepConfig.subtitle}
-                </p>
-                <div className="mt-2 text-sm text-gray-500">
-                  Étape {currentStep} sur {totalSteps}
-                </div>
-              </div>
 
-              {renderStepContent()}
+                {renderStepContent()}
 
-              <div className="flex justify-between mt-8 pt-6 border-t border-gray-200 dark:border-gray-700">
-                <button
-                  type="button"
-                  onClick={prevStep}
-                  disabled={currentStep === 1}
-                  className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50"
-                >
-                  <ChevronLeft className="inline mr-1" size={16} />
-                  Précédent
-                </button>
-
-                {currentStep < totalSteps ? (
+                <div className="flex justify-between mt-6 sm:mt-8 pt-4 sm:pt-6 border-t border-gray-200 dark:border-gray-700 gap-3">
                   <button
                     type="button"
-                    onClick={nextStep}
-                    className="px-6 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700"
+                    onClick={prevStep}
+                    disabled={currentStep === 1}
+                    className="flex items-center justify-center gap-1 px-3 sm:px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed text-sm sm:text-base transition-colors"
                   >
-                    Suivant
-                    <ChevronRight className="inline ml-1" size={16} />
+                    <ChevronLeft size={16} />
+                    <span className="hidden xs:inline">{t('quote.button.previous')}</span>
                   </button>
-                ) : (
+
+                  {currentStep < totalSteps ? (
+                    <button
+                      type="button"
+                      onClick={nextStep}
+                      className="flex items-center justify-center gap-1 px-4 sm:px-6 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 text-sm sm:text-base transition-colors"
+                    >
+                      <span>{t('quote.button.next')}</span>
+                      <ChevronRight size={16} />
+                    </button>
+                  ) : (
                     <button
                       type="submit"
                       disabled={isSubmitting}
-                      className="px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:bg-gray-400"
+                      className="flex items-center justify-center gap-1 px-4 sm:px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:bg-gray-400 disabled:cursor-not-allowed text-sm sm:text-base transition-colors"
                     >
-                      {isSubmitting ? 'Envoi...' : (
+                      {isSubmitting ? (
+                        <span>{t('quote.button.submitting')}</span>
+                      ) : (
                         <>
-                          <Send className="inline mr-1" size={16} />
-                          Envoyer
+                          <Send size={16} />
+                          <span>{t('quote.button.submit')}</span>
                         </>
                       )}
                     </button>
-                )}
-              </div>
-            </div>
-          </div>
-
-          <div className="lg:col-span-1">
-            <div className={`${isDark ? 'bg-gray-800' : 'bg-white'} rounded-xl shadow-lg p-6 sticky top-24`}>
-              <div className="flex items-center gap-2 mb-4 pb-3 border-b">
-                <Calculator className="text-primary-600" size={20} />
-                <h3 className={`font-bold ${isDark ? 'text-white' : 'text-gray-900'}`}>
-                  Estimation
-                </h3>
-              </div>
-
-              {watchedServiceType ? (
-                <div className="space-y-3">
-                  <div className="flex justify-between py-2">
-                    <span className="text-sm">Service</span>
-                    <span className="font-bold">
-                      {watchedServiceType === 'custom' ? 'Sur devis' : `${servicePrices[watchedServiceType]}€`}
-                    </span>
-                  </div>
-
-                  {watchedOptions.map((opt) => (
-                    <div key={opt} className="flex justify-between py-2">
-                      <span className="text-sm">{opt}</span>
-                      <span className="text-primary-600">+{optionPrices[opt as keyof typeof optionPrices]}€</span>
-                    </div>
-                  ))}
-
-                  {watchedServiceType !== 'custom' && estimatedPrice > 0 && (
-                    <div className="pt-3 border-t">
-                      <div className="flex justify-between font-bold">
-                        <span>Total</span>
-                        <span className="text-2xl text-primary-600">{estimatedPrice}€</span>
-                      </div>
-                    </div>
                   )}
                 </div>
-              ) : (
-                <p className="text-sm text-gray-500 text-center py-4">
-                  Sélectionnez un pack
-                </p>
-              )}
+              </div>
+            </div>
 
-              <div className="mt-6 pt-4 border-t">
-                <div className="flex justify-between text-sm mb-2">
-                  <span>Progression</span>
-                  <span>{Math.round((currentStep / totalSteps) * 100)}%</span>
+            <div className="lg:col-span-1 order-first lg:order-last">
+              <div className={`${isDark ? 'bg-gray-800' : 'bg-white'} rounded-xl shadow-lg p-4 sm:p-6 lg:sticky lg:top-24`}>
+                <div className="flex items-center gap-2 mb-3 sm:mb-4 pb-2 sm:pb-3 border-b">
+                  <Calculator className="text-primary-600 flex-shrink-0" size={18} />
+                  <h3 className={`font-bold text-sm sm:text-base ${isDark ? 'text-white' : 'text-gray-900'}`}>
+                    {t('quote.estimate')}
+                  </h3>
                 </div>
-                <div className="w-full bg-gray-200 rounded-full h-2">
-                  <div 
-                    className="bg-primary-600 h-2 rounded-full transition-all"
-                    style={{ width: `${(currentStep / totalSteps) * 100}%` }}
-                  />
+
+                {watchedServiceType ? (
+                  <div className="space-y-2 sm:space-y-3">
+                    <div className="flex justify-between py-2 text-sm sm:text-base">
+                      <span className="text-sm">{t('quote.estimate.service')}</span>
+                      <span className="font-bold">
+                        {watchedServiceType === 'custom' ? t('quote.service.custom.price') : `${servicePrices[watchedServiceType]}€`}
+                      </span>
+                    </div>
+
+                    {watchedOptions.map((opt) => (
+                      <div key={opt} className="flex justify-between py-2 text-sm sm:text-base">
+                        <span className="text-sm">{t(`quote.option.${opt}`)}</span>
+                        <span className="text-primary-600">+{optionPrices[opt as keyof typeof optionPrices]}€</span>
+                      </div>
+                    ))}
+
+                    {watchedServiceType !== 'custom' && estimatedPrice > 0 && (
+                      <div className="pt-2 sm:pt-3 border-t">
+                        <div className="flex justify-between font-bold">
+                          <span className="text-sm sm:text-base">{t('quote.estimate.total')}</span>
+                          <span className="text-xl sm:text-2xl text-primary-600">{estimatedPrice}€</span>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                ) : (
+                  <p className="text-xs sm:text-sm text-gray-500 text-center py-4">
+                    {t('quote.estimate.select')}
+                  </p>
+                )}
+
+                <div className="mt-4 sm:mt-6 pt-3 sm:pt-4 border-t">
+                  <div className="flex justify-between text-xs sm:text-sm mb-2">
+                    <span>{t('quote.progress')}</span>
+                    <span>{Math.round((currentStep / totalSteps) * 100)}%</span>
+                  </div>
+                  <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
+                    <div 
+                      className="bg-primary-600 h-2 rounded-full transition-all duration-300"
+                      style={{ width: `${(currentStep / totalSteps) * 100}%` }}
+                    />
+                  </div>
                 </div>
               </div>
             </div>
           </div>
-        </div>
         </form>
 
       </div>

@@ -246,50 +246,82 @@ const translations = {
     'contact.why.support': '• Dedicated support throughout the project',
     'contact.why.pricing': '• Transparent pricing and timelines',
     
-    // Quote
+///////////////////////////////////////////////////////////////////////
+    // Quote Page
     'quote.title': 'Request a Quote',
-    'quote.subtitle': 'Tell us about your project and get an instant estimate. We\'ll provide a detailed quote within 24 hours.',
-    'quote.service': 'Service Type',
-    'quote.service.placeholder': 'Select a service...',
-    'quote.service.showcase': 'Showcase Website',
-    'quote.service.ecommerce': 'E-commerce Platform',
-    'quote.service.automation': 'Automation Bot',
-    'quote.service.ai': 'AI Integration',
-    'quote.options': 'Additional Options',
-    'quote.option.design': 'Custom Design',
-    'quote.option.maintenance': 'Maintenance Package',
-    'quote.option.support': 'Priority Support',
-    'quote.estimate': 'Estimated Price',
+    'quote.subtitle': 'Get an instant estimate',
+    
+    // Pack pre-selected message
+    'quote.pack.preselected': 'Pack <strong>{packName}</strong> pre-selected',
+    
+    // Steps
+    'quote.step1.title': 'Choose your pack',
+    'quote.step1.subtitle': 'Select the pack that matches your needs',
+    'quote.step2.title': 'Additional options',
+    'quote.step2.subtitle': 'Customize your project',
+    'quote.step3.title': 'Project details',
+    'quote.step3.subtitle': 'Tell us about your needs',
+    'quote.step4.title': 'Your contact information',
+    'quote.step4.subtitle': 'To contact you quickly',
+    
+    // Service types
+    'quote.service.label': 'Service type',
+    'quote.service.starter': 'Starter',
+    'quote.service.starter.desc': 'Professional showcase website',
+    'quote.service.business': 'Business',
+    'quote.service.business.desc': 'Complete online store',
+    'quote.service.business.popular': 'POPULAR',
+    'quote.service.premium': 'Premium',
+    'quote.service.premium.desc': 'High-end solution',
+    'quote.service.ai': 'AI',
+    'quote.service.ai.desc': 'Custom AI solutions',
+    'quote.service.custom': 'Custom',
+    'quote.service.custom.desc': 'Tailor-made solution',
+    'quote.service.custom.price': 'Quote-based',
+    'quote.service.required': 'Please select a service',
+    
+    // Options
+    'quote.options.label': 'Additional options (Optional)',
+    'quote.option.design': 'Custom design',
+    'quote.option.design.desc': 'Custom design and branding',
+    'quote.option.maintenance': 'Maintenance',
+    'quote.option.maintenance.desc': 'Monthly maintenance included',
+    'quote.option.support': 'Priority support',
+    'quote.option.support.desc': 'Priority technical support',
+    
+    // Project details
+    'quote.details.label': 'Project details (Optional)',
+    'quote.details.placeholder': 'Describe your project...',
+    'quote.summary.title': 'Summary',
+    'quote.summary.service': 'Service',
+    'quote.summary.total': 'Total',
+    
+    // Contact form
+    'quote.name.label': 'Full name *',
+    'quote.name.placeholder': 'John Doe',
+    'quote.name.required': 'Name is required',
+    'quote.email.label': 'Email *',
+    'quote.email.placeholder': 'john@example.com',
+    'quote.email.required': 'Email is required',
+    'quote.email.invalid': 'Invalid email',
+    
+    // Navigation
+    'quote.button.previous': 'Previous',
+    'quote.button.next': 'Next',
+    'quote.button.submit': 'Send',
+    'quote.button.submitting': 'Sending...',
+    'quote.step.progress': 'Step {current} of {total}',
+    
+    // Estimation sidebar
+    'quote.estimate': 'Estimate',
+    'quote.estimate.service': 'Service',
     'quote.estimate.total': 'Total',
-    'quote.estimate.disclaimer': '*This is an estimated price. Final quote may vary based on specific requirements.',
-    'quote.estimate.included': 'What\'s Included:',
-    'quote.estimate.included.design': '• Professional design & development',
-    'quote.estimate.included.responsive': '• Responsive mobile-friendly layout',
-    'quote.estimate.included.seo': '• SEO optimization',
-    'quote.estimate.included.warranty': '• 3 months warranty',
-    'quote.submit': 'Request Quote',
-    'quote.success': 'Quote request submitted successfully!',
-    'quote.details': 'Additional Details',
-    'quote.details.placeholder': 'Tell us more about your project requirements...',
-
-    'quote.step.personal': 'Personal Information',
-    'quote.step.service': 'Service Type', 
-    'quote.step.options': 'Additional Options',
-    'quote.step.details': 'Project Details',
+    'quote.estimate.select': 'Select a pack',
     'quote.progress': 'Progress',
-    'quote.summary': 'Project Summary',
-    'quote.estimated.total': 'Estimated Total',
-    'quote.step.of': 'Step {current} of {total}',
-
-    // Quote Steps
-    'quote.step1.title': 'Personal Information',
-    'quote.step1.subtitle': 'Tell us who you are',
-    'quote.step2.title': 'Service Type',
-    'quote.step2.subtitle': 'Choose the service that suits you',
-    'quote.step3.title': 'Additional Options',
-    'quote.step3.subtitle': 'Customize your project',
-    'quote.step4.title': 'Project Details',
-    'quote.step4.subtitle': 'Tell us about your vision',
+    
+    // Success/Error messages
+    'quote.success': '🎉 Your quote request has been sent successfully!',
+    'quote.error': 'Error sending the request',
     
     // Booking
     'booking.title': 'Book a Meeting',
@@ -1047,51 +1079,85 @@ const translations = {
     'contact.why.support': '• Support dédié tout au long du projet',
     'contact.why.pricing': '• Tarification et délais transparents',
     
-///////////////////////////////////////////////////
-    // Quote
-    'quote.title': 'Demander un Devis',
-    'quote.subtitle': 'Parlez-nous de votre projet et obtenez une estimation instantanée. Nous fournirons un devis détaillé sous 24 heures.',
-    'quote.service': 'Type de Service',
-    'quote.service.placeholder': 'Sélectionnez un service...',
-    'quote.service.showcase': 'Site Vitrine',
-    'quote.service.ecommerce': 'Plateforme E-commerce',
-    'quote.service.automation': 'Bot d\'Automatisation',
-    'quote.service.ai': 'Intégration IA',
-    'quote.options': 'Options Additionnelles',
-    'quote.option.design': 'Design Personnalisé',
-    'quote.option.maintenance': 'Package Maintenance',
-    'quote.option.support': 'Support Prioritaire',
-    'quote.estimate': 'Prix Estimé',
+//////////////////////////////////////////////////////////////////////////////////////////////////////
+    // Quote Page
+    'quote.title': 'Demande de devis',
+    'quote.subtitle': 'Obtenez une estimation instantanée',
+    
+    // Pack pre-selected message
+    'quote.pack.preselected': 'Pack <strong>{packName}</strong> pré-sélectionné',
+    
+    // Steps
+    'quote.step1.title': 'Choisissez votre pack',
+    'quote.step1.subtitle': 'Sélectionnez le pack qui correspond à vos besoins',
+    'quote.step2.title': 'Options supplémentaires',
+    'quote.step2.subtitle': 'Personnalisez votre projet',
+    'quote.step3.title': 'Détails du projet',
+    'quote.step3.subtitle': 'Parlez-nous de vos besoins',
+    'quote.step4.title': 'Vos coordonnées',
+    'quote.step4.subtitle': 'Pour vous contacter rapidement',
+    
+    // Service types
+    'quote.service.label': 'Type de service',
+    'quote.service.starter': 'Starter',
+    'quote.service.starter.desc': 'Site vitrine professionnel',
+    'quote.service.business': 'Business',
+    'quote.service.business.desc': 'Boutique en ligne complète',
+    'quote.service.business.popular': 'POPULAIRE',
+    'quote.service.premium': 'Premium',
+    'quote.service.premium.desc': 'Solution haut de gamme',
+    'quote.service.ai': 'IA',
+    'quote.service.ai.desc': 'Solutions IA personnalisées',
+    'quote.service.custom': 'Personnalisé',
+    'quote.service.custom.desc': 'Solution sur mesure',
+    'quote.service.custom.price': 'Sur devis',
+    'quote.service.required': 'Veuillez sélectionner un service',
+    
+    // Options
+    'quote.options.label': 'Options supplémentaires (Optionnel)',
+    'quote.option.design': 'Design personnalisé',
+    'quote.option.design.desc': 'Design personnalisé et branding',
+    'quote.option.maintenance': 'Maintenance',
+    'quote.option.maintenance.desc': 'Maintenance mensuelle incluse',
+    'quote.option.support': 'Support prioritaire',
+    'quote.option.support.desc': 'Support technique prioritaire',
+    
+    // Project details
+    'quote.details.label': 'Détails du projet (Optionnel)',
+    'quote.details.placeholder': 'Décrivez votre projet...',
+    'quote.summary.title': 'Résumé',
+    'quote.summary.service': 'Service',
+    'quote.summary.total': 'Total',
+    
+    // Contact form
+    'quote.name.label': 'Nom complet *',
+    'quote.name.placeholder': 'John Doe',
+    'quote.name.required': 'Le nom est requis',
+    'quote.email.label': 'Email *',
+    'quote.email.placeholder': 'john@example.com',
+    'quote.email.required': "L'email est requis",
+    'quote.email.invalid': 'Email invalide',
+    
+    // Navigation
+    'quote.button.previous': 'Précédent',
+    'quote.button.next': 'Suivant',
+    'quote.button.submit': 'Envoyer',
+    'quote.button.submitting': 'Envoi...',
+    'quote.step.progress': 'Étape {current} sur {total}',
+    
+    // Estimation sidebar
+    'quote.estimate': 'Estimation',
+    'quote.estimate.service': 'Service',
     'quote.estimate.total': 'Total',
-    'quote.estimate.disclaimer': '*Ceci est un prix estimé. Le devis final peut varier selon les exigences spécifiques.',
-    'quote.estimate.included': 'Ce qui est Inclus :',
-    'quote.estimate.included.design': '• Design et développement professionnel',
-    'quote.estimate.included.responsive': '• Interface responsive adaptée mobile',
-    'quote.estimate.included.seo': '• Optimisation SEO',
-    'quote.estimate.included.warranty': '• 3 mois de garantie',
-    'quote.submit': 'Demander un Devis',
-    'quote.success': 'Demande de devis soumise avec succès !',
-    'quote.details': 'Détails Supplémentaires',
-    'quote.details.placeholder': 'Parlez-nous davantage des exigences de votre projet...',
-
-    'quote.step.personal': 'Informations personnelles',
-    'quote.step.service': 'Type de service',
-    'quote.step.options': 'Options supplémentaires', 
-    'quote.step.details': 'Détails du projet',
+    'quote.estimate.select': 'Sélectionnez un pack',
     'quote.progress': 'Progression',
-    'quote.summary': 'Résumé du projet',
-    'quote.estimated.total': 'Total estimé',
-    'quote.step.of': 'Étape {current} sur {total}',
+    
+    // Success/Error messages
+    'quote.success': '🎉 Votre demande de devis a été envoyée avec succès !',
+    'quote.error': "Erreur lors de l'envoi de la demande",
 
-    // Quote Steps
-    'quote.step1.title': 'Informations personnelles',
-    'quote.step1.subtitle': 'Dites-nous qui vous êtes',
-    'quote.step2.title': 'Type de service',
-    'quote.step2.subtitle': 'Choisissez le service qui vous convient',
-    'quote.step3.title': 'Options supplémentaires',
-    'quote.step3.subtitle': 'Personnalisez votre projet',
-    'quote.step4.title': 'Détails du projet',
-    'quote.step4.subtitle': 'Parlez-nous de votre vision',
+//////////////////////////////////////////////////////////////////////////////////////////////////////
+
     
     // Booking
     'booking.title': 'Réserver un Rendez-vous',

@@ -452,7 +452,7 @@ export class QuoteService {
                         </li>
                         <li>
                             <span class="contact-icon">📞</span>
-                            ${process.env.CONTACT_PHONE || '+33 1 23 45 67 89'}
+                            ${process.env.CONTACT_PHONE || ''}
                         </li>
                         <li>
                             <span class="contact-icon">📍</span>

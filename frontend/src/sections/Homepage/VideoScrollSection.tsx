@@ -95,7 +95,7 @@ export const VideoScrollSection = () => {
       <div className="absolute inset-0 flex items-center justify-center overflow-hidden">
         <video
           ref={videoRef}
-          src="/assets/ampouleExplose.mp4"
+          src="/assets/ampouleCompress.m4v"
           poster="/assets/ampoulePoster.png"
           className="w-full h-full object-cover"
           muted

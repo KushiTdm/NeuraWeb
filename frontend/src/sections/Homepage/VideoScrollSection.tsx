@@ -95,8 +95,7 @@ export const VideoScrollSection = () => {
       <div className="absolute inset-0 flex items-center justify-center overflow-hidden">
         <video
           ref={videoRef}
-          src="/assets/ampouleCompress.m4v"
-          poster="/assets/ampoulePoster.webp"
+          src="/assets/Idee.webm"
           className="w-full h-full object-cover"
           muted
           autoPlay

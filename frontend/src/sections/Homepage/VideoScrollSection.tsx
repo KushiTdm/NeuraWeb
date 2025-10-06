@@ -96,12 +96,29 @@ export const VideoScrollSection = () => {
         <video
           ref={videoRef}
           src="/assets/ampouleExplose.mp4"
+          poster="/assets/ampoulePoster.png"
           className="w-full h-full object-cover"
           muted
           autoPlay
           playsInline
           preload="auto"
+        >
+          {/* Subtitles FR */}
+        <track
+          kind="captions"
+          src="/assets/ampouleExplose_fr.vtt"
+          srcLang="fr"
+          label="Français"
         />
+
+        {/* Subtitles EN */}
+        <track
+          kind="captions"
+          src="/assets/ampouleExplose_en.vtt"
+          srcLang="en"
+          label="English"
+        />
+        </video>
       </div>
 
       <div

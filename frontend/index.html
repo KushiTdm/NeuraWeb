@@ -6,9 +6,20 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>NeuraWeb - Professional Web Development & AI Integration</title>
     <meta name="description" content="Professional web development, automation, and AI integration services. Create stunning websites and intelligent solutions for your business." />
+    
+    <!-- Optimisation Google Fonts : preconnect + DNS-prefetch -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="dns-prefetch" href="https://fonts.googleapis.com">
+    
+    <!-- Preload de la police principale pour éviter FOIT/FOUT -->
+    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap"></noscript>
+    
+    <!-- Fallback pour le chargement asynchrone -->
+    <script>
+      !function(e){"use strict";var t=function(t,n,o){var i,r=e.document,a=r.createElement("link");if(n)i=n;else{var d=(r.body||r.getElementsByTagName("head")[0]).childNodes;i=d[d.length-1]}var l=r.styleSheets;a.rel="stylesheet",a.href=t,a.media="only x",function e(t){if(r.body)return t();setTimeout(function(){e(t)})}(function(){i.parentNode.insertBefore(a,n?i:i.nextSibling)});var s=function(e){for(var t=a.href,n=l.length;n--;)if(l[n].href===t)return e();setTimeout(function(){s(e)})};return a.addEventListener&&a.addEventListener("load",o),a.onloadcssdefined=s,s(o),a};"undefined"!=typeof exports?exports.loadCSS=t:e.loadCSS=t}("undefined"!=typeof global?global:this);
+    </script>
   </head>
   <body>
     <div id="root"></div>

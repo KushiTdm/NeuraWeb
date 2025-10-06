@@ -7,7 +7,7 @@ const Footer: React.FC = () => {
   const { t } = useLanguage();
 
   return (
-    <footer className="bg-black/30 backdrop-blur-sm border-t border-white/20">
+    <footer className="bg-gray-900/95 backdrop-blur-md border-t border-white/30 shadow-2xl">
       <style>{`
         /* Styles responsifs pour le footer */
         @media (max-width: 768px) {
@@ -65,7 +65,7 @@ const Footer: React.FC = () => {
 
           {/* Services */}
           <div className="footer-section text-center">
-            <h4 className="text-white font-medium mb-3">Services</h4>
+            <h3 className="text-white font-medium mb-3 text-sm">Services</h3>
             <ul className="space-y-2 text-white text-xs">
               <li>{t('services.web.title')}</li>
               <li>{t('services.automation.title')}</li>
@@ -75,7 +75,7 @@ const Footer: React.FC = () => {
 
           {/* Quick Links */}
           <div className="footer-section text-center sm:col-span-2 lg:col-span-1 lg:text-right">
-            <h4 className="text-white font-medium mb-3">{t('footer.links.title')}</h4>
+            <h3 className="text-white font-medium mb-3 text-sm">{t('footer.links.title')}</h3>
             <ul className="space-y-2 text-white text-xs">
               <li>
                 <Link to="/contact" className="hover:text-gray-200 transition-colors">

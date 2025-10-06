@@ -276,13 +276,19 @@ export const PortfolioSection: React.FC = () => {
                 setCurrentIndex(index);
                 setIsAutoPlay(false);
               }}
-              className={`h-1.5 md:h-2 rounded-full transition-all duration-300 ${
+              className={`h-2 md:h-3 rounded-full transition-all duration-300 min-w-[44px] min-h-[44px] flex items-center justify-center ${
                 index === currentIndex 
-                  ? 'w-6 md:w-8 bg-gradient-to-r from-blue-600 to-purple-600 dark:from-blue-400 dark:to-purple-400' 
-                  : 'w-1.5 md:w-2 bg-gray-300 dark:bg-white/30 hover:bg-gray-400 dark:hover:bg-white/50'
+                  ? 'w-8 md:w-10' 
+                  : 'w-2 md:w-3'
               }`}
               aria-label={t('portfolio.nav.goto') + ` ${index + 1}`}
-            />
+            >
+              <span className={`block h-2 md:h-3 rounded-full transition-all duration-300 ${
+                index === currentIndex 
+                  ? 'w-8 md:w-10 bg-gradient-to-r from-blue-600 to-purple-600 dark:from-blue-400 dark:to-purple-400' 
+                  : 'w-2 md:w-3 bg-gray-300 dark:bg-white/30'
+              }`} />
+            </button>
           ))}
         </div>
       </div>

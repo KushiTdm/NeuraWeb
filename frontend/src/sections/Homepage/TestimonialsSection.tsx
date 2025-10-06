@@ -102,13 +102,19 @@ export const TestimonialsSection = () => {
               <button
                 key={index}
                 onClick={() => setCurrentTestimonial(index)}
-                className={`transition-all duration-300 rounded-full ${
+                className={`transition-all duration-300 rounded-full min-w-[44px] min-h-[44px] flex items-center justify-center ${
                   index === currentTestimonial 
-                    ? 'bg-gradient-to-r from-blue-600 to-purple-600 w-10 h-3 sm:w-12 sm:h-4' 
-                    : 'bg-gray-300 dark:bg-gray-600 w-3 h-3 sm:w-4 sm:h-4 hover:bg-gray-400'
+                    ? 'bg-gradient-to-r from-blue-600 to-purple-600' 
+                    : 'bg-gray-300 dark:bg-gray-600 hover:bg-gray-400'
                 }`}
                 aria-label={`${t('testimonials.viewTestimonial')} ${index + 1}`}
-              />
+              >
+                <span className={`block rounded-full transition-all duration-300 ${
+                  index === currentTestimonial 
+                    ? 'w-10 h-3 sm:w-12 sm:h-4' 
+                    : 'w-3 h-3 sm:w-4 sm:h-4'
+                }`} style={{ backgroundColor: index === currentTestimonial ? 'transparent' : 'currentColor' }} />
+              </button>
             ))}
           </div>
         </div>

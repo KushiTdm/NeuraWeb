@@ -7,7 +7,7 @@ const Footer: React.FC = () => {
   const { t } = useLanguage();
 
   return (
-    <footer className="bg-black/20 backdrop-blur-sm border-t border-white/20">
+    <footer className="bg-black/30 backdrop-blur-sm border-t border-white/20">
       <style>{`
         /* Styles responsifs pour le footer */
         @media (max-width: 768px) {
@@ -55,10 +55,10 @@ const Footer: React.FC = () => {
                 <span className="text-white font-bold text-xs">NW</span>
               </div>
             </Link>
-            <p className="text-white/80 text-xs mb-2 max-w-sm mx-auto sm:mx-0">
+            <p className="text-white text-xs mb-2 max-w-sm mx-auto sm:mx-0">
               {t('footer.company.description')}
             </p>
-            <div className="text-white/70 text-xs">
+            <div className="text-gray-200 text-xs">
               <div className="mb-1">contact@neuraweb.tech</div>
             </div>
           </div>
@@ -66,7 +66,7 @@ const Footer: React.FC = () => {
           {/* Services */}
           <div className="footer-section text-center">
             <h4 className="text-white font-medium mb-3">Services</h4>
-            <ul className="space-y-2 text-white/80 text-xs">
+            <ul className="space-y-2 text-white text-xs">
               <li>{t('services.web.title')}</li>
               <li>{t('services.automation.title')}</li>
               <li>{t('services.ai.title')}</li>
@@ -76,19 +76,19 @@ const Footer: React.FC = () => {
           {/* Quick Links */}
           <div className="footer-section text-center sm:col-span-2 lg:col-span-1 lg:text-right">
             <h4 className="text-white font-medium mb-3">{t('footer.links.title')}</h4>
-            <ul className="space-y-2 text-white/80 text-xs">
+            <ul className="space-y-2 text-white text-xs">
               <li>
-                <Link to="/contact" className="hover:text-white transition-colors">
+                <Link to="/contact" className="hover:text-gray-200 transition-colors">
                   {t('nav.contact')}
                 </Link>
               </li>
               <li>
-                <Link to="/quote" className="hover:text-white transition-colors">
+                <Link to="/quote" className="hover:text-gray-200 transition-colors">
                   {t('nav.quote')}
                 </Link>
               </li>
               <li>
-                <Link to="/booking" className="hover:text-white transition-colors">
+                <Link to="/booking" className="hover:text-gray-200 transition-colors">
                   {t('nav.booking')}
                 </Link>
               </li>
@@ -96,7 +96,7 @@ const Footer: React.FC = () => {
           </div>
         </div>
 
-        <div className="border-t border-white/20 mt-6 pt-4 text-center text-white/60 text-xs">
+        <div className="border-t border-white/20 mt-6 pt-4 text-center text-gray-200 text-xs">
           <p>{t('footer.copyright')}</p>
         </div>
       </div>

@@ -26,13 +26,13 @@ export default function PricingSection() {
   }> = [
     {
       id: 'starter',
-      icon: '/assets/etoile.png',
+      icon: '/assets/etoile.webp',
       gradient: 'from-blue-500 to-cyan-500',
       featuresCount: 5,
     },
     {
       id: 'business',
-      icon: '/assets/eclair.png',
+      icon: '/assets/eclair.webp',
       gradient: 'from-purple-500 to-pink-500',
       popular: true,
       featuresCount: 6,

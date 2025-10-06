@@ -52,7 +52,7 @@ const Header: React.FC = () => {
           {/* Logo */}
           <Link to="/" className="flex items-center">
             <img 
-              src={isDark ? "/assets/neurawebW.png" : "/assets/neurawebB.png"}
+              src={isDark ? "/assets/neurawebW.webp" : "/assets/neurawebB.webp"}
               alt="NeuraWeb Logo" 
               className="h-14 w-auto object-contain"
               onError={(e) => {

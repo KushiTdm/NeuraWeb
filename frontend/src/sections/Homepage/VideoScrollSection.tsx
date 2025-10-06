@@ -96,7 +96,7 @@ export const VideoScrollSection = () => {
         <video
           ref={videoRef}
           src="/assets/ampouleCompress.m4v"
-          poster="/assets/ampoulePoster.png"
+          poster="/assets/ampoulePoster.webp"
           className="w-full h-full object-cover"
           muted
           autoPlay

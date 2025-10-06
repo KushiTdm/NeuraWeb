@@ -12,21 +12,21 @@ export const TestimonialsSection = () => {
       companyKey: 'testimonials.marie.company',
       textKey: 'testimonials.marie.text',
       rating: 5,
-      avatar: 'assets/dupont.jpg'
+      avatar: 'assets/dupont.webp'
     },
     {
       nameKey: 'testimonials.jean.name',
       companyKey: 'testimonials.jean.company',
       textKey: 'testimonials.jean.text',
       rating: 5,
-      avatar: 'assets/Martin.jpg'
+      avatar: 'assets/Martin.webp'
     },
     {
       nameKey: 'testimonials.sophie.name',
       companyKey: 'testimonials.sophie.company',
       textKey: 'testimonials.sophie.text',
       rating: 5,
-      avatar: 'assets/chen.jpg'
+      avatar: 'assets/chen.webp'
     },
   ];
 

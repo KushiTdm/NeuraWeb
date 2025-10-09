@@ -26,8 +26,8 @@ const portfolio: Project[] = [
   {
     titleKey: 'portfolio.ecommerce.title',
     descriptionKey: 'portfolio.ecommerce.description',
-    image: '/assets/ecommerce/ecommerce.png',
-    gif: '/assets/ecommerce/ecommerce.png', 
+    image: '/assets/ecommerce/ecommerceCompressed.png',
+    gif: '/assets/ecommerce/ecommerceCompressed.png', 
     gifType: 'webm',
     technologies: ['React', 'Node.js', 'Stripe'],
     category: 'web',
@@ -37,8 +37,8 @@ const portfolio: Project[] = [
   {
     titleKey: 'portfolio.fitness.title',
     descriptionKey: 'portfolio.fitness.description',
-    image: '/assets/Fit/fit.png',
-    gif: '/assets/Fit/fit.png',
+    image: '/assets/Fit/fitCompressed.png',
+    gif: '/assets/Fit/fitCompressed.png',
     gifType: 'gif',
     technologies: ['React Native', 'Firebase'],
     category: 'mobile',
